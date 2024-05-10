@@ -32,6 +32,8 @@ export const POST = async ({ request, redirect }) => {
       { status: 400 }
     );
   }
+  const detail = await supabase.from("users").insert([{ role:"users",name:null }]).select();
+  console.log(detail.error);
   return new Response("Berhasil", {
     status: 200,
   });

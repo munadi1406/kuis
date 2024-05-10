@@ -1,7 +1,31 @@
 ---
 import Dashboard from "../layouts/Dashboard.astro"
+// import { supabase } from "../lib/supabase";
+
+
+// const { data: { user } } = await supabase.auth.getUser()
+// console.log(user)
+
+
+import { createClient } from '@supabase/supabase-js'
+
+const supabase = createClient(import.meta.env.SUPABASE_URL, import.meta.env.SUPABASE_SERVICE_KEY, {
+  auth: {
+    autoRefreshToken: false,
+    persistSession: false
+  }
+})
+
+// Access auth admin api
+
+const { data: { users }, error } = await supabase.auth.admin.listUsers()
+console.log(users);
 ---
 <Dashboard title="Users">
-
     <div>ini halaman users</div>
+    <div>
+        {users.map((data)=>(
+            <p>{data.email}</p>
+        ))}
+    </div>
 </Dashboard>

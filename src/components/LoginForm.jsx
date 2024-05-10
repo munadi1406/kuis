@@ -19,8 +19,14 @@ const LoginForm = () => {
             console.log("first")
             return auth
         },
-        onSuccess: () => {
+        onSuccess: (data) => {
+            if(data.data.type === "detail"){
+
+                window.location.href = '/detailUsers'
+                return
+            }
             window.location.href = '/dashboard'
+            
         },
         onError: (error) => {
             setMsg(error.response.data.message)
