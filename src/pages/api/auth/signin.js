@@ -37,8 +37,7 @@ export const POST = async ({ request, cookies, redirect }) => {
   .from("users")
   .select("*")
   .eq("id", data.user.id);
-  console.log(checkDetailUsers.data.length)
-  if(!checkDetailUsers.data.name){
+  if(!checkDetailUsers.data[0].name){
     return new Response(
       JSON.stringify({
         message: "Login Berhasil",

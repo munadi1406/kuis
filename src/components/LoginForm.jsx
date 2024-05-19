@@ -26,7 +26,6 @@ const LoginForm = () => {
                 return
             }
             window.location.href = '/dashboard'
-            
         },
         onError: (error) => {
             setMsg(error.response.data.message)

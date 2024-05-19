@@ -1,11 +1,20 @@
 ---
-import Navbar from '../components/Navbar.astro';
+import Navbar from '../components/Navbar.jsx';
 import { ViewTransitions } from 'astro:transitions';
 
 import Font from '../components/Font.astro';
 const { title } = Astro.props;
----
-  <html lang="en">
+import '@/styles/globals.css'
+import { supabase } from "../lib/supabase";
+import axios from 'axios'
+
+const {
+  data: { user },
+} = await supabase.auth.getUser();
+const getRole = await axios.get(`${new URL("/api/user/role", Astro.url)}`)
+
+--- 
+  <html lang="en"> 
 	<head> 
 		<meta charset="UTF-8" />
 		<meta name="description" content="Astro description" />
@@ -18,9 +27,11 @@ const { title } = Astro.props;
 		<ViewTransitions />
 	</head>
 	<body>
-		<Navbar/>
+		<Navbar client:idle data={user} role={getRole.data.role}/>
 		<main class="p-2">
 			<slot />
 		</main>
+		
 	</body>
 </html>
+
