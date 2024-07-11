@@ -33,20 +33,7 @@ export const POST = async ({ request, cookies, redirect }) => {
   cookies.set("sb-refresh-token", refresh_token, {
     path: "/",
   });
-  const checkDetailUsers = await supabase
-  .from("users")
-  .select("*")
-  .eq("id", data.user.id);
-  if(!checkDetailUsers.data[0].name){
-    return new Response(
-      JSON.stringify({
-        message: "Login Berhasil",
-        type:"detail"
-      }),
-      { status: 200 }
-    );
-  }
-
+  
   return new Response(
     JSON.stringify({
       message: "Login Berhasil",

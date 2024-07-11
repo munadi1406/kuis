@@ -1,17 +1,32 @@
 ---
-import Dashboard from "../layouts/Dashboard.astro"
-import { createClient } from '@supabase/supabase-js'
-import UsersData from "./users/UsersData";
+import Dashboard from "../layouts/Dashboard.astro";
+import { createClient } from "@supabase/supabase-js";
+import UsersData from "../components/users/UsersData";
+import CardUser from "@/components/users/CardUser";
 
-const supabase = createClient(import.meta.env.SUPABASE_URL, import.meta.env.SUPABASE_SERVICE_KEY, {
-  auth: {
-    autoRefreshToken: false,
-    persistSession: false
+const supabase = createClient(
+  import.meta.env.SUPABASE_URL,
+  import.meta.env.SUPABASE_SERVICE_KEY,
+  {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false,
+    },
   }
-})
+);
 
-const { data: { users }, error } = await supabase.auth.admin.listUsers()
+const {
+  data: { users },
+  error,
+} = await supabase.auth.admin.listUsers();
 ---
+
 <Dashboard title="Users">
-    <UsersData data={users}/>
-</Dashboard> 
+  <div class="grid grid-cols-4 gap-2">
+    <CardUser title={"Total User"} value={100} />
+    <CardUser title={"Total User Baru"} value={100} />
+  </div>
+  <div class="py-2">
+    <UsersData data={users} client:idle/>
+  </div>
+</Dashboard>

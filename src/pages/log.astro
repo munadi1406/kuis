@@ -1,7 +1,20 @@
 ---
+import CardLog from "@/components/log/CardLog"
 import Dashboard from "../layouts/Dashboard.astro"
----
-<Dashboard title="Users">
+import LogData from '../components/log/LogData'
 
-    <div>ini halaman log</div>
+
+---
+<Dashboard title="Log">
+    <div class="grid grid-cols-4 gap-2">
+
+        <CardLog title={"Total Aktifitas"} value={100}/>
+        <CardLog title={"Total Aktifitas Dalam Seminggu"} value={100}/>
+        <CardLog title={"Total Aktifitas Dalam Sebulan"} value={100}/>
+        <CardLog title={"Total Aktifitas Dalam Setahun"} value={100}/>
+        
+    </div>
+    <div class="py-2">
+        <LogData />
+    </div>
 </Dashboard>

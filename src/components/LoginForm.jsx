@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import {useEffect, useState } from 'react'
 import WithQuery from '../utils/WithQuery'
 import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
@@ -16,21 +16,18 @@ const LoginForm = () => {
         mutationFn: async (event) => {
             event.preventDefault()
             const auth = await axios.post(`api/auth/signin`, data);
-            console.log("first")
             return auth
         },
         onSuccess: (data) => {
-            if(data.data.type === "detail"){
-
-                window.location.href = '/detailUsers'
-                return
-            }
             window.location.href = '/dashboard'
         },
         onError: (error) => {
             setMsg(error.response.data.message)
         }
     })
+
+
+ 
     return (
         <div className="min-h-screen bg-gray-100 flex flex-col justify-center sm:py-12">
             <div className="p-10 xs:p-0 mx-auto md:w-full md:max-w-md">
@@ -66,7 +63,7 @@ const LoginForm = () => {
                             type="submit"
                            
                             className="transition duration-200 bg-blue-500 hover:bg-blue-600 focus:bg-blue-700 focus:shadow-sm focus:ring-4 focus:ring-blue-500 focus:ring-opacity-50 text-white w-full py-2.5 rounded-lg text-sm shadow-sm hover:shadow-md font-semibold text-center inline-block">
-                            <span className="inline-block mr-2 font-poppins">Login</span>
+                            <span className="inline-block mr-2 font-poppins">{mutation.isPending ? "Loading..." : "Login"}</span>
                         </button>
                     </form>
                 </div>

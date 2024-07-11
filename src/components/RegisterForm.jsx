@@ -25,7 +25,9 @@ const RegisterForm = () => {
       setMsg(error.response.data.message)
     }
   })
-
+useEffect(()=>{
+  console.log(mutation.isPending)
+},[mutation])
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col justify-center sm:py-12">
       <div className="p-10 xs:p-0 mx-auto md:w-full md:max-w-md">
@@ -46,10 +48,19 @@ const RegisterForm = () => {
           <form className="px-5 py-7" onSubmit={mutation.mutate} method='post'>
             <label className="text-sm text-gray-600 pb-1 block font-poppins">Email</label>
             <input
-              type="text"
+              type="email"
               name="email"
               onChange={handleChange}
               className="border font-poppins focus:outline-none rounded-lg px-3 py-2 mt-1 mb-5 text-sm w-full"
+              required
+            />
+            <label className="text-sm text-gray-600 pb-1 block font-poppins">Username</label>
+            <input
+              type="text"
+              name="username"
+              onChange={handleChange}
+              className="border font-poppins focus:outline-none rounded-lg px-3 py-2 mt-1 mb-5 text-sm w-full"
+              required
             />
             <label className="font-poppins text-sm text-gray-600 pb-1 block">Password</label>
             <input
@@ -57,6 +68,8 @@ const RegisterForm = () => {
               name="password"
               onChange={handleChange}
               className="border font-poppins focus:outline-none rounded-lg px-3 p-2 mt-1 mb-5 text-sm w-full"
+              required
+              minLength="6"
             />
             <label className="font-poppins text-sm text-gray-600 pb-1 block">Konfirmasi Password</label>
             <input
@@ -65,6 +78,8 @@ const RegisterForm = () => {
               onChange={handleChange}
               placeholder="Silhkan Ketik Password Sekali Lagi"
               className="border font-poppins focus:outline-none rounded-lg px-3 p-2 mt-1 mb-5 text-sm w-full"
+              required
+              minLength="6"
             />
             <div className="pb-2 flex items-end justify-end w-full">
               <a
@@ -74,7 +89,7 @@ const RegisterForm = () => {
             <button
               type="submit"
               className="transition duration-200 bg-blue-500 hover:bg-blue-600 focus:bg-blue-700 focus:shadow-sm focus:ring-4 focus:ring-blue-500 focus:ring-opacity-50 text-white w-full py-2.5 rounded-lg text-sm shadow-sm hover:shadow-md font-semibold text-center inline-block">
-              <span className="inline-block mr-2">Register</span>
+              <span className="inline-block mr-2">{mutation.isPending ? 'Loading' : 'Register'}</span>
 
             </button>
           </form>

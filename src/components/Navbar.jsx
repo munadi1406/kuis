@@ -70,7 +70,9 @@ export default function Navbar({ data, role }) {
                 {data.email}
               </DropdownMenuTrigger>
               <DropdownMenuContent>
-                <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                <a href="/profile">
+                  <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                </a>
                 <DropdownMenuSeparator />
                 <a href="/api/auth/signout">
                   <DropdownMenuItem>Logout</DropdownMenuItem>

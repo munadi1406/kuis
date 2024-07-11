@@ -1,7 +1,7 @@
 ---
 import DashboardLayout from "@/layouts/Dashboard.astro";
 import { supabase } from "../lib/supabase";
-import { Button } from "@/components/ui/button"
+import Cards from "@/components/Card";
 const { cookies, redirect } = Astro;
 
 const accessToken = cookies.get("sb-access-token");
@@ -11,7 +11,7 @@ if (!accessToken || !refreshToken) {
   return redirect("/signin");
 }
 
-const { data, error } = await supabase.auth.setSession({
+const { error } = await supabase.auth.setSession({
   refresh_token: refreshToken.value,
   access_token: accessToken.value,
 });
@@ -29,9 +29,25 @@ if (error) {
 
 
 
-const email = data.user?.email;
+
+const cardData = [
+  { id: 1, title: "Card 1", date: "2024-01-01", skor: 85 },
+  { id: 2, title: "Card 2", date: "2024-01-02", skor: 90 },
+  { id: 3, title: "Card 3", date: "2024-01-03", skor: 75 },
+  { id: 4, title: "Card 4", date: "2024-01-04", skor: 88 },
+  { id: 5, title: "Card 5", date: "2024-01-05", skor: 92 },
+  { id: 6, title: "Card 6", date: "2024-01-06", skor: 80 },
+  { id: 7, title: "Card 7", date: "2024-01-07", skor: 85 },
+  { id: 8, title: "Card 8", date: "2024-01-08", skor: 87 },
+  { id: 9, title: "Card 9", date: "2024-01-09", skor: 90 },
+  { id: 10, title: "Card 10", date: "2024-01-10", skor: 95 }
+];
 ---
 
 <DashboardLayout title="dashboard" >
-  <h1>Welcome {email}</h1>
+  <div class="grid grid-cols-4 gap-2">
+   {cardData.map((e)=>(
+    <Cards title={e.title} skor={e.skor} id={e.id} date={e.date}/>
+   ))}
+  </div>
 </DashboardLayout>
