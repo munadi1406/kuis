@@ -15,7 +15,8 @@ const {
   data: { user },
 } = await supabase.auth.getUser();
 const getRole = await axios.get(`${new URL("/api/user/role", Astro.url)}`)
-
+console.log({url:new URL("/api/user/role", Astro.url)})
+console.log(Astro.url)
 --- 
   <html lang="en"> 
 	<head> 
