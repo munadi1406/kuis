@@ -85,36 +85,36 @@ export default function Navbar({ data, role,path }) {
         </div>
       </div>
       <div className="md:hidden block bg-white z-10 shadow-md border-t-4 border-blue-600 fixed bottom-0 py-2 px-3 w-full flex justify-between items center gap-2">
-        <a  href="/dashboard" className={buttonVariants({ variant: "outline",className:"px-2 w-1/4 block flex justify-center items-center flex-col h-full" })}>
+        <a  href="/dashboard" className={buttonVariants({ variant: "outline",className:"px-2 w-1/5 block flex justify-center items-center flex-col h-full" })}>
           <div className="flex justify-between items-center flex-col">
-            <span className="material-symbols-outlined sm:text-3xl text-2xl text-gray-900">
+            <span className="material-symbols-outlined  text-2xl text-gray-900">
               dashboard 
             </span>
             <h3 className="text-xs text-gray-600 font-semibold">Dashboard</h3>
           </div>
         </a>
         {role !== "users" && (
-           <a  href="/users" className={buttonVariants({ variant: "outline",className:"px-2 w-1/4 block flex justify-center items-center flex-col h-full" })}>
+           <a  href="/users" className={buttonVariants({ variant: "outline",className:"px-2 w-1/5 block flex justify-center items-center flex-col h-full" })}>
             <div className="flex justify-center items-center flex-col">
-              <span className="material-symbols-outlined text-3xl text-gray-900">
+              <span className="material-symbols-outlined text-2xl text-gray-900">
                 group
               </span>
               <h3 className="text-xs text-gray-600 font-semibold">users</h3>
             </div>
           </a>
         )}
-         <a  href="/feedback" className={buttonVariants({ variant: "outline",className:"px-2 w-1/4 block flex justify-center items-center flex-col h-full" })}>
+         <a  href="/feedback" className={buttonVariants({ variant: "outline",className:"px-2 w-1/5 block flex justify-center items-center flex-col h-full" })}>
           <div className="flex justify-center items-center flex-col">
-            <span className="material-symbols-outlined text-3xl text-gray-900">
+            <span className="material-symbols-outlined text-2xl text-gray-900">
               feedback
             </span>
             <h3 className="text-xs text-gray-600 font-semibold text-center">Umpan Balik</h3>
           </div>
         </a>
         {role !== "users" && (
-           <a  href="/log" className={buttonVariants({ variant: "outline",className:"px-2 w-1/4 block flex justify-center items-center flex-col h-full" })}>
+           <a  href="/log" className={buttonVariants({ variant: "outline",className:"px-2 w-1/5 block flex justify-center items-center flex-col h-full" })}>
             <div className="flex justify-center items-center flex-col">
-              <span className="material-symbols-outlined text-3xl text-gray-900">
+              <span className="material-symbols-outlined text-2xl text-gray-900">
                 history
               </span>
               <h3 className="text-xs text-gray-600 font-semibold">Log</h3>
@@ -122,9 +122,9 @@ export default function Navbar({ data, role,path }) {
           </a>
         )}
         <DropdownMenu>
-          <DropdownMenuTrigger className="border rounded-md px-2 w-1/4 block flex justify-center items-center flex-col">
+          <DropdownMenuTrigger className="border rounded-md px-2 w-1/5 block flex justify-center items-center flex-col">
             <div className="flex justify-center items-center flex-col">
-              <span className="material-symbols-outlined text-3xl text-gray-900">
+              <span className="material-symbols-outlined text-2xl text-gray-900">
                 Person
               </span>
               <h3 className="text-xs text-gray-600 font-semibold">Profile</h3>

@@ -2,6 +2,8 @@ import { Fragment } from "react";
 // import Input from "../Input";
 // import PropTypes from "prop-types";
 import { Input } from "../ui/input";
+import { Label } from "../ui/label";
+import { Textarea } from "../ui/textarea";
 
 export default function Form({
   soalArray,
@@ -12,17 +14,18 @@ export default function Form({
     <>
       {soalArray.map((e) => (
         <Fragment key={e}>
-          <Input
-            label={`Soal Ke ${e + 1}`}
+          <Label htmlFor={`Soal-Ke-${e + 1}`}>{`Soal Ke ${e + 1}`}</Label>
+          <Textarea id={`Soal-Ke-${e + 1}`}
+            placeholder={`Soal Ke ${e + 1}`}
             key={e}
             row={3}
             name={`soal-${e}`}
             onChange={handleInputChange}
-            required={true}
-          />
+            required={true} />
+          
           {opsiJawabanArray.map((jawabanI) => (
             <div
-              className="grid grid-cols-6 w-full border-l-2 border-blue1"
+              className="grid grid-cols-6 w-full border-l-2 border-blue-600"
               key={jawabanI}
             >
               <div className="col-span-1 flex flex-col justify-center items-center">
@@ -41,13 +44,17 @@ export default function Form({
                   required={true}
                 />
               </div>
-              <Input
-               
-                label={`Jawaban Ke ${jawabanI + 1}`}
-                name={`jawaban${jawabanI}-${e}`}
-                onChange={handleInputChange}
-                required={true}
-              />
+              <div className=" col-span-5 w-full">
+                <Label htmlFor={`Jawaban Ke ${jawabanI + 1}`}>{`Jawaban Ke ${
+                  jawabanI + 1
+                }`}</Label>
+                <Textarea
+                  id={`Jawaban-Ke-${jawabanI + 1}`}
+                  name={`jawaban${jawabanI}-${e}`}
+                  onChange={handleInputChange}
+                  required={true}
+                />
+              </div>
             </div>
           ))}
         </Fragment>

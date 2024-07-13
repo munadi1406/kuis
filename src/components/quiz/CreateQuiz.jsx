@@ -1,4 +1,4 @@
-import { useState, Suspense, lazy } from "react";
+import { useState, Suspense, lazy, useEffect } from "react";
 // import ButtonPure from "../ButtonPure";
 // import DateTimeRange from "../DateTimeRange";
 // import { useMutation } from "react-query";
@@ -9,10 +9,9 @@ import Form from "./FormAnswer";
 import { Label } from "../ui/label";
 import { Button } from "../ui/button";
 
-
 export default function CreateQuiz() {
-  const [jumlahSoal, setJumlahSoal] = useState(0);
-  const [jumlahOpsiJawaban, setJumlahOpsiJawaban] = useState(0);
+  const [jumlahSoal, setJumlahSoal] = useState(1);
+  const [jumlahOpsiJawaban, setJumlahOpsiJawaban] = useState(4);
   const [judul, setJudul] = useState("");
   const [deskripsi, setDeskripsi] = useState("");
   const [duration, setDuration] = useState(0);
@@ -119,13 +118,13 @@ export default function CreateQuiz() {
     });
   };
 
+
   return (
-    <form className="grid grid-cols-6 gap-2" autoComplete="none">
-      <div
-        className="grid grid-cols-1 gap-2 p-2 rounded-md border col-span-4"
+    <form className="grid md:grid-cols-6 grid-cols-1 gap-2" autoComplete="none">
+      <div className="grid grid-cols-1 order-1   gap-2 p-2 rounded-md border col-span-4"
         autoComplete="none"
       >
-        <div className="flex justify-center items-center gap-2 w-full flex-col">
+        <div className="flex  justify-center items-center gap-2 w-full flex-col">
           <div className="w-full gap-1.5">
             <Label htmlFor="namaKuis">Nama Kuis</Label>
             <Input
@@ -140,30 +139,29 @@ export default function CreateQuiz() {
             <Label htmlFor="Deskripsi">Deskripsi Quiz</Label>
             <Textarea id="Deskripsi" />
           </div>
-          <Input
-            type={"number"}
-            label={"Lama Pengerjaan Quiz"}
-            placeholder={"Masukkan Lama Pengerjaan Kuis Dalam Menit..."}
-            required={true}
-            onChange={(e) => setDuration(e.target.value)}
-          />
           <div className="grid grid-cols-2 gap-2 w-full">
             {!isFromFile ? (
               <>
-                <Input
-                  placeholder={"Masukkan Jumlah Soal "}
-                  label={"Jumlah Soal"}
-                  value={jumlahSoal}
-                  onChange={(e) => setJumlahSoal(e.target.value)}
-                  required={true}
-                />
-                <Input
-                  placeholder={"Masukkan Jumlah Opsi Jawaban Di Setiap Soal"}
-                  label={"Jumlah Opsi Jawaban"}
-                  value={jumlahOpsiJawaban}
-                  onChange={(e) => setJumlahOpsiJawaban(e.target.value)}
-                  required={true}
-                />
+                <div className="w-full gap-1.5">
+                  <Label htmlFor="jumlahSoal">Jumlah Soal</Label>
+                  <Input
+                    id="jumlahSoal"
+                    placeholder={"Masukkan Jumlah Soal "}
+                    value={jumlahSoal}
+                    onChange={(e) => setJumlahSoal(e.target.value)}
+                    required={true}
+                  />
+                </div>
+                <div className="w-full gap-1.5">
+                  <Label htmlFor="jumlahSoal">Opsi Jawaban</Label>
+                  <Input
+                    id="opsiJawaban"
+                    placeholder={"Masukkan Jumlah Opsi Jawaban Di Setiap Soal"}
+                    value={jumlahOpsiJawaban}
+                    onChange={(e) => setJumlahOpsiJawaban(e.target.value)}
+                    required={true}
+                  />
+                </div>
               </>
             ) : (
               <div className="col-span-2">
@@ -188,7 +186,7 @@ export default function CreateQuiz() {
         /> */}
         </div>
       </div>
-      <div className="col-span-2 border p-2 rounded-md flex flex-col gap-2 sticky top-0">
+      <div className="col-span-2 md:order-2 order-3 border p-2 rounded-md flex flex-col gap-2 md:sticky top-0">
         <div className="w-full gap-1.5">
           <Label htmlFor="date1">Tanggal Mulai</Label>
           <Input type="date" required={true} id="date1" />
@@ -218,7 +216,7 @@ export default function CreateQuiz() {
           <Input
             type={"number"}
             label={"Lama Pengerjaan Quiz"}
-            placeholder={"Masukkan Lama Pengerjaan Kuis Dalam Menit..."}
+            placeholder={"Masukkan Token Kuis..."}
             required={true}
             onChange={(e) => setDuration(e.target.value)}
             id="tokenKuis"
@@ -226,7 +224,7 @@ export default function CreateQuiz() {
         </div>
         <Button>Simpan</Button>
       </div>
-      <div className="w-full col-span-4 flex flex-col gap-2">
+      <div className="w-full md:order-3 order-2 col-span-4 flex flex-col gap-2 border p-2 rounded-md">
         <Form
           opsiJawabanArray={opsiJawabanArray}
           handleInputChange={handleInputChange}

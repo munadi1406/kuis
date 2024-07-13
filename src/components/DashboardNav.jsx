@@ -54,7 +54,7 @@ const DashboardNav = ({ title }) => {
         <Dialog>
           <DialogTrigger className="flex justify-center items-center ">
             <ButtonLabel
-              text={"Test"}
+              text={"Kerjakan Kuis"}
               trigger={
                 <span className="material-symbols-outlined">commit</span>
               }
