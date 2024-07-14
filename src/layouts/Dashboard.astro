@@ -1,52 +1,82 @@
 ---
-import Navbar from '../components/Navbar.jsx';
+import Navbar from "../components/Navbar.jsx";
 // import { ViewTransitions } from 'astro:transitions';
 
-import Font from '../components/Font.astro';
+import Font from "../components/Font.astro";
 const { title } = Astro.props;
-import '@/styles/globals.css'
+import "@/styles/globals.css";
 import { supabase } from "../lib/supabase";
-import axios from 'axios'
-import DashboardNav from '../components/DashboardNav'
+// import axios from "axios";
+import DashboardNav from "../components/DashboardNav";
 const path = Astro.url.pathname;
 
- 
 const {
   data: { user },
 } = await supabase.auth.getUser();
 const { data: roleData, error: roleError } = await supabase
-      .from("users")
-      .select("role")
-      .eq("id", user.id)
-      .single();
-
+  .from("users")
+  .select("role")
+  .eq("id", user.id)
+  .single();
+import { SEO } from "astro-seo";
 // const getRole = await axios.get(`${new URL("/api/user/role", Astro.url)}`)
 // console.log({url:new URL("/api/user/role", Astro.url)})
 // console.log(Astro.url)
---- 
-  <html lang="en"> 
-	<head> 
-		<meta charset="UTF-8" />
-		<meta name="description" content="Astro description" />
-		<meta name="viewport" content="width=device-width" />
-		<link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-		<meta name="generator" content={Astro.generator} />
-		<title>{title}</title>
-		<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
-		<Font/>
-		<!-- <ViewTransitions /> -->
-	</head>
-	<body>
-		<Navbar client:idle data={user} role={roleData.role} path={path}/>
-		<main class="">
-			<div class="md:p-2 p-0">
-				<DashboardNav title={title} client:idle />
-			</div>
-			<div class="mt-3 md:mb-0 mb-24 p-2">
-				<slot />
-			</div>
-		</main>
-		
-	</body>
-</html>
+---
 
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="description" content="Astro description" />
+    <meta name="viewport" content="width=device-width" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="generator" content={Astro.generator} />
+    <title>{title}</title>
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200"
+    />
+    <Font />
+    <SEO
+      title={title}
+      description="A heavily optimized description full of well-researched keywords."
+      openGraph={{
+        basic: {
+          title,
+          type: "A type.",
+          image:
+            "https://user-images.githubusercontent.com/5182256/131216951-8f74f425-f775-463d-a11b-0e01ad9fce8d.png",
+        },
+      }}
+      twitter={{
+        creator: "@jonasmerlins1",
+      }}
+      extend={{
+        // extending the default link tags
+        link: [{ rel: "icon", href: "/favicon.ico" }],
+        // extending the default meta tags
+        meta: [
+          {
+            name: "twitter:image",
+            content:
+              "https://user-images.githubusercontent.com/5182256/131216951-8f74f425-f775-463d-a11b-0e01ad9fce8d.png",
+          },
+          { name: "twitter:title", content: "Tinker Tailor Soldier Spy" },
+          { name: "twitter:description", content: "Agent" },
+        ],
+      }}
+    />
+    <!-- <ViewTransitions /> -->
+  </head>
+  <body>
+    <Navbar client:idle data={user} role={roleData.role} path={path} />
+    <main class="">
+      <div class="md:p-2 p-0">
+        <DashboardNav title={title} client:idle />
+      </div>
+      <div class="mt-3 md:mb-0 mb-24 p-2">
+        <slot />
+      </div>
+    </main>
+  </body>
+</html>

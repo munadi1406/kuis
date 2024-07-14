@@ -45,7 +45,7 @@ const cardData = [
   <div class="grid lg:grid-cols-4 sm:grid-cols-2 grid-cols-1 gap-2">
     {
       cardData.map((e) => (
-        <Cards title={e.title} skor={e.skor} id={e.id} date={e.date} />
+        <Cards title={e.title} skor={e.skor} id={e.id} date={e.date} client:idle/>
       ))
     }
   </div>

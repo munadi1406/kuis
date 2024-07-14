@@ -1,0 +1,50 @@
+---
+const { kuis } = Astro.params;
+import { Button } from "@/components/ui/button";
+import CardUser from "@/components/users/CardUser";
+import Dashboard from "@/layouts/Dashboard.astro";
+import KuisSubmittion from '../../components/quiz/KuisSubmittion'
+---
+
+<Dashboard title={kuis}>
+  <div class="grid md:grid-cols-6 grid-cols-1 gap-2">
+    <div
+      class="grid grid-cols-1 order-1 gap-2 p-2 rounded-md border col-span-4"
+    >
+      <div>
+        <CardUser title={"Jumlah Kuis Dikerjakan"} value={100} />
+      </div>
+      <div class="flex justify-center items-center gap-2">
+        <Button>Cetak Nilai</Button>
+        <Button>Pertanyaan Paling Sering Salah</Button>
+        <Button>Analisis Kesulitan Soal</Button>
+      </div>
+    </div>
+    <div
+      class="col-span-2 md:order-2 order-3 border p-2 rounded-md flex flex-col gap-2 "
+    >
+      <h2
+        class="scroll-m-20 pb-2 text-3xl font-semibold tracking-tight first:mt-0 flex gap-2 items-center"
+      >
+        {kuis}
+        <div class="bg-green-500 rounded-md text-xs px-2 py-1 text-white">
+          buka
+        </div>
+      </h2>
+      <p class="text-sm">
+        {`${new Date().toLocaleString()}-${new Date().toLocaleString()}`}
+      </p>
+      <p class="leading-7 ">
+        Once upon a time, in a far-off land, there was a very lazy king who
+        spent all day lounging on his throne. One day, his advisors came to him
+        with a problem: the kingdom was running out of money.
+      </p>
+      <Button>Edit Kuis</Button>
+    </div>
+    <div
+      class="w-full md:order-3 order-2 col-span-full flex flex-col gap-2 border p-2 rounded-md"
+    >
+    <KuisSubmittion/>
+    </div>
+  </div>
+</Dashboard>
