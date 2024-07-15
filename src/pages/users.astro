@@ -16,9 +16,9 @@ const supabase = createClient(
 );
 
 const {
-  data: { users },
-  error,
+  data: { users }
 } = await supabase.auth.admin.listUsers();
+
 ---
 
 <Dashboard title="Users">

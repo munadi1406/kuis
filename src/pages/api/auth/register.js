@@ -22,6 +22,12 @@ export const POST = async ({ request, redirect }) => {
   const { error } = await supabase.auth.signUp({
     email,
     password,
+    options:{
+      data:{
+        role:"users",
+        username
+      }
+    }
   });
 
   if (error) {
@@ -32,8 +38,6 @@ export const POST = async ({ request, redirect }) => {
       { status: 400 }
     );
   }
-  const detail = await supabase.from("users").insert([{ role:"users",name:username }]).select();
-  console.log(detail.error);
   return new Response("Berhasil", {
     status: 200,
   });

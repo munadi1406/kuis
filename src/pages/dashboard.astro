@@ -1,31 +1,7 @@
 ---
 import DashboardLayout from "@/layouts/Dashboard.astro";
-import { supabase } from "../lib/supabase";
 import Cards from "@/components/Card";
-const { cookies, redirect } = Astro;
 
-const accessToken = cookies.get("sb-access-token");
-const refreshToken = cookies.get("sb-refresh-token");
-
-if (!accessToken || !refreshToken) {
-  return redirect("/signin");
-}
-
-const { error } = await supabase.auth.setSession({
-  refresh_token: refreshToken.value,
-  access_token: accessToken.value,
-});
-
-if (error) {
-  cookies.delete("sb-access-token", {
-    path: "/",
-  });
-  cookies.delete("sb-refresh-token", {
-    path: "/",
-  });
-
-  return redirect("/");
-}
 
 const cardData = [
   { id: 1, title: "Card 1", date: "2024-01-01", skor: 85 },
