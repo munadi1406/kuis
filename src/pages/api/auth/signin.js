@@ -38,6 +38,6 @@ export const POST = async ({ request, cookies, redirect }) => {
     JSON.stringify({
       message: "Login Berhasil",
     }),
-    { status: 200 }
+    { status: 200,data:{access_token,refresh_token} }
   );
 };
