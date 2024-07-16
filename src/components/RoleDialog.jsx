@@ -43,7 +43,6 @@ const RoleDialog = ({open,id}) => {
  
   return (
     <Dialog open={isOpen}>
-      <DialogTrigger>Open</DialogTrigger>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Deskripsikan Diri Anda</DialogTitle>
