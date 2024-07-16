@@ -10,6 +10,7 @@ import { supabase } from "../lib/supabase";
 import DashboardNav from "../components/DashboardNav";
 import { SEO } from "astro-seo";
 import { Toaster } from "@/components/ui/toaster";
+import RoleDialog from './../components/RoleDialog'
 
 
 
@@ -76,12 +77,13 @@ const {
     <Navbar client:idle data={user} role={user.user_metadata.role} path={path} />
     <main class="">
       <div class="md:p-2 p-0">
-        <DashboardNav title={title} client:idle />
+        <DashboardNav title={title} client:idle role={user.user_metadata.roleUser}/>
       </div>
       <div class="mt-3 md:mb-0 mb-24 p-2">
         <slot />
       </div>
     </main>
+    <RoleDialog client:idle open={user.user_metadata.roleUser ? false : true} id={user.id}/>
     <Toaster client:idle/>
   </body>
 </html>

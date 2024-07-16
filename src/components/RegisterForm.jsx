@@ -15,7 +15,7 @@ const RegisterForm = () => {
   const mutation = useMutation({
     mutationFn: async (event) => {
       event.preventDefault()
-     
+      
       const regist = await axios.post(`api/auth/register`, data);
       return regist
     },
