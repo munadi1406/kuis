@@ -12,23 +12,28 @@ const supabase = createClient(
 );
 
 export const POST = async ({ request, cookies, redirect }) => {
-  const { role,id } = await request.json();
-  
-  if (!role) {
+  const { id, password, confirmPassword } = await request.json();
+ 
+  if (!id || !password || !confirmPassword) {
     return new Response(
       JSON.stringify({
-        message: "Role Tidak Boleh Kosong",
+        message: "Password Tidak Boleh Kosong",
       }),
       { status: 500 }
     );
   }
- 
+  if(password !== confirmPassword){
+    return new Response(
+        JSON.stringify({
+          message: "Password dan Konfirmasi Password Tidak Sama",
+        }),
+        { status: 500 }
+      );
+  }
   const { data: user, error } = await supabase.auth.admin.updateUserById(id, {
-    user_metadata:{
-      role
-    }
+    password: password,
   });
- 
+
 
   if (error) {
     return new Response(
@@ -39,10 +44,17 @@ export const POST = async ({ request, cookies, redirect }) => {
     );
   }
 
+  //   const { access_token, refresh_token } = data.session;
+  //   cookies.set("sb-access-token", access_token, {
+  //     path: "/",
+  //   });
+  //   cookies.set("sb-refresh-token", refresh_token, {
+  //     path: "/",
+  //   });
 
   return new Response(
     JSON.stringify({
-      message: "Role Berhasil Dirubah",
+      message: "Password Berhasil Dirubah",
     }),
     { status: 200 }
   );

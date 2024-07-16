@@ -15,7 +15,7 @@ const RegisterForm = () => {
   const mutation = useMutation({
     mutationFn: async (event) => {
       event.preventDefault()
-      console.log("running")
+     
       const regist = await axios.post(`api/auth/register`, data);
       return regist
     },
@@ -26,9 +26,7 @@ const RegisterForm = () => {
       setMsg(error.response.data.message)
     }
   })
-useEffect(()=>{
-  console.log(mutation.isPending)
-},[mutation])
+
   return (
     <div className="min-h-screen bg-gray-100 flex flex-col justify-center sm:py-12">
       <div className="p-10 xs:p-0 mx-auto w-full md:max-w-md">

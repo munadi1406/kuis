@@ -1,8 +1,9 @@
+import { supabase } from "@/lib/supabase";
 import { defineMiddleware } from "astro:middleware";
-import { supabase } from "./lib/supabase";
+
 // const { cookies, redirect } = Astro;
 // `context` and `next` are automatically typed
-export const onRequest = defineMiddleware(async (context, next) => {
+export const auth = defineMiddleware(async (context, next) => {
   const { request } = context;
   const url = new URL(request.url);
   const protectedPaths = ["/dashboard", "/profile", "/feedback", "/log", "/kuis",'/createKuis','/history','/users'];

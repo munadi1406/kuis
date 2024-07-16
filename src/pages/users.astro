@@ -3,8 +3,9 @@ import Dashboard from "../layouts/Dashboard.astro";
 import { createClient } from "@supabase/supabase-js";
 import UsersData from "../components/users/UsersData";
 import CardUser from "@/components/users/CardUser";
+import { supabase } from "../lib/supabase";
 
-const supabase = createClient(
+const supabaseAD = createClient(
   import.meta.env.SUPABASE_URL,
   import.meta.env.SUPABASE_SERVICE_KEY,
   {
@@ -15,9 +16,10 @@ const supabase = createClient(
   }
 );
 
+
 const {
   data: { users }
-} = await supabase.auth.admin.listUsers();
+} = await supabaseAD.auth.admin.listUsers();
 
 ---
 

@@ -1,8 +1,8 @@
 import { supabase } from "../../../lib/supabase";
 
 export const POST = async ({ request, redirect }) => {
-  const { email, password, passwordConfirm,username } = await request.json();
-  console.log({email,password,passwordConfirm,username})
+  const { email, password, passwordConfirm, username } = await request.json();
+
   if (!email || !password || !passwordConfirm) {
     return new Response(
       JSON.stringify({
@@ -11,12 +11,15 @@ export const POST = async ({ request, redirect }) => {
       { status: 400 }
     );
   }
-  if(password !== passwordConfirm){
-    return new Response(JSON.stringify({
-      message:"Password Dan Konfirmasi Password Tidak Sama"
-    }),{
-      status:400
-    })
+  if (password !== passwordConfirm) {
+    return new Response(
+      JSON.stringify({
+        message: "Password Dan Konfirmasi Password Tidak Sama",
+      }),
+      {
+        status: 400,
+      }
+    );
   }
 
   const { error } = await supabase.auth.signUp({
@@ -25,9 +28,11 @@ export const POST = async ({ request, redirect }) => {
     options:{
       data:{
         role:"users",
-        username
+        username,
+
       }
-    }
+    },
+
   });
 
   if (error) {
