@@ -3,7 +3,6 @@ import Dashboard from "../layouts/Dashboard.astro";
 import { createClient } from "@supabase/supabase-js";
 import UsersData from "../components/users/UsersData";
 import CardUser from "@/components/users/CardUser";
-import { supabase } from "../lib/supabase";
 
 const supabaseAD = createClient(
   import.meta.env.SUPABASE_URL,
@@ -16,19 +15,28 @@ const supabaseAD = createClient(
   }
 );
 
-
 const {
-  data: { users }
+  data: { users },
 } = await supabaseAD.auth.admin.listUsers();
+let totalUsers = 0;
+let newUsersThisWeek = 0;
+totalUsers = users.length;
 
+const oneWeekAgo = new Date();
+oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+
+newUsersThisWeek = users.filter((user) => {
+  const createdAt = new Date(user.created_at);
+  return createdAt >= oneWeekAgo;
+}).length;
 ---
 
 <Dashboard title="Users">
   <div class="grid grid-cols-4 gap-2">
-    <CardUser title={"Total User"} value={100} />
-    <CardUser title={"Total User Baru"} value={100} />
+    <CardUser title={"Total User"} value={totalUsers} />
+    <CardUser title={"Total User Baru"} value={newUsersThisWeek} />
   </div>
   <div class="py-2">
-    <UsersData data={users} client:idle/>
+    <UsersData data={users} client:idle />
   </div>
 </Dashboard>
