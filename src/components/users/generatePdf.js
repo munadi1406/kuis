@@ -1,7 +1,7 @@
 import pdfMake from 'pdfmake/build/pdfmake';
 // import * as pdfFonts from "./vfs_fontes";
 
-const pdfMakeFonts = {
+const pdfMakeFonts = { 
   Roboto: {
     normal:
       "https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.66/fonts/Roboto/Roboto-Regular.ttf",
