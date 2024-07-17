@@ -18,12 +18,12 @@ import {
   DialogTrigger,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, lazy } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import WithQuery from "@/utils/WithQuery";
 import axios from "axios";
 import { DialogDescription } from "@radix-ui/react-dialog";
-import ChangePassword from "./ChangePassword";
+const  ChangePassword = lazy(()=>("./ChangePassword"));
 import {
   Select,
   SelectContent,
@@ -33,51 +33,17 @@ import {
 } from "@/components/ui/select";
 import { toast } from "../ui/use-toast";
 import { createClient } from "@supabase/supabase-js";
-import ReactToPrint  from 'react-to-print'
-import pdfMake from 'pdfmake/build/pdfmake';
-import pdfFonts from 'pdfmake/build/vfs_fonts';
+import {  generatePdf } from "./generatePdf";
+
+
+// Set fonts for pdfmake
+
 
 
 export const supabase = createClient(
   import.meta.env.PUBLIC_SUPABASE_URL,
   import.meta.env.PUBLIC_SUPABASE_ANON_KEY
 );
-
-// Set fonts for pdfmake
-pdfMake.vfs = pdfFonts.pdfMake.vfs;
-
-const generatePDF = (data) => {
-  // Definisi konten dokumen PDF
-  const documentDefinition = {
-    content: [
-      {
-        text: 'Daftar Pengguna', // Judul
-        style: 'header', // Gaya teks header
-        alignment: 'center', 
-      },
-      {
-        table: {
-          headerRows: 1, // Jumlah baris header
-          widths: ['auto', '*', '*', 'auto'], // Lebar kolom
-          body: [
-            ['No', 'Username', 'Email', 'Role'], // Header kolom
-            ...data.map((user, index) => [index + 1, user.username, user.email, user.role]), // Data pengguna
-          ],
-        },
-      },
-    ],
-    styles: {
-      header: {
-        fontSize: 18,
-        bold: true,
-        margin: [0, 0, 0, 10], // Atur margin bawah untuk judul
-      },
-    },
-  };
-
-  // Membuat PDF dan mengunduhnya
-  pdfMake.createPdf(documentDefinition).download('users.pdf');
-};
 
 const LocalTime = ({ isoDateString }) => {
   const [localTimeString, setLocalTimeString] = useState("");
@@ -333,7 +299,7 @@ const UsersData = () => {
                   // content={() => tableRef.current}
                 /> */}
               </div>
-              <Button className="w-max " onClick={() => generatePDF(userData)}>
+              <Button className="w-max " onClick={() => generatePdf(userData)}>
                 Cetak
               </Button>
             </DialogContent>
