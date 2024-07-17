@@ -1,5 +1,5 @@
 import { jsxs, jsx } from 'react/jsx-runtime';
-import { C as Card, d as CardContent, e as CardFooter, b as CardTitle } from './card_l2R7sklx.mjs';
+import { C as Card, d as CardContent, e as CardFooter, b as CardTitle } from './card_BquKlWie.mjs';
 
 const CardUser = ({ title, value }) => {
   return /* @__PURE__ */ jsxs(Card, { className: "flex justify-center items-center flex-col p-2", children: [

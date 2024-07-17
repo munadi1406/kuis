@@ -1,9 +1,9 @@
 import { k as createComponent, l as renderTemplate, p as renderComponent, m as maybeRenderHead } from './astro/server_C9L6Sq8c.mjs';
 import 'kleur/colors';
 import { jsxs, jsx } from 'react/jsx-runtime';
-import { C as Card, d as CardContent, e as CardFooter, b as CardTitle } from './card_l2R7sklx.mjs';
-import { L as Label, I as Input, B as Button, $ as $$Dashboard } from './Dashboard_Bt_cIbUM.mjs';
-import { T as Table, a as TableCaption, b as TableHeader, c as TableRow, d as TableHead, e as TableBody, f as TableCell, g as TableFooter } from './table_RhVWFkcH.mjs';
+import { C as Card, d as CardContent, e as CardFooter, b as CardTitle } from './card_BquKlWie.mjs';
+import { L as Label, I as Input, B as Button, $ as $$Dashboard } from './Dashboard_-s-1A4aB.mjs';
+import { T as Table, a as TableCaption, b as TableHeader, c as TableRow, d as TableHead, e as TableBody, f as TableCell, g as TableFooter } from './table_CzpXkMJU.mjs';
 
 const CardLog = ({ title, value }) => {
   return /* @__PURE__ */ jsxs(Card, { className: "flex justify-center items-center flex-col p-2", children: [

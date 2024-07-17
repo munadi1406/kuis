@@ -23,9 +23,9 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import WithQuery from "@/utils/WithQuery";
 import axios from "axios";
 import { DialogDescription } from "@radix-ui/react-dialog";
-const  ChangePassword = lazy(()=>("./ChangePassword"));
+const ChangePassword = lazy(() => import("./ChangePassword"));
 import {
-  Select,
+  Select, 
   SelectContent,
   SelectItem,
   SelectTrigger,

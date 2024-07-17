@@ -1,18 +1,30 @@
 import { k as createComponent, l as renderTemplate, p as renderComponent, m as maybeRenderHead } from './astro/server_C9L6Sq8c.mjs';
 import 'kleur/colors';
-import { W as WithQuery, t as toast, L as Label, I as Input, D as Dialog, a as DialogTrigger, B as Button, d as DialogContent, e as DialogHeader, f as DialogTitle, g as DialogFooter, S as Select, h as SelectTrigger, i as SelectValue, j as SelectContent, k as SelectItem, $ as $$Dashboard } from './Dashboard_Bt_cIbUM.mjs';
+import { W as WithQuery, t as toast, L as Label, I as Input, D as Dialog, a as DialogTrigger, B as Button, d as DialogContent, e as DialogHeader, f as DialogTitle, g as DialogFooter, S as Select, h as SelectTrigger, i as SelectValue, j as SelectContent, k as SelectItem, $ as $$Dashboard } from './Dashboard_-s-1A4aB.mjs';
 import { createClient } from '@supabase/supabase-js';
 import { jsxs, jsx } from 'react/jsx-runtime';
-import { T as Table, a as TableCaption, b as TableHeader, c as TableRow, d as TableHead, e as TableBody, f as TableCell } from './table_RhVWFkcH.mjs';
+import { T as Table, a as TableCaption, b as TableHeader, c as TableRow, d as TableHead, e as TableBody, f as TableCell } from './table_CzpXkMJU.mjs';
 import { lazy, useState, useRef, useEffect } from 'react';
 import { useMutation } from '@tanstack/react-query';
 import axios from 'axios';
 import { DialogDescription } from '@radix-ui/react-dialog';
 import pdfMake from 'pdfmake/build/pdfmake.js';
-import * as pdfFonts from 'pdfmake/build/vfs_fonts.js';
-import { C as CardUser } from './CardUser_D2JTLd9b.mjs';
+import { C as CardUser } from './CardUser_E5MrXS7V.mjs';
 
-pdfMake.vfs = pdfFonts.pdfMake.vfs;
+// import * as pdfFonts from "./vfs_fontes";
+
+const pdfMakeFonts = {
+  Roboto: {
+    normal:
+      "https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.66/fonts/Roboto/Roboto-Regular.ttf",
+    bold: "https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.66/fonts/Roboto/Roboto-Medium.ttf",
+    italics:
+      "https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.66/fonts/Roboto/Roboto-Italic.ttf",
+    bolditalics:
+      "https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.1.66/fonts/Roboto/Roboto-MediumItalic.ttf",
+  },
+};
+pdfMake.fonts = pdfMakeFonts;
 
 const generatePdf = (data) => {
   const documentDefinition = {
@@ -45,7 +57,7 @@ const generatePdf = (data) => {
   pdfMake.createPdf(documentDefinition).download('users.pdf');
 };
 
-const ChangePassword = lazy(() => "./ChangePassword");
+const ChangePassword = lazy(() => import('./ChangePassword_Bw-njuf5.mjs'));
 createClient(
   "https://mbkrjdzimlemcuyphnla.supabase.co",
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1ia3JqZHppbWxlbWN1eXBobmxhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MDY3NTA1MTgsImV4cCI6MjAyMjMyNjUxOH0.8qjpePe0w0clItrLZFEwOlppzeVigqeAZ1CzNHetxDk"

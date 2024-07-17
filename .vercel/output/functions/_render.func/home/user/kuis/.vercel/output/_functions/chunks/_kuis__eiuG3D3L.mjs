@@ -1,9 +1,9 @@
 import { k as createComponent, l as renderTemplate, p as renderComponent, o as createAstro, m as maybeRenderHead } from './astro/server_C9L6Sq8c.mjs';
 import 'kleur/colors';
-import { L as Label, I as Input, B as Button, $ as $$Dashboard } from './Dashboard_Bt_cIbUM.mjs';
-import { C as CardUser } from './CardUser_D2JTLd9b.mjs';
+import { L as Label, I as Input, B as Button, $ as $$Dashboard } from './Dashboard_-s-1A4aB.mjs';
+import { C as CardUser } from './CardUser_E5MrXS7V.mjs';
 import { jsxs, jsx } from 'react/jsx-runtime';
-import { T as Table, a as TableCaption, b as TableHeader, c as TableRow, d as TableHead, e as TableBody, f as TableCell, g as TableFooter } from './table_RhVWFkcH.mjs';
+import { T as Table, a as TableCaption, b as TableHeader, c as TableRow, d as TableHead, e as TableBody, f as TableCell, g as TableFooter } from './table_CzpXkMJU.mjs';
 
 const invoices = [
   {

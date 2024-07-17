@@ -1,6 +1,6 @@
 import { k as createComponent, l as renderTemplate, p as renderComponent, m as maybeRenderHead, n as addAttribute } from './astro/server_C9L6Sq8c.mjs';
 import 'kleur/colors';
-import { $ as $$Dashboard } from './Dashboard_Bt_cIbUM.mjs';
+import { $ as $$Dashboard } from './Dashboard_-s-1A4aB.mjs';
 import { s as supabase } from './supabase_DBBGmT5w.mjs';
 
 const $$Profile = createComponent(async ($$result, $$props, $$slots) => {

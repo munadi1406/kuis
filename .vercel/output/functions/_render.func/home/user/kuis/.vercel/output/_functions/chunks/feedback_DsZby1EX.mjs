@@ -1,6 +1,6 @@
 import { k as createComponent, l as renderTemplate, p as renderComponent, m as maybeRenderHead } from './astro/server_C9L6Sq8c.mjs';
 import 'kleur/colors';
-import { $ as $$Dashboard } from './Dashboard_Bt_cIbUM.mjs';
+import { $ as $$Dashboard } from './Dashboard_-s-1A4aB.mjs';
 
 const $$Feedback = createComponent(($$result, $$props, $$slots) => {
   return renderTemplate`${renderComponent($$result, "Dashboard", $$Dashboard, { "title": "Umpan Balik" }, { "default": ($$result2) => renderTemplate` ${maybeRenderHead()}<div>ini halaman feedback</div> ` })}`;
