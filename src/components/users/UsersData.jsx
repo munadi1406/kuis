@@ -18,8 +18,8 @@ import {
   DialogTrigger,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { useEffect, useState } from "react";
-import { useMutation } from "@tanstack/react-query";
+import { useEffect, useState, useRef } from "react";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import WithQuery from "@/utils/WithQuery";
 import axios from "axios";
 import { DialogDescription } from "@radix-ui/react-dialog";
@@ -32,6 +32,52 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { toast } from "../ui/use-toast";
+import { createClient } from "@supabase/supabase-js";
+import ReactToPrint  from 'react-to-print'
+import pdfMake from 'pdfmake/build/pdfmake';
+import pdfFonts from 'pdfmake/build/vfs_fonts';
+
+
+export const supabase = createClient(
+  import.meta.env.PUBLIC_SUPABASE_URL,
+  import.meta.env.PUBLIC_SUPABASE_ANON_KEY
+);
+
+// Set fonts for pdfmake
+pdfMake.vfs = pdfFonts.pdfMake.vfs;
+
+const generatePDF = (data) => {
+  // Definisi konten dokumen PDF
+  const documentDefinition = {
+    content: [
+      {
+        text: 'Daftar Pengguna', // Judul
+        style: 'header', // Gaya teks header
+        alignment: 'center', 
+      },
+      {
+        table: {
+          headerRows: 1, // Jumlah baris header
+          widths: ['auto', '*', '*', 'auto'], // Lebar kolom
+          body: [
+            ['No', 'Username', 'Email', 'Role'], // Header kolom
+            ...data.map((user, index) => [index + 1, user.username, user.email, user.role]), // Data pengguna
+          ],
+        },
+      },
+    ],
+    styles: {
+      header: {
+        fontSize: 18,
+        bold: true,
+        margin: [0, 0, 0, 10], // Atur margin bawah untuk judul
+      },
+    },
+  };
+
+  // Membuat PDF dan mengunduhnya
+  pdfMake.createPdf(documentDefinition).download('users.pdf');
+};
 
 const LocalTime = ({ isoDateString }) => {
   const [localTimeString, setLocalTimeString] = useState("");
@@ -43,13 +89,15 @@ const LocalTime = ({ isoDateString }) => {
 
   return <div>{localTimeString}</div>;
 };
-const UsersData = ({ data }) => {
+const UsersData = () => {
   const [datas, setdata] = useState({});
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isDialogPasswordOpen, setIsDialogPasswordOpen] = useState(false);
+  const [userData, setUserdata] = useState([]);
+  const [isSearch, setIsSearch] = useState(false);
+
   const [editUser, setEditUser] = useState({ username: "", id: 0 });
   const handleClickEditUser = ({ username, id }) => {
-   
     setEditUser({
       username,
       id,
@@ -63,6 +111,8 @@ const UsersData = ({ data }) => {
       [name]: e.target.value,
     }));
   };
+  const tableRef = useRef();
+
   const mutation = useMutation({
     mutationFn: async (event) => {
       event.preventDefault();
@@ -73,13 +123,12 @@ const UsersData = ({ data }) => {
       // window.location.href = "/";
       setIsDialogOpen(false);
       window.location.reload();
-      
     },
     onError: (error) => {
       setMsg(error.response.data.message);
     },
   });
-  const role = useMutation({
+  const roleChange = useMutation({
     mutationFn: async (datas) => {
       const changeRole = await axios.post(`api/user/role`, datas);
       return changeRole;
@@ -93,18 +142,64 @@ const UsersData = ({ data }) => {
     onError: (error) => {
       toast({
         title: "Gagal",
-        variant:"destructive",
+        variant: "destructive",
         description: `Role Gagal Di ubah`,
       });
     },
   });
+  const getUserData = async (query) => {
+    try {
+      const response = await axios.get(`/api/user/data?search=${query}`);
+      const dataSearch = response.data.data;
+      console.log({ dataSearch });
+      setUserdata(dataSearch);
+      return dataSearch;
+    } catch (error) {
+      console.error("Error fetching user data:", error);
+      throw error; // Menangani atau lempar kesalahan
+    }
+  };
+
+  const handleSearchUsers = useMutation({
+    mutationFn: async (username) => {
+      const dataSearch = await getUserData(username);
+      return dataSearch;
+    },
+  });
+
+  let searchTimeout;
+  const search = (e) => {
+    const query = e.target.value;
+    if (query.length > 3) {
+      setIsSearch(true);
+      if (searchTimeout) {
+        clearTimeout(searchTimeout);
+      }
+      searchTimeout = setTimeout(async () => {
+        handleSearchUsers.mutate(query);
+      }, 2000);
+    } else {
+      setIsSearch(false);
+    }
+  };
+
+  useEffect(() => {
+    if (!isSearch) {
+      getUserData("");
+    }
+  }, [isSearch]);
 
   return (
     <div className="border rounded-md">
       <div className="w-full flex justify-between items-end  border-b  p-2">
         <div>
           <Label htmlFor="search">Search</Label>
-          <Input type="search" id="search" placeholder="Search" />
+          <Input
+            type="search"
+            id="search"
+            placeholder="Search"
+            onChange={search}
+          />
         </div>
         <div className="flex items-end justify-end gap-2">
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
@@ -180,62 +275,130 @@ const UsersData = ({ data }) => {
               </form>
             </DialogContent>
           </Dialog>
-          <Button className="w-max ">Cetak</Button>
+          <Dialog>
+            <DialogTrigger asChild>
+              <Button>Cetak</Button>
+            </DialogTrigger>
+            <DialogContent className="sm:max-w-[900px]">
+              <DialogHeader>
+                <DialogTitle>Cetak</DialogTitle>
+              </DialogHeader>
+              <div>
+                <div ref={tableRef}>
+                  <div className="w-full mb-4 text-center text-xl font-semibold uppercase underline underline-offset-2">
+                    Laporan Surat Masuk
+                  </div>
+                  <table className="border-collapse border border-black w-full">
+                    <thead>
+                      <tr>
+                        <th className="border border-black py-2">No</th>
+                        <th className="border border-black py-2">Username</th>
+                        <th className="border border-black py-2">Email</th>
+                        <th className="border border-black py-2">Role</th>
+                      </tr>
+                    </thead>
+
+                    <tbody>
+                      {userData &&
+                        userData.map(
+                          ({ email, username, role, id }, i) =>
+                            role !== "admin" && (
+                              <tr key={i}>
+                                <td
+                                  className={
+                                    "border border-black text-center p-1 "
+                                  }
+                                >
+                                  {i + 1}
+                                </td>
+                                <td className={"border border-black p-1"}>
+                                  {username}
+                                </td>
+                                <td className={"border border-black p-1"}>
+                                  {email}
+                                </td>
+                                <td className={"border border-black p-1"}>
+                                  {role}
+                                </td>
+                              </tr>
+                            )
+                        )}
+                    </tbody>
+                  </table>
+                </div>
+                {/* <ReactToPrint
+                  trigger={() => {
+                    return <a href="#">Print this out!</a>;
+                  }}
+                  // content={() => tableRef.current}
+                /> */}
+              </div>
+              <Button className="w-max " onClick={() => generatePDF(userData)}>
+                Cetak
+              </Button>
+            </DialogContent>
+          </Dialog>
         </div>
       </div>
       <Table>
         <TableCaption>Daftar Users</TableCaption>
+
         <TableHeader>
           <TableRow>
             <TableHead>No</TableHead>
             <TableHead>Username</TableHead>
             <TableHead>Email</TableHead>
             <TableHead>Role</TableHead>
-            <TableHead>Login Terakhir</TableHead>
             <TableHead>Action</TableHead>
           </TableRow>
         </TableHeader>
-        
+
         <TableBody>
-          {data.map(
-            ({ email, last_sign_in_at, user_metadata, id }, i) =>
-              user_metadata.role !== "admin" && (
-                <TableRow key={email}>
-                  <TableCell className="font-medium">{i + 1}</TableCell>
-                  <TableCell className="font-medium">
-                    {user_metadata.username}
-                  </TableCell>
-                  <TableCell className="font-medium">{email}</TableCell>
-                  <TableCell className="font-medium">
-                    <Select onValueChange={(e)=>role.mutate({role:e,id})} disabled={role.isPending}>
-                      <SelectTrigger className="w-[180px]">
-                        <SelectValue placeholder="Users" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="admin" selected>Admin</SelectItem>
-                        <SelectItem value="users" selected>Users</SelectItem>
-                      </SelectContent>
-                    </Select>
-                  </TableCell>
-                  <TableCell>
-                    <LocalTime isoDateString={last_sign_in_at} />
-                  </TableCell>
-                  <TableCell>
-                    <Button
-                      onClick={() => {
-                        setIsDialogPasswordOpen(true),
-                          handleClickEditUser({
-                            username: user_metadata.username,
-                            id,
-                          });
-                      }}
-                    >
-                      Edit
-                    </Button>
-                  </TableCell>
-                </TableRow>
-              )
-          )}
+          {userData &&
+            userData.map(
+              ({ email, username, role, id }, i) =>
+                role !== "admin" && (
+                  <TableRow key={email}>
+                    <TableCell className="font-medium">{i + 1}</TableCell>
+                    <TableCell className="font-medium">{username}</TableCell>
+                    <TableCell className="font-medium">{email}</TableCell>
+                    <TableCell className="font-medium">
+                      <Select
+                        onValueChange={(e) =>
+                          roleChange.mutate({ role: e, id })
+                        }
+                        disabled={roleChange.isPending}
+                      >
+                        <SelectTrigger className="w-[180px]">
+                          <SelectValue placeholder="Users" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="admin" selected>
+                            Admin
+                          </SelectItem>
+                          <SelectItem value="users" selected>
+                            Users
+                          </SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </TableCell>
+
+                    <TableCell>
+                      <Button
+                        onClick={() => {
+                          setIsDialogPasswordOpen(true),
+                            handleClickEditUser({
+                              username: username,
+                              id,
+                            });
+                        }}
+                      >
+                        Edit
+                      </Button>
+                    </TableCell>
+                  </TableRow>
+                )
+            )}
         </TableBody>
       </Table>
       <ChangePassword

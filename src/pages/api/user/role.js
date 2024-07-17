@@ -1,6 +1,6 @@
-// import { supabase } from "../../../lib/supabase";
+import { supabase } from "../../../lib/supabase";
 import { createClient } from "@supabase/supabase-js";
-const supabase = createClient(
+const supabaseAD = createClient(
   import.meta.env.SUPABASE_URL,
   import.meta.env.SUPABASE_SERVICE_KEY,
   {
@@ -12,8 +12,8 @@ const supabase = createClient(
 );
 
 export const POST = async ({ request, cookies, redirect }) => {
-  const { role,id } = await request.json();
-  
+  const { role, id } = await request.json();
+
   if (!role) {
     return new Response(
       JSON.stringify({
@@ -22,13 +22,18 @@ export const POST = async ({ request, cookies, redirect }) => {
       { status: 500 }
     );
   }
- 
-  const { data: user, error } = await supabase.auth.admin.updateUserById(id, {
-    user_metadata:{
-      role
-    }
+
+  const { data: user, error } = await supabaseAD.auth.admin.updateUserById(id, {
+    user_metadata: {
+      role,
+    },
   });
- 
+
+  const { data } = await supabase
+    .from("detail_user")
+    .update({ role })
+    .eq("id_user", id)
+    .select();
 
   if (error) {
     return new Response(
@@ -38,7 +43,6 @@ export const POST = async ({ request, cookies, redirect }) => {
       { status: 500 }
     );
   }
-
 
   return new Response(
     JSON.stringify({

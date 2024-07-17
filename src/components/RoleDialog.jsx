@@ -19,7 +19,7 @@ import axios from "axios";
 import { toast } from "./ui/use-toast";
 
 const RoleDialog = ({open,id}) => {
-    console.log({open})
+   
     const [isOpen,setIsOpen] = useState(open);
 
     const {mutate} = useMutation({

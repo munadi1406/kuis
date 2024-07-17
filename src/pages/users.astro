@@ -4,6 +4,7 @@ import { createClient } from "@supabase/supabase-js";
 import UsersData from "../components/users/UsersData";
 import CardUser from "@/components/users/CardUser";
 
+
 const supabaseAD = createClient(
   import.meta.env.SUPABASE_URL,
   import.meta.env.SUPABASE_SERVICE_KEY,
@@ -14,6 +15,7 @@ const supabaseAD = createClient(
     },
   }
 );
+
 
 const {
   data: { users },
@@ -29,6 +31,8 @@ newUsersThisWeek = users.filter((user) => {
   const createdAt = new Date(user.created_at);
   return createdAt >= oneWeekAgo;
 }).length;
+
+
 ---
 
 <Dashboard title="Users">
@@ -37,6 +41,6 @@ newUsersThisWeek = users.filter((user) => {
     <CardUser title={"Total User Baru"} value={newUsersThisWeek} />
   </div>
   <div class="py-2">
-    <UsersData data={users} client:idle />
+    <UsersData client:load />
   </div>
 </Dashboard>

@@ -5,6 +5,7 @@ import {
 
 
 
+
 const WithQuery = (WrappedComponent) => {
     const queryClient = new QueryClient()
     function WithLogger(props) {
