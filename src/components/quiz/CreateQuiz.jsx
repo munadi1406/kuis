@@ -8,8 +8,18 @@ import { Textarea } from "@/components/ui/textarea";
 import Form from "./FormAnswer";
 import { Label } from "../ui/label";
 import { Button } from "../ui/button";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { useQuery } from "@tanstack/react-query";
+import axios from "axios";
+import WithQuery from "@/utils/WithQuery";
 
-export default function CreateQuiz() {
+const CreateQuiz = () => {
   const [jumlahSoal, setJumlahSoal] = useState(1);
   const [jumlahOpsiJawaban, setJumlahOpsiJawaban] = useState(4);
   const [judul, setJudul] = useState("");
@@ -62,6 +72,21 @@ export default function CreateQuiz() {
       setSoalData(soalData);
     }
   };
+
+  const dataMapel = useQuery({
+    queryKey: ["mapelForm"],
+    queryFn: async () => {
+      const datas = await axios.get("/api/mapel/all");
+      return datas.data;
+    },
+  });
+  const dataKelas = useQuery({
+    queryKey: ["kelasForm"],
+    queryFn: async () => {
+      const datas = await axios.get("/api/kelas/all");
+      return datas.data;
+    },
+  });
 
   //   const { mutate, isLoading } = useMutation({
   //     mutationFn: async (e) => {
@@ -118,10 +143,10 @@ export default function CreateQuiz() {
     });
   };
 
-
   return (
     <form className="grid md:grid-cols-6 grid-cols-1 gap-2" autoComplete="none">
-      <div className="grid grid-cols-1 order-1   gap-2 p-2 rounded-md border col-span-4"
+      <div
+        className="grid grid-cols-1 order-1   gap-2 p-2 rounded-md border col-span-4"
         autoComplete="none"
       >
         <div className="flex  justify-center items-center gap-2 w-full flex-col">
@@ -138,6 +163,34 @@ export default function CreateQuiz() {
           <div className="w-full gap-1.5">
             <Label htmlFor="Deskripsi">Deskripsi Quiz</Label>
             <Textarea id="Deskripsi" />
+          </div>
+          <div className="w-full gap-1.5">
+            <Label htmlFor="Deskripsi">Pilih Mata Pelajaran</Label>
+            <Select disabled={dataMapel.isLoading}>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Mata Pelajaran" />
+              </SelectTrigger>
+              <SelectContent>
+                {dataMapel.isSuccess > 0 &&
+                  dataMapel.data.data.map(({ id, mapel },i) => (
+                    <SelectItem value={mapel} key={i} id={i}>{mapel}</SelectItem>
+                  ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="w-full gap-1.5">
+            <Label htmlFor="Deskripsi">Kelas</Label>
+            <Select disabled={dataKelas.isLoading}>
+              <SelectTrigger className="w-full">
+                <SelectValue placeholder="Pilih Kelas" />
+              </SelectTrigger>
+              <SelectContent>
+                {dataKelas.isSuccess > 0 &&
+                  dataKelas.data.data.map(({ id, kelas },i) => (
+                    <SelectItem value={kelas} key={i} id={i}>{kelas}</SelectItem>
+                  ))}
+              </SelectContent>
+            </Select>
           </div>
           <div className="grid grid-cols-2 gap-2 w-full">
             {!isFromFile ? (
@@ -233,4 +286,6 @@ export default function CreateQuiz() {
       </div>
     </form>
   );
-}
+};
+
+export default WithQuery(CreateQuiz);

@@ -3,7 +3,7 @@ import { supabase } from "../../../lib/supabase";
 export const GET = async ({ params, url }) => {
   const search = url.searchParams.get("search");
 
-  let query = supabase.from("detail_user").select("*").neq('role', 'admin');
+  let query = supabase.from("detail_user").select("*");
 
   // Jika search tidak kosong, tambahkan filter ilike
   if (search) {

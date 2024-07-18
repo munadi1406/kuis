@@ -1,1 +1,0 @@
-export default { "Roboto-Regular.ttf": "AAEAAAARAQAABAAQR0RFRqbz ... 0AjQAwAJgAmwAxANAA0AA1AAA="};

@@ -6,7 +6,7 @@ import { defineMiddleware } from "astro:middleware";
 export const validate = defineMiddleware(async (context, next) => {
   const { request } = context;
   const url = new URL(request.url);
-  const protectedPaths = ["/users"];
+  const protectedPaths = ["/users","/mapel","/kelas"];
   if (protectedPaths.includes(url.pathname)) {
     const {
         data: { user },

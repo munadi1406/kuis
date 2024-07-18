@@ -32,29 +32,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { toast } from "../ui/use-toast";
-import { createClient } from "@supabase/supabase-js";
 import {  generatePdf } from "./generatePdf";
 
 
-// Set fonts for pdfmake
-
-
-
-export const supabase = createClient(
-  import.meta.env.PUBLIC_SUPABASE_URL,
-  import.meta.env.PUBLIC_SUPABASE_ANON_KEY
-);
-
-const LocalTime = ({ isoDateString }) => {
-  const [localTimeString, setLocalTimeString] = useState("");
-
-  useEffect(() => {
-    const localTime = new Date(isoDateString).toLocaleString();
-    setLocalTimeString(localTime);
-  }, [isoDateString]);
-
-  return <div>{localTimeString}</div>;
-};
 const UsersData = () => {
   const [datas, setdata] = useState({});
   const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -117,7 +97,7 @@ const UsersData = () => {
     try {
       const response = await axios.get(`/api/user/data?search=${query}`);
       const dataSearch = response.data.data;
-      console.log({ dataSearch });
+      
       setUserdata(dataSearch);
       return dataSearch;
     } catch (error) {
@@ -322,8 +302,8 @@ const UsersData = () => {
         <TableBody>
           {userData &&
             userData.map(
-              ({ email, username, role, id }, i) =>
-                role !== "admin" && (
+              ({ email, username, role, id_user }, i) =>
+                (
                   <TableRow key={email}>
                     <TableCell className="font-medium">{i + 1}</TableCell>
                     <TableCell className="font-medium">{username}</TableCell>
@@ -331,31 +311,30 @@ const UsersData = () => {
                     <TableCell className="font-medium">
                       <Select
                         onValueChange={(e) =>
-                          roleChange.mutate({ role: e, id })
+                          roleChange.mutate({ role: e, id:id_user })
                         }
                         disabled={roleChange.isPending}
                       >
                         <SelectTrigger className="w-[180px]">
-                          <SelectValue placeholder="Users" />
+                          <SelectValue placeholder={role} />
                         </SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="admin" selected>
+                          <SelectItem value="admin" >
                             Admin
                           </SelectItem>
-                          <SelectItem value="users" selected>
+                          <SelectItem value="users" > 
                             Users
                           </SelectItem>
                         </SelectContent>
                       </Select>
                     </TableCell>
-
                     <TableCell>
                       <Button
                         onClick={() => {
                           setIsDialogPasswordOpen(true),
                             handleClickEditUser({
                               username: username,
-                              id,
+                              id:id_user,
                             });
                         }}
                       >

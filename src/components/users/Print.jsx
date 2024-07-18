@@ -1,14 +1,13 @@
-import { forwardRef } from "react";
 
 
 
 
 const Print = ({ userData,ref }) => {
-    console.log(ref)
+   
   return (
     <div ref={ref}>
       <div className="w-full mb-4 text-center text-xl font-semibold uppercase underline underline-offset-2">
-        Laporan Surat Masuk
+        Laporan Daftar Users
       </div>
       <table className="border-collapse border border-black w-full">
         <thead>

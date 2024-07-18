@@ -6,9 +6,9 @@ import { defineMiddleware } from "astro:middleware";
 export const auth = defineMiddleware(async (context, next) => {
   const { request } = context;
   const url = new URL(request.url);
-  const protectedPaths = ["/dashboard", "/profile", "/feedback", "/log", "/kuis",'/createKuis','/history','/users'];
+  const protectedPaths = ["/dashboard", "/profile", "/feedback", "/log", "/kuis",'/createKuis','/history','/users','/mapel','/kelas'];
   if (protectedPaths.includes(url.pathname)) {
-    console.log("middleware running");
+    // console.log("middleware running");
     
     const accessToken = context.cookies.get("sb-access-token");
     const refreshToken = context.cookies.get("sb-refresh-token");
