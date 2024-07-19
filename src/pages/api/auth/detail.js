@@ -10,7 +10,7 @@ export const POST = async ({ request, redirect }) => {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  console.log(user.id);
+
 
   // const { data, error } = await supabase
   //   .from("users")

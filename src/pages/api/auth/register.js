@@ -1,8 +1,8 @@
 import { supabase } from "../../../lib/supabase";
 
 export const POST = async ({ request, redirect }) => {
-  const { email, password, passwordConfirm,username } = await request.json();
-  console.log({email,password,passwordConfirm,username})
+  const { email, password, passwordConfirm, username } = await request.json();
+
   if (!email || !password || !passwordConfirm) {
     return new Response(
       JSON.stringify({
@@ -11,19 +11,27 @@ export const POST = async ({ request, redirect }) => {
       { status: 400 }
     );
   }
-  if(password !== passwordConfirm){
-    return new Response(JSON.stringify({
-      message:"Password Dan Konfirmasi Password Tidak Sama"
-    }),{
-      status:400
-    })
+  if (password !== passwordConfirm) {
+    return new Response(
+      JSON.stringify({
+        message: "Password Dan Konfirmasi Password Tidak Sama",
+      }),
+      {
+        status: 400,
+      }
+    );
   }
 
-  const { error } = await supabase.auth.signUp({
+  const { data, error } = await supabase.auth.signUp({
     email,
     password,
+    options: {
+      data: {
+        role: "users",
+        username,
+      },
+    },
   });
-
   if (error) {
     return new Response(
       JSON.stringify({
@@ -32,8 +40,18 @@ export const POST = async ({ request, redirect }) => {
       { status: 400 }
     );
   }
-  const detail = await supabase.from("users").insert([{ role:"users",name:username }]).select();
-  console.log(detail.error);
+ const test =  await supabase
+    .from("detail_user")
+    .insert([
+      {
+        id_user: data.user.id,
+        username: username,
+        email: data.user.email,
+        role:"users"
+      },
+    ])
+    .select();
+    
   return new Response("Berhasil", {
     status: 200,
   });

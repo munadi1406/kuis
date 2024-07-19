@@ -59,7 +59,7 @@ import {
   
   const KuisSubmittion = () => {
     return (
-      <div className="w-full border rounded-md">
+      <div className="w-full border rounded-md ">
         <div className="w-full flex justify-between items-end  border-b  p-2">
           <div >
             <Label htmlFor="search">Search</Label>

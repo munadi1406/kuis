@@ -9,19 +9,19 @@ import KuisSubmittion from '../../components/quiz/KuisSubmittion'
 <Dashboard title={kuis}>
   <div class="grid md:grid-cols-6 grid-cols-1 gap-2">
     <div
-      class="grid grid-cols-1 order-1 gap-2 p-2 rounded-md border col-span-4"
+      class="grid grid-cols-1 order-1 gap-2 p-2 rounded-md border md:col-span-4"
     >
       <div>
         <CardUser title={"Jumlah Kuis Dikerjakan"} value={100} />
       </div>
-      <div class="flex justify-center items-center gap-2">
+      <div class="flex justify-center items-center gap-2 flex-wrap">
         <Button>Cetak Nilai</Button>
         <Button>Pertanyaan Paling Sering Salah</Button>
         <Button>Analisis Kesulitan Soal</Button>
       </div>
     </div>
     <div
-      class="col-span-2 md:order-2 order-3 border p-2 rounded-md flex flex-col gap-2 "
+      class="md:col-span-2 col-span-1 md:order-2  order-2 border p-2 rounded-md flex flex-col gap-2 "
     >
       <h2
         class="scroll-m-20 pb-2 text-3xl font-semibold tracking-tight first:mt-0 flex gap-2 items-center"
@@ -42,9 +42,9 @@ import KuisSubmittion from '../../components/quiz/KuisSubmittion'
       <Button>Edit Kuis</Button>
     </div>
     <div
-      class="w-full md:order-3 order-2 col-span-full flex flex-col gap-2 border p-2 rounded-md"
+      class="w-full order-3 col-span-full flex flex-col gap-2 border p-2 rounded-md"
     >
     <KuisSubmittion/>
     </div>
-  </div>
+  </div> 
 </Dashboard>

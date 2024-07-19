@@ -13,7 +13,7 @@ import Link from "./Link";
 
 import ButtonLabel from "./ButtonLabel";
 
-const DashboardNav = ({ title }) => {
+const DashboardNav = ({ title, role }) => {
   return (
     <div className="flex justify-between py-2 md:p-0 p-2 md:border-b-0 border-b-2 border-black md:relative sticky top-0 bg-white/90 backdrop-blur-sm z-10">
       <h1 className="capitalize scroll-m-20 text-2xl font-semibold tracking-tight">
@@ -43,12 +43,14 @@ const DashboardNav = ({ title }) => {
             </div>
           </DialogContent>
         </Dialog>
+
         <Link
           to={"/history"}
           text={"History Pengerjaan Kuis"}
           variants={"outline"}
         />
-        <Link to={"/createKuis"} text={"Buat Kuis"} />
+
+        {role !== "Siswa" && <Link to={"/createKuis"} text={"Buat Kuis"} />}
       </div>
       <div className="md:hidden gap-2 flex">
         <Dialog>
@@ -88,14 +90,16 @@ const DashboardNav = ({ title }) => {
             }
           />
         </a>
-        <a href="/createKuis">
-          <ButtonLabel
-            text={"Buat Kuis"}
-            trigger={
-              <span className="material-symbols-outlined">add_circle</span>
-            }
-          />
-        </a>
+        {role !== "Siswa" && (
+          <a href="/createKuis">
+            <ButtonLabel
+              text={"Buat Kuis"}
+              trigger={
+                <span className="material-symbols-outlined">add_circle</span>
+              }
+            />
+          </a>
+        )}
       </div>
     </div>
   );
