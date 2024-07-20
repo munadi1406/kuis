@@ -21,9 +21,21 @@ export const POST = async ({ params, request, url }) => {
   const dirPath = path.join(__dirname, "images");
   const filePath = path.join(dirPath, uniqueFileName);
 
+  console.log("Current directory:", __dirname);
+  console.log("Target directory:", dirPath);
+  console.log("Target file path:", filePath);
+
+  // Ensure the directory exists
   try {
-    fs.mkdirSync(dirPath, { recursive: true });
+    if (!fs.existsSync(dirPath)) {
+      console.log("Directory does not exist, creating...");
+      fs.mkdirSync(dirPath, { recursive: true });
+    } else {
+      console.log("Directory already exists.");
+    }
   } catch (err) {
+    console.log({ dirPath });
+    console.log({ filePath });
     console.error("Failed to create directory:", err);
     return new Response(JSON.stringify({ message: "Directory creation failed" }), {
       status: 500,
