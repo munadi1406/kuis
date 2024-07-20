@@ -18,10 +18,10 @@ export const POST = async ({ params, request, url }) => {
   const buffer = await file.arrayBuffer();
   const fileExtension = path.extname(file.name);
   const uniqueFileName = `${uuidv4()}${fileExtension}`;
-  const filePath = path.join(process.cwd(), "public", "images", uniqueFileName);
+  const filePath = path.join(process.cwd(), "src", "images", uniqueFileName);
 
   // Ensure the directory exists
-  const dirPath = path.join(process.cwd(), "public", "images");
+  const dirPath = path.join(process.cwd(), "src", "images");
 
   // Ensure the directory exists
   if (!fs.existsSync(dirPath)) {
@@ -68,7 +68,7 @@ export const GET = async ({ params ,url}) => {
     );
   }
 
-  const imagePath = path.join(process.cwd(), 'public', 'images', imageName);
+  const imagePath = path.join(process.cwd(), 'src', 'images', imageName);
 
   try {
     const image = fs.readFileSync(imagePath);
@@ -103,7 +103,7 @@ export const DELETE = async ({ url }) => {
     }
   
     // Tentukan path gambar
-    const imagePath = path.join(process.cwd(), 'public', 'images', imageName);
+    const imagePath = path.join(process.cwd(), 'src', 'images', imageName);
   
     try {
       // Cek apakah file gambar ada
