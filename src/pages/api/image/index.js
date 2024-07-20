@@ -21,7 +21,9 @@ export const POST = async ({ params, request, url }) => {
   const filePath = path.join(process.cwd(), "public", "images", uniqueFileName);
 
   // Ensure the directory exists
-  const dirPath = path.dirname(filePath);
+  const dirPath = path.join(process.cwd(), "public", "images");
+
+  // Ensure the directory exists
   if (!fs.existsSync(dirPath)) {
     fs.mkdirSync(dirPath, { recursive: true });
   }
