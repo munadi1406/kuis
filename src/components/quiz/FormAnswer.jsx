@@ -1,9 +1,10 @@
-import { Fragment } from "react";
+import { Fragment, lazy } from "react";
 // import Input from "../Input";
 // import PropTypes from "prop-types";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { Textarea } from "../ui/textarea";
+const EditorInput = lazy(()=>import("../EditorInput"));
 
 export default function Form({
   soalArray,
@@ -15,13 +16,14 @@ export default function Form({
       {soalArray.map((e) => (
         <Fragment key={e}>
           <Label htmlFor={`Soal-Ke-${e + 1}`}>{`Soal Ke ${e + 1}`}</Label>
-          <Textarea id={`Soal-Ke-${e + 1}`}
+          <EditorInput id={`Soal-Ke-${e + 1}`} name={`soal-${e}`}  onChange={handleInputChange}/>
+          {/* <Textarea id={`Soal-Ke-${e + 1}`}
             placeholder={`Soal Ke ${e + 1}`}
             key={e}
-            row={3}
+            
             name={`soal-${e}`}
             onChange={handleInputChange}
-            required={true} />
+            required={true} /> */}
           
           {opsiJawabanArray.map((jawabanI) => (
             <div
