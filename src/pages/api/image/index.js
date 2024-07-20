@@ -18,7 +18,7 @@ export const POST = async ({ params, request, url }) => {
   const buffer = await file.arrayBuffer();
   const fileExtension = path.extname(file.name);
   const uniqueFileName = `${uuidv4()}${fileExtension}`;
-  const dirPath = path.join(__dirname, "src", "images");
+  const dirPath = path.join(__dirname, "images");
   const filePath = path.join(dirPath, uniqueFileName);
 
   try {
@@ -69,7 +69,7 @@ export const GET = async ({ params ,url}) => {
     );
   }
 
-  const imagePath = path.join(process.cwd(), 'src', 'images', imageName);
+  const imagePath = path.join(process.cwd(), 'images', imageName);
 
   try {
     const image = fs.readFileSync(imagePath);
