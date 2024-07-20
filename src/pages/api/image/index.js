@@ -3,7 +3,7 @@ import path from "path";
 import { v4 as uuidv4 } from 'uuid';
 
 
-
+const __dirname = path.resolve();
 export const POST = async ({ params, request, url }) => {
   const data = await request.formData();
   const file = data.get("image");
@@ -18,16 +18,17 @@ export const POST = async ({ params, request, url }) => {
   const buffer = await file.arrayBuffer();
   const fileExtension = path.extname(file.name);
   const uniqueFileName = `${uuidv4()}${fileExtension}`;
-  const filePath = path.join(process.cwd(), "src", "images", uniqueFileName);
+  const dirPath = path.join(__dirname, "src", "images");
+  const filePath = path.join(dirPath, uniqueFileName);
 
-  // Ensure the directory exists
-  const dirPath = path.join(process.cwd(), "src", "images");
-
-  // Ensure the directory exists
-  if (!fs.existsSync(dirPath)) {
+  try {
     fs.mkdirSync(dirPath, { recursive: true });
+  } catch (err) {
+    console.error("Failed to create directory:", err);
+    return new Response(JSON.stringify({ message: "Directory creation failed" }), {
+      status: 500,
+    });
   }
-
   try {
     fs.writeFileSync(filePath, Buffer.from(buffer));
     
