@@ -11,7 +11,7 @@ export default defineConfig({
     applyBaseStyles: false
   }), react()],
   output: "server",
-  adapter: vercel(),
+  adapter: vercel(), 
   
 });
 

@@ -1,7 +1,7 @@
 import { useState, Suspense, lazy, useEffect } from "react";
 // import ButtonPure from "../ButtonPure";
 // import DateTimeRange from "../DateTimeRange";
-// import { useMutation } from "react-query";
+
 // import PropTypes from "prop-types";
 import { Input } from "../ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -15,9 +15,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import WithQuery from "@/utils/WithQuery";
+import EditorInput from "../EditorInput";
 
 const CreateQuiz = () => {
   const [jumlahSoal, setJumlahSoal] = useState(1);
@@ -27,6 +28,20 @@ const CreateQuiz = () => {
   const [duration, setDuration] = useState(0);
   const [startQuiz, setStartQuiz] = useState("");
   const [endQuiz, setEndQuiz] = useState("");
+  const [option, setOption] = useState({
+    mapel: '',
+    kelas: '',
+  });
+  const handleSelectChange = (event) => {
+    const { name, value } = event.target;
+    setOption((prevState) => ({
+      ...prevState,
+      [name]: value,
+    }));
+  };
+  
+
+  const [token,setToken] = useState("");
   //   const { courseId } = useParams();
   //   const { setStatus, setStatusType, setMsgNotification } = useNotification();
   const [isFromFile, setIsFromFile] = useState(false);
@@ -37,6 +52,12 @@ const CreateQuiz = () => {
     (_, index) => index
   );
   const [soalData, setSoalData] = useState([]);
+
+  // useEffect(()=>{
+  //   console.log(soalData)
+  // },[soalData])
+
+
   const handleInputChange = (event) => {
     const { name, value, id } = event.target;
     // Memeriksa apakah input merupakan input soal atau jawaban
@@ -88,34 +109,45 @@ const CreateQuiz = () => {
     },
   });
 
-  //   const { mutate, isLoading } = useMutation({
-  //     mutationFn: async (e) => {
-  //       e.preventDefault();
-  //       const dataPayload = {
-  //         idCourse: courseId,
-  //         judul,
-  //         deskripsi,
-  //         duration,
-  //         startQuiz,
-  //         endQuiz,
-  //         dataQuiz: soalData,
-  //       };
-  //       const data = await createQuiz(dataPayload);
-  //       return data;
-  //     },
-  //     onSuccess: (data) => {
-  //       setStatus(true);
-  //       setStatusType(true);
-  //       setMsgNotification(data.data.message);
-  //       handleClose();
-  //     },
-  //     onError: (error) => {
-  //       setStatus(true);
-  //       setStatusType(true);
-  //       setMsgNotification(error.response.data.message);
-  //     },
-  //   });
+    // const { mutate, isLoading } = useMutation({
+    //   mutationFn: async (e) => {
+    //     e.preventDefault();
+    //     const dataPayload = {
+    //       id_user: 1,
+    //       judul,
+    //       deskripsi,
+    //       duration,
+    //       startQuiz,
+    //       endQuiz,
+    //       token,
+    //       dataQuiz: soalData,
+    //     };
+    //     console.og(dataPayload)
+    //     return dataPayload
+    //   },
+    //   onSuccess: (data) => {
+       
+    //   },
+    //   onError: (error) => {
+        
+    //   },
+    // });
 
+    const mutate = (e)=>{
+      e.preventDefault()
+      const dataPayload = {
+              id_user: 1,
+              judul,
+              deskripsi,
+              duration,
+              startQuiz,
+              endQuiz,
+              token,
+              dataQuiz: soalData,
+              ...option,
+            };
+            console.log(dataPayload)
+    }
   const [text, setText] = useState();
   const handleChangePdf = async (e) => {
     const file = e.target.files[0];
@@ -144,7 +176,7 @@ const CreateQuiz = () => {
   };
 
   return (
-    <form className="grid md:grid-cols-6 grid-cols-1 gap-2" autoComplete="none">
+    <form className="grid md:grid-cols-6 grid-cols-1 gap-2" autoComplete="none" onSubmit={mutate}>
       <div
         className="grid grid-cols-1 order-1   gap-2 p-2 rounded-md border col-span-4"
         autoComplete="none"
@@ -165,11 +197,17 @@ const CreateQuiz = () => {
             <Textarea id="Deskripsi" />
           </div>
           <div className="w-full gap-1.5">
+            <Label htmlFor="Deskripsi">Deskripsi Quiz</Label>
+            
+          </div>
+          
+         
+          <div className="w-full gap-1.5">
             <Label htmlFor="Deskripsi">Pilih Mata Pelajaran</Label>
-            <Select disabled={dataMapel.isLoading}>
+            <Select disabled={dataMapel.isLoading} onValueChange={(e)=>handleSelectChange({target:{name:"mapel",value:e}})}>
               <SelectTrigger className="w-full">
                 <SelectValue placeholder="Mata Pelajaran" />
-              </SelectTrigger>
+              </SelectTrigger> 
               <SelectContent>
                 {dataMapel.isSuccess > 0 &&
                   dataMapel.data.data.map(({ id, mapel },i) => (
@@ -180,7 +218,7 @@ const CreateQuiz = () => {
           </div>
           <div className="w-full gap-1.5">
             <Label htmlFor="Deskripsi">Kelas</Label>
-            <Select disabled={dataKelas.isLoading}>
+            <Select disabled={dataKelas.isLoading} onValueChange={(e)=>handleSelectChange({target:{name:"kelas",value:e}})}>
               <SelectTrigger className="w-full">
                 <SelectValue placeholder="Pilih Kelas" />
               </SelectTrigger>
@@ -203,11 +241,14 @@ const CreateQuiz = () => {
                     value={jumlahSoal}
                     onChange={(e) => setJumlahSoal(e.target.value)}
                     required={true}
+                    type="number"
+                    max="50"
                   />
                 </div>
                 <div className="w-full gap-1.5">
                   <Label htmlFor="jumlahSoal">Opsi Jawaban</Label>
                   <Input
+                  type="number"
                     id="opsiJawaban"
                     placeholder={"Masukkan Jumlah Opsi Jawaban Di Setiap Soal"}
                     value={jumlahOpsiJawaban}
@@ -242,15 +283,16 @@ const CreateQuiz = () => {
       <div className="col-span-2 md:order-2 order-3 border p-2 rounded-md flex flex-col gap-2 md:sticky top-0">
         <div className="w-full gap-1.5">
           <Label htmlFor="date1">Tanggal Mulai</Label>
-          <Input type="date" required={true} id="date1" />
+          <Input type="datetime-local" required={true} id="date1" onChange={(e)=>setStartQuiz(e.target.value)}/>
         </div>
         <div className="w-full gap-1.5">
           <Label htmlFor="date2">Tanggal Selesai</Label>
           <Input
-            type="date"
+            type="datetime-local"
             placeholder={"Masukkan Nama Quiz"}
             required={true}
             id="date2"
+            onChange={(e)=>setEndQuiz(e.target.value)}
           />
         </div>
         <div className="w-full gap-1.5">
@@ -267,15 +309,15 @@ const CreateQuiz = () => {
         <div className="w-full gap-1.5">
           <Label htmlFor="lamaPengerjaan">Token Kuis</Label>
           <Input
-            type={"number"}
+            type={"text"}
             label={"Lama Pengerjaan Quiz"}
             placeholder={"Masukkan Token Kuis..."}
             required={true}
-            onChange={(e) => setDuration(e.target.value)}
+            onChange={(e) => setToken(e.target.value)}
             id="tokenKuis"
           />
         </div>
-        <Button>Simpan</Button>
+        <Button type="submit">Simpan</Button>
       </div>
       <div className="w-full md:order-3 order-2 col-span-4 flex flex-col gap-2 border p-2 rounded-md">
         <Form
