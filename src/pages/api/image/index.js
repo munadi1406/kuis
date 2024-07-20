@@ -30,6 +30,11 @@ export const POST = async ({ params, request, url }) => {
     if (!fs.existsSync(dirPath)) {
       console.log("Directory does not exist, creating...");
       fs.mkdirSync(dirPath, { recursive: true });
+      if (fs.existsSync(dirPath)) {
+        console.log("Directory created successfully.");
+      } else {
+        console.log("Failed to create directory.");
+      }
     } else {
       console.log("Directory already exists.");
     }
