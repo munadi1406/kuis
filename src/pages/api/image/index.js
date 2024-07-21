@@ -2,8 +2,11 @@ import fs from "fs";
 import path from "path";
 import { v4 as uuidv4 } from 'uuid';
 
+import { fileURLToPath } from 'url';
 
-const __dirname = path.resolve();
+// Definisikan __dirname di lingkungan ESM
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 export const POST = async ({ params, request, url }) => {
   const data = await request.formData();
   const file = data.get("image");
@@ -82,7 +85,7 @@ export const GET = async ({ params ,url}) => {
     );
   }
 
-  const imagePath = path.join(process.cwd(), 'images', imageName);
+  const imagePath = path.join(__dirname, 'images', imageName);
 
   try {
     const image = fs.readFileSync(imagePath);
@@ -117,7 +120,7 @@ export const DELETE = async ({ url }) => {
     }
   
     // Tentukan path gambar
-    const imagePath = path.join(process.cwd(), 'src', 'images', imageName);
+    const imagePath = path.join(__dirname,'images', imageName);
   
     try {
       // Cek apakah file gambar ada
