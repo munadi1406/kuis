@@ -20,8 +20,8 @@ export const POST = async ({ params, request, url }) => {
 
   const buffer = await file.arrayBuffer();
   const fileExtension = path.extname(file.name);
-  const uniqueFileName = `${uuidv4()}${fileExtension}`;
-  const dirPath = path.join(__dirname, "images");
+  const uniqueFileName = `_${uuidv4()}${fileExtension}`;
+  const dirPath = path.resolve(__dirname, 'images');
   const filePath = path.join(dirPath, uniqueFileName);
 
   console.log("Current directory:", __dirname);
