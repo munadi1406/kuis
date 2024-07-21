@@ -4,9 +4,28 @@ import { Button } from "@/components/ui/button";
 import CardUser from "@/components/users/CardUser";
 import Dashboard from "@/layouts/Dashboard.astro";
 import KuisSubmittion from '../../components/quiz/KuisSubmittion'
----
+import { supabase } from "@/lib/supabase";
+import {getStatus} from '../../components/Card'
+import { localTime } from "@/utils/localTime";
 
-<Dashboard title={kuis}>
+
+const { data: quiz, error } = await supabase
+  .from('quiz')
+  .select(`
+    *,
+    mapel (
+      mapel
+    ),
+    kelas(
+      kelas
+    )
+  `)
+  .eq('id',kuis).single();
+  
+    const status =  getStatus(quiz.start_quiz,quiz.end_quiz)
+---
+ 
+<Dashboard title={quiz.title}>
   <div class="grid md:grid-cols-6 grid-cols-1 gap-2">
     <div
       class="grid grid-cols-1 order-1 gap-2 p-2 rounded-md border md:col-span-4"
@@ -26,18 +45,26 @@ import KuisSubmittion from '../../components/quiz/KuisSubmittion'
       <h2
         class="scroll-m-20 pb-2 text-3xl font-semibold tracking-tight first:mt-0 flex gap-2 items-center"
       >
-        {kuis}
+        {quiz.title}
         <div class="bg-green-500 rounded-md text-xs px-2 py-1 text-white">
-          buka
+          {status}
+        </div> 
+        <div class="bg-blue-500 rounded-md text-xs px-2 py-1 text-white">
+          {`Mata Pelajaran : ${quiz.mapel.mapel}`}
         </div>
+        <div class="bg-slate-500 rounded-md text-xs px-2 py-1 text-white">
+          {`Kelas : ${quiz.kelas.kelas}`}
+        </div>
+        
       </h2>
       <p class="text-sm">
-        {`${new Date().toLocaleString()}-${new Date().toLocaleString()}`}
+        {`${localTime(quiz.start_quiz)} - ${localTime(quiz.end_quiz)}`}
+      </p>
+      <p class="text-md bg-blue-600 py-2 px-2 w-full rounded-md text-white font-bold">
+       Token : {quiz.token} 
       </p>
       <p class="leading-7 ">
-        Once upon a time, in a far-off land, there was a very lazy king who
-        spent all day lounging on his throne. One day, his advisors came to him
-        with a problem: the kingdom was running out of money.
+       {quiz.desc}
       </p>
       <Button>Edit Kuis</Button>
     </div>

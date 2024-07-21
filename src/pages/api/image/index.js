@@ -3,7 +3,7 @@ import path from "path";
 import { v4 as uuidv4 } from 'uuid';
 
 import { fileURLToPath } from 'url';
-
+ 
 // Definisikan __dirname di lingkungan ESM
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -21,10 +21,10 @@ export const POST = async ({ params, request, url }) => {
   const buffer = await file.arrayBuffer();
   const fileExtension = path.extname(file.name);
   const uniqueFileName = `_${uuidv4()}${fileExtension}`;
-  const dirPath = path.resolve(__dirname, 'images');
+  const dirPath = path.resolve(process.cwd(), 'images');
   const filePath = path.join(dirPath, uniqueFileName);
 
-  console.log("Current directory:", __dirname);
+  console.log("Current working directory:", process.cwd());
   console.log("Target directory:", dirPath);
   console.log("Target file path:", filePath);
 
@@ -43,8 +43,11 @@ export const POST = async ({ params, request, url }) => {
     }
   } catch (err) {
     console.error("Failed to create directory:", err);
-    console.log(err)
+    return new Response(JSON.stringify({ message: "Directory creation failed" }), {
+      status: 500,
+    });
   }
+
   try {
     fs.writeFileSync(filePath, Buffer.from(buffer));
     
@@ -85,7 +88,7 @@ export const GET = async ({ params ,url}) => {
     );
   }
 
-  const imagePath = path.join(__dirname, 'images', imageName);
+  const imagePath = path.join(process.cwd(), 'images', imageName);
 
   try {
     const image = fs.readFileSync(imagePath);

@@ -19,6 +19,8 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import WithQuery from "@/utils/WithQuery";
 import EditorInput from "../EditorInput";
+import { toast } from "../ui/use-toast";
+import ButtonLoader from "../ButtonLoader";
 
 const CreateQuiz = () => {
   const [jumlahSoal, setJumlahSoal] = useState(1);
@@ -29,19 +31,19 @@ const CreateQuiz = () => {
   const [startQuiz, setStartQuiz] = useState("");
   const [endQuiz, setEndQuiz] = useState("");
   const [option, setOption] = useState({
-    mapel: '',
-    kelas: '',
+    mapel: 0,
+    kelas: 0,
   });
   const handleSelectChange = (event) => {
     const { name, value } = event.target;
     setOption((prevState) => ({
       ...prevState,
-      [name]: value,
+      [name]: Number(value),
     }));
   };
-  
 
-  const [token,setToken] = useState("");
+
+  const [token, setToken] = useState("");
   //   const { courseId } = useParams();
   //   const { setStatus, setStatusType, setMsgNotification } = useNotification();
   const [isFromFile, setIsFromFile] = useState(false);
@@ -109,45 +111,89 @@ const CreateQuiz = () => {
     },
   });
 
-    // const { mutate, isLoading } = useMutation({
-    //   mutationFn: async (e) => {
-    //     e.preventDefault();
-    //     const dataPayload = {
-    //       id_user: 1,
-    //       judul,
-    //       deskripsi,
-    //       duration,
-    //       startQuiz,
-    //       endQuiz,
-    //       token,
-    //       dataQuiz: soalData,
-    //     };
-    //     console.og(dataPayload)
-    //     return dataPayload
-    //   },
-    //   onSuccess: (data) => {
-       
-    //   },
-    //   onError: (error) => {
-        
-    //   },
-    // });
-
-    const mutate = (e)=>{
-      e.preventDefault()
+  const { mutate,isPending, } = useMutation({
+    mutationFn: async (e) => {
+      e.preventDefault();
       const dataPayload = {
-              id_user: 1,
-              judul,
-              deskripsi,
-              duration,
-              startQuiz,
-              endQuiz,
-              token,
-              dataQuiz: soalData,
-              ...option,
-            };
-            console.log(dataPayload)
+        id_user: 1,
+        title: judul,
+        desc: deskripsi,
+        duration,
+        startDate: startQuiz,
+        endDate: endQuiz,
+        token,
+        soalData,
+        ...option
+      };
+      console.log(dataPayload)
+      const insert = await axios.post('api/quiz', { data: dataPayload })
+      return insert
+    },
+    onSuccess: (data) => {
+      toast({
+        title: "berhasil",
+        description: "Kuis Berhasil Dibuat"
+      })
+      window.location.href = '/dashboard'
+    },
+    onError: (error) => {
+      toast({
+        title: "Gagal",
+        variant: "destructive",
+        description: error.response.data.message,
+      });
+    },
+  });
+
+  const handleDateChange = (e) => {
+    const { id, value } = e.target;
+    const newDate = new Date(value).toISOString();
+    let newStartQuiz = startQuiz;
+    let newEndQuiz = endQuiz;
+
+    // Update the date based on the input id
+    if (id === "date1") {
+      newStartQuiz = newDate;
+    } else if (id === "date2") {
+      newEndQuiz = newDate;
     }
+
+    // Validate dates
+    const startDate = new Date(newStartQuiz);
+    const endDate = new Date(newEndQuiz);
+
+    if (newStartQuiz && newEndQuiz && endDate < startDate) {
+      toast({
+        title: "Error",
+        variant: "destructive",
+        description: "Tanggal selesai tidak boleh kurang dari tanggal mulai.",
+        // You may also want to clear the end date if validation fails
+        // For example, setEndQuiz("");
+      });
+    } else {
+      // Only update state if validation passes
+      if (id === "date1") {
+        setStartQuiz(newStartQuiz);
+      } else if (id === "date2") {
+        setEndQuiz(newEndQuiz);
+      }
+    }
+  };
+  // const mutate = (e)=>{
+  //   e.preventDefault()
+  //   const dataPayload = {
+  //           id_user: 1,
+  //           judul,
+  //           deskripsi,
+  //           duration,
+  //           startQuiz,
+  //           endQuiz,
+  //           token,
+  //           dataQuiz: soalData,
+  //           ...option,
+  //         };
+  //         console.log(dataPayload)
+  // }
   const [text, setText] = useState();
   const handleChangePdf = async (e) => {
     const file = e.target.files[0];
@@ -158,6 +204,9 @@ const CreateQuiz = () => {
     setIsFromFile(true);
   };
 
+  useEffect(() => {
+    console.log(deskripsi)
+  }, [deskripsi])
   const readFileContents = (file) => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -194,38 +243,35 @@ const CreateQuiz = () => {
           </div>
           <div className="w-full gap-1.5">
             <Label htmlFor="Deskripsi">Deskripsi Quiz</Label>
-            <Textarea id="Deskripsi" />
+            <Textarea id="Deskripsi" onChange={(e) => setDeskripsi(e.target.value)} />
           </div>
+
+
+
           <div className="w-full gap-1.5">
-            <Label htmlFor="Deskripsi">Deskripsi Quiz</Label>
-            
-          </div>
-          
-         
-          <div className="w-full gap-1.5">
-            <Label htmlFor="Deskripsi">Pilih Mata Pelajaran</Label>
-            <Select disabled={dataMapel.isLoading} onValueChange={(e)=>handleSelectChange({target:{name:"mapel",value:e}})}>
-              <SelectTrigger className="w-full">
+            <Label htmlFor="mapel">Pilih Mata Pelajaran</Label>
+            <Select id="mapel" name="mapel" disabled={dataMapel.isLoading} value={option.mapel === 0 ? "" : option.mapel} onValueChange={(e) => handleSelectChange({ target: { name: "mapel", value: e } })}>
+              <SelectTrigger className="w-full" >
                 <SelectValue placeholder="Mata Pelajaran" />
-              </SelectTrigger> 
+              </SelectTrigger>
               <SelectContent>
                 {dataMapel.isSuccess > 0 &&
-                  dataMapel.data.data.map(({ id, mapel },i) => (
-                    <SelectItem value={mapel} key={i} id={i}>{mapel}</SelectItem>
+                  dataMapel.data.data.map(({ id, mapel }, i) => (
+                    <SelectItem value={id} key={id} id={id}>{mapel}</SelectItem>
                   ))}
               </SelectContent>
             </Select>
           </div>
           <div className="w-full gap-1.5">
             <Label htmlFor="Deskripsi">Kelas</Label>
-            <Select disabled={dataKelas.isLoading} onValueChange={(e)=>handleSelectChange({target:{name:"kelas",value:e}})}>
+            <Select disabled={dataKelas.isLoading} value={option.kelas === 0 ? "" : option.kelas} onValueChange={(e) => handleSelectChange({ target: { name: "kelas", value: e } })}>
               <SelectTrigger className="w-full">
                 <SelectValue placeholder="Pilih Kelas" />
               </SelectTrigger>
               <SelectContent>
                 {dataKelas.isSuccess > 0 &&
-                  dataKelas.data.data.map(({ id, kelas },i) => (
-                    <SelectItem value={kelas} key={i} id={i}>{kelas}</SelectItem>
+                  dataKelas.data.data.map(({ id, kelas }, i) => (
+                    <SelectItem value={id} key={i} id={i}>{kelas}</SelectItem>
                   ))}
               </SelectContent>
             </Select>
@@ -248,7 +294,7 @@ const CreateQuiz = () => {
                 <div className="w-full gap-1.5">
                   <Label htmlFor="jumlahSoal">Opsi Jawaban</Label>
                   <Input
-                  type="number"
+                    type="number"
                     id="opsiJawaban"
                     placeholder={"Masukkan Jumlah Opsi Jawaban Di Setiap Soal"}
                     value={jumlahOpsiJawaban}
@@ -283,16 +329,22 @@ const CreateQuiz = () => {
       <div className="col-span-2 md:order-2 order-3 border p-2 rounded-md flex flex-col gap-2 md:sticky top-0">
         <div className="w-full gap-1.5">
           <Label htmlFor="date1">Tanggal Mulai</Label>
-          <Input type="datetime-local" required={true} id="date1" onChange={(e)=>setStartQuiz(e.target.value)}/>
+          <Input
+            type="datetime-local"
+            required={true}
+            id="date1"
+            onChange={handleDateChange}
+            value={startQuiz ? new Date(startQuiz).toISOString().slice(0, 16) : ""}
+          />
         </div>
         <div className="w-full gap-1.5">
           <Label htmlFor="date2">Tanggal Selesai</Label>
           <Input
             type="datetime-local"
-            placeholder={"Masukkan Nama Quiz"}
             required={true}
             id="date2"
-            onChange={(e)=>setEndQuiz(e.target.value)}
+            onChange={handleDateChange}
+            value={endQuiz ? new Date(endQuiz).toISOString().slice(0, 16) : ""}
           />
         </div>
         <div className="w-full gap-1.5">
@@ -308,16 +360,19 @@ const CreateQuiz = () => {
         </div>
         <div className="w-full gap-1.5">
           <Label htmlFor="lamaPengerjaan">Token Kuis</Label>
+          <p className="text-red-600 text-xs">Jika Anda Tidak Memasukkan Token Kami Akan Membuatkan Token Anda Secara Otomatis</p>
           <Input
             type={"text"}
             label={"Lama Pengerjaan Quiz"}
             placeholder={"Masukkan Token Kuis..."}
-            required={true}
+        
             onChange={(e) => setToken(e.target.value)}
             id="tokenKuis"
           />
         </div>
-        <Button type="submit">Simpan</Button>
+        
+        <ButtonLoader loading={isPending} text={"Simpan"} type="submit"/>
+        {/* {console.log(isLoading)} */}
       </div>
       <div className="w-full md:order-3 order-2 col-span-4 flex flex-col gap-2 border p-2 rounded-md">
         <Form

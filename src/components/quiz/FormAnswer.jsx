@@ -4,7 +4,7 @@ import { Fragment, lazy } from "react";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { Textarea } from "../ui/textarea";
-const EditorInput = lazy(()=>import("../EditorInput"));
+const EditorInput = lazy(() => import("../EditorInput"));
 
 export default function Form({
   soalArray,
@@ -15,8 +15,11 @@ export default function Form({
     <>
       {soalArray.map((e) => (
         <Fragment key={e}>
+
           <Label htmlFor={`Soal-Ke-${e + 1}`}>{`Soal Ke ${e + 1}`}</Label>
-          <EditorInput id={`Soal-Ke-${e + 1}`} name={`soal-${e}`}  onChange={handleInputChange}/>
+          <div className="px-4">
+            <EditorInput id={`Soal-Ke-${e + 1}`} name={`soal-${e}`} onChange={handleInputChange} />
+          </div>
           {/* <Textarea id={`Soal-Ke-${e + 1}`}
             placeholder={`Soal Ke ${e + 1}`}
             key={e}
@@ -24,7 +27,7 @@ export default function Form({
             name={`soal-${e}`}
             onChange={handleInputChange}
             required={true} /> */}
-          
+
           {opsiJawabanArray.map((jawabanI) => (
             <div
               className="grid grid-cols-6 w-full border-l-2 border-blue-600"
@@ -47,9 +50,8 @@ export default function Form({
                 />
               </div>
               <div className=" col-span-5 w-full">
-                <Label htmlFor={`Jawaban Ke ${jawabanI + 1}`}>{`Jawaban Ke ${
-                  jawabanI + 1
-                }`}</Label>
+                <Label htmlFor={`Jawaban Ke ${jawabanI + 1}`}>{`Jawaban Ke ${jawabanI + 1
+                  }`}</Label>
                 <Textarea
                   id={`Jawaban-Ke-${jawabanI + 1}`}
                   name={`jawaban${jawabanI}-${e}`}
