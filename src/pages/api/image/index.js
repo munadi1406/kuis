@@ -3,8 +3,7 @@ import path from "path";
 import { v4 as uuidv4 } from 'uuid';
 
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const __dirname = path.resolve();
 export const POST = async ({ params, request, url }) => {
   const data = await request.formData();
   const file = data.get("image");
@@ -42,9 +41,6 @@ export const POST = async ({ params, request, url }) => {
   } catch (err) {
     console.error("Failed to create directory:", err);
     console.log(err)
-    return new Response(JSON.stringify({ message: "Directory creation failed" }), {
-      status: 500,
-    });
   }
   try {
     fs.writeFileSync(filePath, Buffer.from(buffer));
