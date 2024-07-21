@@ -1,0 +1,127 @@
+{
+	"version": 3,
+	"routes": [
+		{
+			"src": "^/_astro/(.*)$",
+			"headers": {
+				"cache-control": "public, max-age=31536000, immutable"
+			},
+			"continue": true
+		},
+		{
+			"handle": "filesystem"
+		},
+		{
+			"src": "^\\/_image$",
+			"dest": "_render"
+		},
+		{
+			"src": "^\\/api\\/auth\\/detail\\/?$",
+			"dest": "_render"
+		},
+		{
+			"src": "^\\/api\\/auth\\/register\\/?$",
+			"dest": "_render"
+		},
+		{
+			"src": "^\\/api\\/auth\\/signin\\/?$",
+			"dest": "_render"
+		},
+		{
+			"src": "^\\/api\\/auth\\/signout\\/?$",
+			"dest": "_render"
+		},
+		{
+			"src": "^\\/api\\/image\\/?$",
+			"dest": "_render"
+		},
+		{
+			"src": "^\\/api\\/kelas\\/all\\/?$",
+			"dest": "_render"
+		},
+		{
+			"src": "^\\/api\\/kelas\\/?$",
+			"dest": "_render"
+		},
+		{
+			"src": "^\\/api\\/mapel\\/all\\/?$",
+			"dest": "_render"
+		},
+		{
+			"src": "^\\/api\\/mapel\\/?$",
+			"dest": "_render"
+		},
+		{
+			"src": "^\\/api\\/quiz\\/?$",
+			"dest": "_render"
+		},
+		{
+			"src": "^\\/api\\/user\\/data\\/?$",
+			"dest": "_render"
+		},
+		{
+			"src": "^\\/api\\/user\\/password-ad\\/?$",
+			"dest": "_render"
+		},
+		{
+			"src": "^\\/api\\/user\\/role\\/?$",
+			"dest": "_render"
+		},
+		{
+			"src": "^\\/api\\/user\\/user-role\\/?$",
+			"dest": "_render"
+		},
+		{
+			"src": "^\\/createKuis\\/?$",
+			"dest": "_render"
+		},
+		{
+			"src": "^\\/dashboard\\/?$",
+			"dest": "_render"
+		},
+		{
+			"src": "^\\/detailUsers\\/?$",
+			"dest": "_render"
+		},
+		{
+			"src": "^\\/feedback\\/?$",
+			"dest": "_render"
+		},
+		{
+			"src": "^\\/history\\/?$",
+			"dest": "_render"
+		},
+		{
+			"src": "^\\/kelas\\/?$",
+			"dest": "_render"
+		},
+		{
+			"src": "^\\/kuis\\/([^/]+?)\\/?$",
+			"dest": "_render"
+		},
+		{
+			"src": "^\\/log\\/?$",
+			"dest": "_render"
+		},
+		{
+			"src": "^\\/mapel\\/?$",
+			"dest": "_render"
+		},
+		{
+			"src": "^\\/profile\\/?$",
+			"dest": "_render"
+		},
+		{
+			"src": "^\\/register\\/?$",
+			"dest": "_render"
+		},
+		{
+			"src": "^\\/users\\/?$",
+			"dest": "_render"
+		},
+		{
+			"src": "^\\/$",
+			"dest": "_render"
+		}
+	]
+}
