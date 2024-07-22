@@ -83,6 +83,7 @@ export const POST = async ({ params, request, url }) => {
       }));
       answerInsertData.push(...answers);
     });
+    console.log({answerInsertData})
 
     // Insert all answers in bulk
     const { data: answerData, error: answerError } = await supabase

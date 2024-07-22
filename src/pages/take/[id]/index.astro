@@ -1,0 +1,45 @@
+---
+import Answer from '@/components/quiz/Asnwer'
+import Layout from '@/layouts/Layout.astro';
+import {supabase} from '../../../lib/supabase'
+
+
+const { id } = Astro.params;
+
+const { data: user } = await supabase.auth.getUser();
+
+
+const {data:quiz,error} = await supabase.from('quiz').select('title,waktu,token,end_quiz').eq('id',id).single()
+
+let status = false; 
+
+if (quiz) {
+  const today = new Date();
+  const endQuizDate = new Date(quiz.end_quiz);
+
+  if (today <= endQuizDate) {
+    status = true;
+  }
+} else {
+  status = false;
+}
+console.log(quiz)
+
+
+if (!user) {
+    // munculkan diaglog untuk mengerjakan kuis beserta nama unntuk membuat akun user di latar belakang
+    //lalu minta masukkan token sekali lagi
+}
+// jika tidak ada maka langsung saja
+---
+
+<Layout title={quiz.title ? quiz.title : ''}>
+    <h3 class="text-xl w-full bg-blue-600 text-white p-2 font-semibold">{quiz.title}</h3>
+    {status ? (
+        <div>Kuis buka</div>
+        <Answer client:only="react" id={id} time={quiz.waktu} id_user={user.user.id}/>
+    ):(
+        <div>Kuis tidak tersedia</div>
+    )}
+</Layout>
+

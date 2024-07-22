@@ -13,7 +13,6 @@ let { data: quiz, error } = await supabase
   .eq('id_user',user.user.id)
   .order('created_at',{ascending:false});
          
-
 ---
 
 <DashboardLayout title="dashboard">
