@@ -1,8 +1,25 @@
 import { supabase } from "@/lib/supabase";
 
+
+// import { createClient } from "@supabase/supabase-js";
+// const supabase = createClient(
+//   import.meta.env.SUPABASE_URL,
+//   import.meta.env.SUPABASE_SERVICE_KEY,
+//   {
+//     auth: {
+//       autoRefreshToken: false,
+//       persistSession: false,
+//     },
+//   }
+// );
+
+
+
 export const POST = async ({ params, request, url }) => {
     const { tokenQuiz } = await request.json();
+    
 
+    
     let { data: quizData, error } = await supabase
         .from("quiz")
         .select(`id,title,desc,waktu,start_quiz,end_quiz,mapel(
@@ -14,7 +31,7 @@ export const POST = async ({ params, request, url }) => {
         )`)
         .eq("token", tokenQuiz).single();
 
-
+        console.log(error);
     if (!quizData) {
         return new Response(
             JSON.stringify({
@@ -61,13 +78,12 @@ export const GET = async ({ params, url }) => {
 
     const id = url.searchParams.get("id");
     // const perPage = 10
-
-    const {data:questions} = await supabase.from('questions').select(`*,options(
+    const {data:questions,error} = await supabase.from('questions').select(`*,options(
         id,option
     )`).eq('id_quiz',id)
-    // console.log(questions)
+    console.log({error})
     const shuffledQuestions = shuffleQuestionsAndOptions(questions);
-    console.log(shuffledQuestions) 
+    // console.log(shuffledQuestions) 
     return new Response(
         JSON.stringify({ 
             message: 200,

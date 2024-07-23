@@ -125,7 +125,7 @@ const CreateQuiz = () => {
         soalData,
         ...option
       };
-      console.log(dataPayload)
+      // console.log(dataPayload)
       const insert = await axios.post('api/quiz', { data: dataPayload })
       return insert
     },
@@ -204,9 +204,9 @@ const CreateQuiz = () => {
     setIsFromFile(true);
   };
 
-  useEffect(() => {
-    console.log(deskripsi)
-  }, [deskripsi])
+  // useEffect(() => {
+  //   console.log(deskripsi)
+  // }, [deskripsi])
   const readFileContents = (file) => {
     return new Promise((resolve, reject) => {
       const reader = new FileReader();

@@ -16,6 +16,7 @@ export const POST = async ({ request, cookies, redirect }) => {
     email,
     password,
   });
+  // console.log({error})
 
   if (error) {
     return new Response(

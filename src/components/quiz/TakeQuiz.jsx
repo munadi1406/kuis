@@ -7,8 +7,7 @@ import { localTime } from '@/utils/localTime'
 import { buttonVariants } from '../ui/button'
 
 const TakeQuiz = ({ isPending, mutate, setToken, data, msg, status }) => {
-    console.log(data)
-    console.log(msg)
+   
     return (
         <>
             {!status ? (
@@ -25,7 +24,7 @@ const TakeQuiz = ({ isPending, mutate, setToken, data, msg, status }) => {
                         </div>
                     </div>
                     <div>
-                        <ButtonLoader text={"Kerjakan"} onClick={() => console.log("oke")} loading={isPending} />
+                        <ButtonLoader text={"Kerjakan"}  loading={isPending} />
                     </div>
                 </form>
             ) : (

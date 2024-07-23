@@ -3,15 +3,15 @@ const { kuis } = Astro.params;
 import { Button } from "@/components/ui/button";
 import CardUser from "@/components/users/CardUser";
 import Dashboard from "@/layouts/Dashboard.astro";
-import KuisSubmittion from '../../components/quiz/KuisSubmittion'
+import KuisSubmittion from "../../components/quiz/KuisSubmittion";
 import { supabase } from "@/lib/supabase";
-import {getStatus} from '../../components/Card'
+import { getStatus } from "../../components/Card";
 import { localTime } from "@/utils/localTime";
 
-
 const { data: quiz, error } = await supabase
-  .from('quiz')
-  .select(`
+  .from("quiz")
+  .select(
+    `
     *,
     mapel (
       mapel
@@ -19,12 +19,14 @@ const { data: quiz, error } = await supabase
     kelas(
       kelas
     )
-  `)
-  .eq('id',kuis).single();
-  
-    const status =  getStatus(quiz.start_quiz,quiz.end_quiz)
+  `
+  )
+  .eq("id", kuis)
+  .single();
+
+const status = getStatus(quiz.start_quiz, quiz.end_quiz);
 ---
- 
+
 <Dashboard title={quiz.title}>
   <div class="grid md:grid-cols-6 grid-cols-1 gap-2">
     <div
@@ -40,38 +42,41 @@ const { data: quiz, error } = await supabase
       </div>
     </div>
     <div
-      class="md:col-span-2 col-span-1 md:order-2  order-2 border p-2 rounded-md flex flex-col gap-2 "
+      class="md:col-span-2 col-span-1 md:order-2 order-2 border p-2 rounded-md flex flex-col gap-2"
     >
-      <h2
-        class="scroll-m-20 pb-2 text-3xl font-semibold tracking-tight first:mt-0 flex gap-2 items-center"
-      >
-        {quiz.title}
-        <div class="bg-green-500 rounded-md text-xs px-2 py-1 text-white">
+      <div class="flex flex-wrap gap-2 items-center">
+        <h2
+          class="scroll-m-20 pb-2 text-3xl font-semibold tracking-tight first:mt-0 flex gap-2 items-center"
+        >
+          {quiz.title}
+        </h2>
+        <p class="bg-green-500 rounded-md h-max text-xs px-2 py-1 text-white">
           {status}
-        </div> 
-        <div class="bg-blue-500 rounded-md text-xs px-2 py-1 text-white">
+        </p>
+        <p class="bg-blue-500 rounded-md text-xs px-2 py-1 text-white">
           {`Mata Pelajaran : ${quiz.mapel.mapel}`}
-        </div>
-        <div class="bg-slate-500 rounded-md text-xs px-2 py-1 text-white">
+        </p>
+        <p class="bg-slate-500 rounded-md text-xs px-2 py-1 text-white">
           {`Kelas : ${quiz.kelas.kelas}`}
-        </div>
-        
-      </h2>
+        </p>
+      </div>
       <p class="text-sm">
         {`${localTime(quiz.start_quiz)} - ${localTime(quiz.end_quiz)}`}
       </p>
-      <p class="text-md border-blue-600 border py-2 px-2 w-full rounded-md  font-bold">
-       Token : {quiz.token} 
+      <p
+        class="text-md border-blue-600 border py-2 px-2 w-full rounded-md font-bold"
+      >
+        Token : {quiz.token}
       </p>
-      <p class="leading-7 ">
-       {quiz.desc}
+      <p class="leading-7">
+        {quiz.desc}
       </p>
       <Button>Edit Kuis</Button>
     </div>
     <div
       class="w-full order-3 col-span-full flex flex-col gap-2 border p-2 rounded-md"
     >
-    <KuisSubmittion/>
+      <KuisSubmittion />
     </div>
-  </div> 
+  </div>
 </Dashboard>

@@ -7,8 +7,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
+
 import Link from "./Link";
 
 import ButtonLabel from "./ButtonLabel";
@@ -27,7 +26,7 @@ const DashboardNav = ({ title, role }) => {
   const { mutate, isPending } = useMutation({
     mutationFn: async (e) => {
       e.preventDefault()
-      console.log("running");
+    
       const take = await axios.post('/api/quiz/take', {
         tokenQuiz: token
       })

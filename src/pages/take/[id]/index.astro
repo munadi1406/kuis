@@ -1,45 +1,83 @@
 ---
-import Answer from '@/components/quiz/Asnwer'
-import Layout from '@/layouts/Layout.astro';
-import {supabase} from '../../../lib/supabase'
+import Answer from "@/components/quiz/Asnwer";
+import Layout from "@/layouts/Layout.astro";
+import GuestForm from "@/components/quiz/GuestForm";
 
+import { createClient } from "@supabase/supabase-js";
+const supabase = createClient(
+  import.meta.env.SUPABASE_URL,
+  import.meta.env.SUPABASE_SERVICE_KEY,
+  {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false,
+    },
+  }
+);
 
 const { id } = Astro.params;
 
-const { data: user } = await supabase.auth.getUser();
+const {
+  data: { user },
+} = await supabase.auth.getUser();
+let userId = user?.id || "";
+console.log({user})
 
+const { data: quiz, error } = await supabase
+  .from("quiz")
+  .select("title,waktu,token,end_quiz")
+  .eq("id", id)
+  .single();
 
-const {data:quiz,error} = await supabase.from('quiz').select('title,waktu,token,end_quiz').eq('id',id).single()
+let status = "false";
 
-let status = false; 
-
-if (quiz) {
-  const today = new Date();
-  const endQuizDate = new Date(quiz.end_quiz);
-
-  if (today <= endQuizDate) {
-    status = true;
+if (error) {
+  console.error("Error fetching quiz:", error);
+}
+const { cookies } = Astro;
+// console.log({ user });
+if (!user) {
+  const refresh_token = cookies.get('sb-refresh-token')?.value 
+  const { data, error } = await supabase.auth.refreshSession({ refresh_token})
+ 
+  if (error) {
+    // console.log({error})
+    status = "guest";
+  } else {
+    const { session, user } = data;
+    userId =user.id
+    cookies.set("sb-access-token", session.access_token, {
+      path: "/",
+    });
+    cookies.set("sb-refresh-token", session.refresh_token, {
+      path: "/",
+    });
+    status="true"
   }
 } else {
-  status = false;
-}
-console.log(quiz)
+  if (quiz) {
+    const today = new Date();
+    const endQuizDate = new Date(quiz.end_quiz);
 
-
-if (!user) {
-    // munculkan diaglog untuk mengerjakan kuis beserta nama unntuk membuat akun user di latar belakang
-    //lalu minta masukkan token sekali lagi
+    if (today <= endQuizDate) {
+      status = "true";
+    }
+  }
 }
+// console.log(quiz)
+
 // jika tidak ada maka langsung saja
 ---
 
-<Layout title={quiz.title ? quiz.title : ''}>
-    <h3 class="text-xl w-full bg-blue-600 text-white p-2 font-semibold">{quiz.title}</h3>
-    {status ? (
-        <div>Kuis buka</div>
-        <Answer client:only="react" id={id} time={quiz.waktu} id_user={user.user.id}/>
-    ):(
-        <div>Kuis tidak tersedia</div>
-    )}
+<Layout title={quiz?.title || ""}>
+  <h3 class="text-xl w-full bg-blue-600 text-white p-2 font-semibold">
+    {quiz?.title || ""}
+  </h3>
+  {
+    status === "true" && (
+      <Answer client:only="react" id={id} time={quiz?.waktu} id_user={userId} />
+    )
+  }
+  {status === "false" && <div>Kuis tidak tersedia</div>}
+  {status === "guest" && <GuestForm client:only="react" id={id}/>}
 </Layout>
-

@@ -12,8 +12,8 @@ const supabase = createClient(
 );
 
 export const POST = async ({ request, cookies, redirect }) => {
-  const { role,id } = await request.json();
-  
+  const { role, id, namaLengkap } = await request.json();
+
   if (!role) {
     return new Response(
       JSON.stringify({
@@ -22,23 +22,60 @@ export const POST = async ({ request, cookies, redirect }) => {
       { status: 500 }
     );
   }
- 
-  const { data: user, error } = await supabase.auth.admin.updateUserById(id, {
-    user_metadata:{
-      roleUser : role
-    }
-  });
- 
 
-  if (error) {
+  // Simpan data pengguna sebelum update
+  let previousUserMetadata;
+  let rollbackRequired = false;
+
+  // 1. Update User Metadata
+  const { data: user, error: userError } = await supabase.auth.admin.updateUserById(id, {
+    user_metadata: {
+      roleUser: role,
+    },
+  });
+
+  if (userError) {
     return new Response(
       JSON.stringify({
-        message: error.message,
+        message: userError.message,
       }),
       { status: 500 }
     );
   }
 
+ 
+  const { data: detailData, error: detailError } = await supabase
+    .from('detail_user')
+    .update({ nama_lengkap: namaLengkap })
+    .eq('id_user', id)
+    .select();
+
+  if (detailError) {
+    rollbackRequired = true;
+  }
+
+  if (rollbackRequired) {
+    // Rollback the user metadata update
+    const { error: rollbackError } = await supabase.auth.admin.updateUserById(id, {
+      user_metadata: null,
+    });
+
+    if (rollbackError) {
+      return new Response(
+        JSON.stringify({
+          message: `Rollback failed: ${rollbackError.message}`,
+        }),
+        { status: 500 }
+      );
+    }
+
+    return new Response(
+      JSON.stringify({
+        message: `Update failed and rollback completed: ${detailError.message}`,
+      }),
+      { status: 500 }
+    );
+  }
 
   return new Response(
     JSON.stringify({
@@ -47,3 +84,4 @@ export const POST = async ({ request, cookies, redirect }) => {
     { status: 200 }
   );
 };
+

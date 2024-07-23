@@ -11,7 +11,7 @@ const generateCustomToken = (length = 12) => {
 };
 export const POST = async ({ params, request, url }) => {
   const { idQuiz, idUser, idQuestion, idOption } = await request.json();
-
+  console.log(idUser)
   const { data: existingData, error: fetchError } = await supabase
   .from('answers')
   .select('id')
@@ -49,17 +49,24 @@ export const POST = async ({ params, request, url }) => {
   
     if (error) {
       console.error('Error inserting data:', error);
+      return new Response(
+        JSON.stringify({
+          message: "500",
+        }),
+        { status: 500 }
+      );
     } else {
       console.log('Data inserted successfully:', data);
+      return new Response(
+        JSON.stringify({
+          message: "200",
+        }),
+        { status: 200 }
+      );
     }
   }
 
-  return new Response(
-    JSON.stringify({
-      message: "200",
-    }),
-    { status: 200 }
-  );
+  
 };
 
 
@@ -71,7 +78,7 @@ export const GET = async ({ params, url }) => {
   .select('id_option')
   .eq('id_user', idUser)
   .eq('id_question', idQuestion).single();
-  console.log(fetchError)
+  // console.log(fetchError)
 
 
   
