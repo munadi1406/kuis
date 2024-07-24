@@ -2,26 +2,28 @@
 import Answer from "@/components/quiz/Asnwer";
 import Layout from "@/layouts/Layout.astro";
 import GuestForm from "@/components/quiz/GuestForm";
+import { supabase } from "@/lib/supabase";
 
-import { createClient } from "@supabase/supabase-js";
-const supabase = createClient(
-  import.meta.env.SUPABASE_URL,
-  import.meta.env.SUPABASE_SERVICE_KEY,
-  {
-    auth: {
-      autoRefreshToken: false,
-      persistSession: false,
-    },
-  }
-);
+// import { createClient } from "@supabase/supabase-js";
+// const supabase = createClient(
+//   import.meta.env.SUPABASE_URL,
+//   import.meta.env.SUPABASE_SERVICE_KEY,
+//   {
+//     auth: {
+//       autoRefreshToken: false,
+//       persistSession: false,
+//     },
+//   },
+// );
 
 const { id } = Astro.params;
 
 const {
-  data: { user },
+  data: { user },error:err,
 } = await supabase.auth.getUser();
 let userId = user?.id || "";
-console.log({user})
+console.log({ user });
+console.log({ err });
 
 const { data: quiz, error } = await supabase
   .from("quiz")
@@ -37,22 +39,52 @@ if (error) {
 const { cookies } = Astro;
 // console.log({ user });
 if (!user) {
-  const refresh_token = cookies.get('sb-refresh-token')?.value 
-  const { data, error } = await supabase.auth.refreshSession({ refresh_token})
- 
-  if (error) {
-    // console.log({error})
+  const refresh_token = cookies.get("sb-refresh-token")?.value;
+  console.log({refresh_token})
+  if (!refresh_token) {
+    // Tidak ada refresh token, tetapkan status sebagai "guest"
     status = "guest";
   } else {
-    const { session, user } = data;
-    userId =user.id
-    cookies.set("sb-access-token", session.access_token, {
-      path: "/",
-    });
-    cookies.set("sb-refresh-token", session.refresh_token, {
-      path: "/",
-    });
-    status="true"
+    console.log("kode meminta rt baru jalan")
+    try {
+      // Mencoba untuk memperbarui sesi menggunakan refresh token
+      const { data, error } = await supabase.auth.refreshSession({
+        refresh_token,
+      });
+
+      if (error) {
+       
+        console.error("Error refreshing session:", error);
+        status = "guest";
+      } else {
+        // Sesi berhasil diperbarui
+        const { session, user } = data;
+
+        // Menyimpan sesi yang diperbarui ke cookies
+        cookies.set("sb-access-token", session.access_token, { path: "/" });
+        cookies.set("sb-refresh-token", session.refresh_token, { path: "/" });
+
+        // Mengatur sesi di supabase
+        const setSession = await supabase.auth.setSession({
+          access_token: session.access_token,
+          refresh_token: session.refresh_token,
+        });
+
+//         const {
+//   data:ooke,
+// } = await supabase.auth.getUser();
+
+// console.log({ooke})
+      
+        userId = user.id;
+        status = "true";
+        // return Astro.redirect(`/take/${id}`)
+      }
+    } catch (err) {
+      // Menangani kesalahan lain yang mungkin terjadi
+      console.error("Unexpected error:", err);
+      status = "guest";
+    }
   }
 } else {
   if (quiz) {
@@ -79,5 +111,5 @@ if (!user) {
     )
   }
   {status === "false" && <div>Kuis tidak tersedia</div>}
-  {status === "guest" && <GuestForm client:only="react" id={id}/>}
+  {status === "guest" && <GuestForm client:only="react" id={id} />}
 </Layout>

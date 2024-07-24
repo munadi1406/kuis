@@ -17,9 +17,9 @@ import { supabase } from "@/lib/supabase";
 
 export const POST = async ({ params, request, url }) => {
     const { tokenQuiz } = await request.json();
-    
 
-    
+
+
     let { data: quizData, error } = await supabase
         .from("quiz")
         .select(`id,title,desc,waktu,start_quiz,end_quiz,mapel(
@@ -31,7 +31,7 @@ export const POST = async ({ params, request, url }) => {
         )`)
         .eq("token", tokenQuiz).single();
 
-        console.log(error);
+    console.log(error);
     if (!quizData) {
         return new Response(
             JSON.stringify({
@@ -50,46 +50,107 @@ export const POST = async ({ params, request, url }) => {
         }),
         { status: 200 }
     );
-};  
+};
 
 const fisherYatesShuffle = (array) => {
     for (let i = array.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [array[i], array[j]] = [array[j], array[i]];
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
     }
-    return array;       
-  };
+    return array;
+};
 
-  const shuffleQuestionsAndOptions = (questions) => {
+const shuffleQuestionsAndOptions = (questions) => {
     // Mengacak options dalam setiap question
     const questionsWithShuffledOptions = questions.map((question) => {
-      if (question.options && question.options.length > 0) {
-        question.options = fisherYatesShuffle([...question.options]);
-      }
-      return question;
+        if (question.options && question.options.length > 0) {
+            question.options = fisherYatesShuffle([...question.options]);
+        }
+        return question;
     });
-  
+
     // Mengacak questions
     return fisherYatesShuffle(questionsWithShuffledOptions);
-  };
-  
+};
 
-export const GET = async ({ params, url }) => {
 
-    const id = url.searchParams.get("id");
-    // const perPage = 10
-    const {data:questions,error} = await supabase.from('questions').select(`*,options(
+export const GET = async ({ params, url,cookies }) => {
+
+    
+    try {
+        const id = url.searchParams.get("id");
+        console.log({iniID :id})
+
+        const access_token = cookies.get("sb-access-token")?.value;
+        const refresh_token = cookies.get("sb-refresh-token")?.value;
+        // console.log({access_token})
+        if (!access_token) {
+          throw new Error("No access token");
+        }
+    
+        // Set the session in supabase
+       await supabase.auth.setSession({ access_token,refresh_token });
+       
+
+        const { data: users,error:e1 } = await supabase.auth.getUser()
+        // console.log({data})
+        // console.log({e1})
+        const { data: status,error:e2 } = await supabase.from('answer_status').select('*').match({ id_quiz: id, id_user: users.user.id }).single();
+        // console.log({e2});
+        const { data: quiz,error:e3 } = await supabase.from('quiz').select('waktu').eq('id', id).single()
+        // console.log({e3})
+
+
+
+
+        if (status?.status) {
+            return new Response(
+                JSON.stringify({
+                    message: "anda sudah mengerjakan kuis",
+                }),
+                { status: 401 }
+            );
+        }
+        // console.log({ status })
+        if (status) {
+            // console.log("pengecekan waktu runn")
+            const quizDurationMinutes = quiz.waktu; // Durasi waktu dalam menit
+            const quizStartTime = new Date(status.created_at); // Waktu mulai quiz
+            const now = new Date(); // Waktu saat ini
+            const elapsedTimeMinutes = (now - quizStartTime) / (1000 * 60);
+            console.log({ elapsedTimeMinutes })
+            console.log({ quizDurationMinutes })
+            if (elapsedTimeMinutes > quizDurationMinutes) {
+                return new Response(
+                    JSON.stringify({
+                        message: "Waktu Pengerjaan Sudah Habis",
+                    }),
+                    { status: 401 }
+                );
+
+            }
+        }
+        const { data: questions, error } = await supabase.from('questions').select(`*,options(
         id,option
-    )`).eq('id_quiz',id)
-    console.log({error})
-    const shuffledQuestions = shuffleQuestionsAndOptions(questions);
-    // console.log(shuffledQuestions) 
-    return new Response(
-        JSON.stringify({ 
-            message: 200,
-            data: shuffledQuestions,
-        }),
-        { status: 200 }
-    );
+    )`).eq('id_quiz', id)
+        const shuffledQuestions = shuffleQuestionsAndOptions(questions);
+        // console.log(shuffledQuestions) 
+        return new Response(
+            JSON.stringify({
+                message: 200,
+                data: shuffledQuestions,
+            }),
+            { status: 200 }
+        );
+    } catch (error) {
+        console.log(error);
+        return new Response(
+            JSON.stringify({
+                message: "Internal Server Error",
+
+            }),
+            { status: 500 }
+        );
+    }
 }
 

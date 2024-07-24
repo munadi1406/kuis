@@ -13,17 +13,8 @@ import {
 import { Button, buttonVariants } from "../ui/button";
 import { useEffect, useState } from "react";
 import edjsHTML from "editorjs-html";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
+import AlertDialog from "./AlertDialog";
+
 
 const HtmlRender = ({ data }) => {
   const edjsParser = edjsHTML();
@@ -52,17 +43,14 @@ const Asnwer = ({ id, time, id_user }) => {
         setIsEnd(true);
         return;
       }
-    } else {
-      const startTime = new Date();
-      localStorage.setItem(`quiz_start_time_${id}`, startTime);
-    }
+    } 
 
     const timer = setInterval(() => {
       setTimeLeft((prevTime) => prevTime - 1);
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [id, time]);
+  }, [id, time,localStorage.getItem(`quiz_start_time_${id}`)]);
 
   useEffect(() => {
     if (timeLeft <= 0) {
@@ -76,12 +64,14 @@ const Asnwer = ({ id, time, id_user }) => {
     return `${minutes}:${secs < 10 ? "0" : ""}${secs}`;
   };
 
-  const { data, isLoading, isSuccess } = useQuery({
-    queryKey: ["id"],
+ 
+  const { data, isLoading, isSuccess,isLoadingError,fetchStatus,error } = useQuery({
+    queryKey: [`quiz${id}`],
     queryFn: async () => {
       const datas = await axios.get(`/api/quiz/take?id=${id}`);
       return datas.data;
     },
+   
     refetchOnWindowFocus: false, // Disable refetch on window focus
     refetchOnMount: false, // Disable refetch on component mount
     refetchOnReconnect: false, // Disable refetch on network reconnect
@@ -91,7 +81,7 @@ const Asnwer = ({ id, time, id_user }) => {
     const isAnswer = await axios.get(
       `/api/answer?id_u=${idUser}&id_q=${questionId}`
     );
-   
+
     if (isAnswer.data.data.id_option) {
       setCurrentOption(isAnswer.data.data.id_option);
     }
@@ -123,7 +113,7 @@ const Asnwer = ({ id, time, id_user }) => {
     setAnswers(newAnswers);
     setCurrentOption(optionId);
     localStorage.setItem(`answers${id}`, JSON.stringify(newAnswers));
-    
+
   };
 
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -165,11 +155,28 @@ const Asnwer = ({ id, time, id_user }) => {
     }
   };
 
+  const postStatusAnswer = async (status)=>{
+    console.log(status)
+    const submitQuiz = await axios.post('/api/answer/status', {
+      idQuiz: id,
+      idUser: id_user,
+      status,
+    })
+    
+    const localTime = new Date(submitQuiz.data.data.created_at).toLocaleString()
+ 
+      const startTime = new Date(localTime);
+    
+      localStorage.setItem(`quiz_start_time_${id}`, startTime);
+    return submitQuiz.data
+  }
+
   useEffect(() => {
-    if (!isLoading) {
+    if (!isLoading && !error) {
       if (data.data.length > 0) {
         setQuizData(data.data[currentIndex]);
         const currentQuestionId = data.data[currentIndex].id;
+        postStatusAnswer(false)
         if (answers[currentQuestionId]) {
           setCurrentOption(answers[currentQuestionId]);
         } else {
@@ -179,13 +186,32 @@ const Asnwer = ({ id, time, id_user }) => {
     }
   }, [isLoading, currentIndex, data, answers]);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+ 
   if (isLoading) {
     return <div>Memuat Soal...</div>;
   }
+  if(error){
+    
+    return <AlertDialog id={id} msg={error.response.data.message} userId={id_user}/>
+  }
+
+    
+  
+
   let allQuestionsAnswered =
     data.data.length > 0 && Object.keys(answers).length === data.data.length;
   const noSoal = currentIndex + 1;
 
+
+
+  const handleSubmit = () => {
+    postStatusAnswer(true);
+    localStorage.removeItem(`markedQuestions${id}`)
+    localStorage.removeItem(`quiz_start_time_${id}`)
+    localStorage.removeItem(`answers${id}`)
+    window.location.href = `/result/${id}/${id_user}`; 
+
+  }
   const hurufAbjad = [
     "a",
     "b",
@@ -218,23 +244,7 @@ const Asnwer = ({ id, time, id_user }) => {
   return (
     <div className="col-span-9 w-full rounded-md p-2 h-max">
       {isEnd && (
-        <AlertDialog open={isEnd}>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>Waktu Pengerjaan Sudah Habis</AlertDialogTitle>
-              <AlertDialogDescription>
-                Terima kasih telah mengerjakan kuis. Kami berharap nilai Anda
-                bagus! Anda bisa melihat hasil Anda dengan mengklik tombol di
-                bawah ini.
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <a href={`/result/${id}`} className={buttonVariants()}>
-                Lihat Nilai
-              </a>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
+       <AlertDialog id={id} msg={"Waktu Pengerjaan Sudah Habis !!!"} userId={id_user}/>
       )}
       <div className="sticky top-0 bg-white pt-2 border-b-2 border-blue-400">
         <div className="bg-blue-600/80 text-center w-full text-white rounded-full">
@@ -244,13 +254,11 @@ const Asnwer = ({ id, time, id_user }) => {
           {data.data.map((e, i) => (
             <div
               key={i}
-              className={`${
-                !!markedQuestions[e.id] && "bg-yellow-500 text-white"
-              } ${!!answers[e.id] && "!bg-green-600 text-white"} ${
-                quizData.id === e.id
+              className={`${!!markedQuestions[e.id] && "bg-yellow-500 text-white"
+                } ${!!answers[e.id] && "!bg-green-600 text-white"} ${quizData.id === e.id
                   ? "bg-blue-600 text-white border-2 border-blue-900"
                   : "border border-blue-600 text-blue-600"
-              }  cursor-pointer px-3 py-2 text-xs rounded-md  px-2 text-center font-semibold`}
+                }  cursor-pointer px-3 py-2 text-xs rounded-md  px-2 text-center font-semibold`}
               onClick={() => {
                 setQuizData(e);
                 setCurrentIndex(i);
@@ -275,13 +283,11 @@ const Asnwer = ({ id, time, id_user }) => {
                 {data.data.map((e, i) => (
                   <div
                     key={i}
-                    className={`${
-                      !!markedQuestions[e.id] && "bg-yellow-500 text-white"
-                    } ${!!answers[e.id] && "!bg-green-600 text-white"} ${
-                      quizData.id === e.id
+                    className={`${!!markedQuestions[e.id] && "bg-yellow-500 text-white"
+                      } ${!!answers[e.id] && "!bg-green-600 text-white"} ${quizData.id === e.id
                         ? "bg-blue-600 text-white"
                         : "border border-blue-600 text-blue-600"
-                    }  cursor-pointer px-3 py-2 text-xs rounded-md text-center font-semibold`}
+                      }  cursor-pointer px-3 py-2 text-xs rounded-md text-center font-semibold`}
                     onClick={() => {
                       setQuizData(e);
                       setCurrentIndex(i);
@@ -352,18 +358,13 @@ const Asnwer = ({ id, time, id_user }) => {
           >
             Next
           </Button>
-         
+
         </div>
         {allQuestionsAnswered && (
           <div className="flex justify-center mt-4">
             <Button
               color="green-600"
-              onClick={() => {
-                localStorage.removeItem(`markedQuestions${id}`)
-                localStorage.removeItem(`quiz_start_time_${id}`)
-                localStorage.removeItem(`answers${id}`)
-                window.location.href = `/result/${id}`;
-              }}
+              onClick={handleSubmit}
             >
               Selesai
             </Button>

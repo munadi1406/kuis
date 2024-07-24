@@ -1,0 +1,36 @@
+---
+import { supabase } from "@/lib/supabase"
+
+const {id,userId} = Astro.params
+
+const getQuizScore = async (quizId, userId) => {
+  const { data: answers, error } = await supabase
+    .from('answers')
+    .select(`*, options(*)`)
+    .eq('id_quiz', quizId)
+    .eq('id_user', userId);
+
+  if (error) {
+    console.error('Error fetching answers:', error);
+    return { score: 0, totalQuestions: 0, correctAnswers: 0 };
+  }
+
+  // Filter correct answers
+  const correctAnswers = answers.filter(answer => answer.options.option_is_true);
+
+  // Calculate score
+  const totalQuestions = answers.length;
+  const score = (correctAnswers.length / totalQuestions) * 100;
+
+  return { score, totalQuestions, correctAnswers: correctAnswers.length };
+};
+
+const { score, totalQuestions, correctAnswers } = await getQuizScore(id, userId);
+---
+
+<div>
+    <h1>Hasil Kuis</h1>
+    <p>Jumlah Pertanyaan: {totalQuestions}</p>
+    <p>Jawaban Benar: {correctAnswers}</p>
+    <p>Nilai Anda: {score.toFixed(2)}</p>
+</div>

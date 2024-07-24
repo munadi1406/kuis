@@ -33,8 +33,20 @@ export const POST = async ({ params, request, url }) => {
   
     if (error) {
       console.error('Error updating data:', error);
+      return new Response(
+        JSON.stringify({
+          message: "500",
+        }),
+        { status: 500 }
+      );
     } else {
       console.log('Data updated successfully:', data);
+      return new Response(
+        JSON.stringify({
+          message: "201",
+        }),
+        { status: 201 }
+      );
     }
   } else {
     // Jika data tidak ada, lakukan insert
@@ -56,12 +68,12 @@ export const POST = async ({ params, request, url }) => {
         { status: 500 }
       );
     } else {
-      console.log('Data inserted successfully:', data);
+      
       return new Response(
         JSON.stringify({
-          message: "200",
+          message: "201",
         }),
-        { status: 200 }
+        { status: 201 }
       );
     }
   }

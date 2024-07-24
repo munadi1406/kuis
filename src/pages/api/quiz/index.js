@@ -10,15 +10,13 @@ const generateCustomToken = (length = 12) => {
   return token;
 };
 export const POST = async ({ params, request, url }) => {
-
-
   const datasss = await request.json();
   const { title, desc, duration, startDate, endDate, token, soalData, mapel, kelas, id_user } = datasss.data
   let quizId;
   let insertedQuestionIds = [];
 
   try {
-
+    
     let finalToken = token;
 
     // Jika token tidak disediakan atau kosong, buat token acak
