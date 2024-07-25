@@ -1,6 +1,7 @@
 import { supabase } from "@/lib/supabase";
 
 
+
 // import { createClient } from "@supabase/supabase-js";
 // const supabase = createClient(
 //   import.meta.env.SUPABASE_URL,
@@ -80,16 +81,12 @@ export const GET = async ({ params, url,cookies }) => {
     try {
         const id = url.searchParams.get("id");
         console.log({iniID :id})
-
-        const access_token = cookies.get("sb-access-token")?.value;
-        const refresh_token = cookies.get("sb-refresh-token")?.value;
-        // console.log({access_token})
-        if (!access_token) {
-          throw new Error("No access token");
-        }
+       
+        
+        
     
         // Set the session in supabase
-       await supabase.auth.setSession({ access_token,refresh_token });
+     
        
 
         const { data: users,error:e1 } = await supabase.auth.getUser()
