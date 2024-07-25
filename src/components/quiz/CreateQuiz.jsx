@@ -55,13 +55,14 @@ const CreateQuiz = () => {
   );
   const [soalData, setSoalData] = useState([]);
 
-  // useEffect(()=>{
+  // useEffect(() => {
   //   console.log(soalData)
-  // },[soalData])
+  // }, [soalData])
 
 
   const handleInputChange = (event) => {
     const { name, value, id } = event.target;
+    console.log("run")
     // Memeriksa apakah input merupakan input soal atau jawaban
 
     if (name.startsWith("soal")) {
@@ -86,13 +87,36 @@ const CreateQuiz = () => {
         return [...prevData];
       });
     } else if (name.startsWith("isTrue")) {
-      const idSoal = name.split("isTrue")[1];
-      const idJawaban = id.split("jawabanId")[1];
-      if (!soalData[idSoal]) return;
-      soalData[idSoal].answerOption.forEach((option, index) => {
-        option.answerIsTrue = index.toString() === idJawaban ? true : false;
+      // console.log("radio run");
+      const idSoal = parseInt(name.split("isTrue")[1]);
+      const idJawaban = parseInt(id.split("jawabanId")[1]);
+      // console.log({ idJawaban });
+
+      setSoalData((prevData) => {
+        const newData = [...prevData];
+
+        // Buat objek soal jika belum ada
+        if (!newData[idSoal]) {
+          newData[idSoal] = { question: "", answerOption: [] };
+        }
+
+        // Buat objek jawaban jika belum ada
+        if (!newData[idSoal].answerOption[idJawaban]) {
+          newData[idSoal].answerOption[idJawaban] = {
+            answerOption: "",
+            answerIsTrue: false,
+          };
+        }
+
+        // Set answerIsTrue pada jawaban yang sesuai
+        newData[idSoal].answerOption.forEach((option, index) => {
+          option.answerIsTrue = index === idJawaban;
+        });
+
+        return newData;
       });
-      setSoalData(soalData);
+
+      // console.log("done");
     }
   };
 
@@ -111,7 +135,7 @@ const CreateQuiz = () => {
     },
   });
 
-  const { mutate,isPending, } = useMutation({
+  const { mutate, isPending, } = useMutation({
     mutationFn: async (e) => {
       e.preventDefault();
       const dataPayload = {
@@ -365,13 +389,13 @@ const CreateQuiz = () => {
             type={"text"}
             label={"Lama Pengerjaan Quiz"}
             placeholder={"Masukkan Token Kuis..."}
-        
+
             onChange={(e) => setToken(e.target.value)}
             id="tokenKuis"
           />
         </div>
-        
-        <ButtonLoader loading={isPending} text={"Simpan"} type="submit"/>
+
+        <ButtonLoader loading={isPending} text={"Simpan"} type="submit" />
         {/* {console.log(isLoading)} */}
       </div>
       <div className="w-full md:order-3 order-2 col-span-4 flex flex-col gap-2 border p-2 rounded-md">

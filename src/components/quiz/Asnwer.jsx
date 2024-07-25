@@ -163,7 +163,7 @@ const Asnwer = ({ id, time, id_user }) => {
       status,
     })
     
-    const localTime = new Date(submitQuiz.data.data.created_at).toLocaleString()
+    const localTime = new Date(submitQuiz.data.data.created_at)
  
       const startTime = new Date(localTime);
     
@@ -308,7 +308,7 @@ const Asnwer = ({ id, time, id_user }) => {
         </Drawer>
       </div>
       <div className="border p-2 rounded-md md:mb-0 mb-20 mt-3">
-        <p>Soal No {noSoal}</p>
+        <p className="text-xl font-bold py-2">Soal No {noSoal}</p>
         {quizData.question && (
           <>
             <div className="p-3 mb-2 bg-slate-300/30 rounded-md ">
@@ -317,11 +317,11 @@ const Asnwer = ({ id, time, id_user }) => {
             {quizData.options.map((e, i) => (
               <div
                 key={i}
-                className="flex hover:bg-blue-500/30 active:scale-x-95 gap-2 items-start justify-start p-2 border-l-2 mb-2 bg-slate-300/30 rounded-md backdrop-blur-md border-blue-600"
+                className={`${e.id === currentOption && '!bg-blue-300'} flex hover:bg-blue-500/30 active:scale-x-95 gap-2 items-start justify-start p-2 border-l-2 mb-2 bg-slate-300/30 rounded-md backdrop-blur-md border-blue-600`}
                 onClick={() => handleAnswerChange(quizData.id, e.id)}
               >
                 <div>
-                  <input
+                  <input 
                     key={e.id}
                     type="radio"
                     id={e.id}

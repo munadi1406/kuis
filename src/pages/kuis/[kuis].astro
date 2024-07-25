@@ -7,7 +7,8 @@ import KuisSubmittion from "../../components/quiz/KuisSubmittion";
 import { supabase } from "@/lib/supabase";
 import { getStatus } from "../../components/Card";
 import { localTime } from "@/utils/localTime";
-
+import ShareQuiz from '../../components/quiz/ShareQuiz'
+ 
 const { data: quiz, error } = await supabase
   .from("quiz")
   .select(
@@ -19,21 +20,30 @@ const { data: quiz, error } = await supabase
     kelas(
       kelas
     )
-  `
+  `,
   )
   .eq("id", kuis)
   .single();
 
-const status = getStatus(quiz.start_quiz, quiz.end_quiz);
----
 
-<Dashboard title={quiz.title}>
+const { data: answers } = await supabase
+  .from("answers")
+  .select("*")
+  .eq("id_quiz", kuis);
+const uniqueUsers = new Set(answers.map((answer) => answer.id_user));
+const participantCount = uniqueUsers.size;
+
+
+const status = getStatus(quiz?.start_quiz, quiz?.end_quiz);
+--- 
+
+<Dashboard title={quiz?.title}>
   <div class="grid md:grid-cols-6 grid-cols-1 gap-2">
     <div
       class="grid grid-cols-1 order-1 gap-2 p-2 rounded-md border md:col-span-4"
     >
       <div>
-        <CardUser title={"Jumlah Kuis Dikerjakan"} value={100} />
+        <CardUser title={"Jumlah Kuis Dikerjakan"} value={participantCount} client:idle/>
       </div>
       <div class="flex justify-center items-center gap-2 flex-wrap">
         <Button>Cetak Nilai</Button>
@@ -64,19 +74,53 @@ const status = getStatus(quiz.start_quiz, quiz.end_quiz);
         {`${localTime(quiz.start_quiz)} - ${localTime(quiz.end_quiz)}`}
       </p>
       <p
-        class="text-md border-blue-600 border py-2 px-2 w-full rounded-md font-bold"
+        class="text-md border-blue-600 border py-2 px-2 w-full rounded-md font-bold" id="token"
       >
         Token : {quiz.token}
       </p>
       <p class="leading-7">
         {quiz.desc}
-      </p>
+      </p> 
       <Button>Edit Kuis</Button>
+  
+      <ShareQuiz id={kuis} client:idle />
     </div>
     <div
       class="w-full order-3 col-span-full flex flex-col gap-2 border p-2 rounded-md"
     >
-      <KuisSubmittion />
+    
+      <KuisSubmittion id={kuis} client:load="react" title={quiz.title}/>
     </div>
   </div>
 </Dashboard>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function() {
+      const tokenElement = document.getElementById('token');
+      
+
+      tokenElement.addEventListener('click', function() {
+          const tokenText = tokenElement.textContent.replace('Token : ', '');
+
+          // Create a temporary input element to hold the token text
+          const tempInput = document.createElement('input');
+          tempInput.value = tokenText;
+          document.body.appendChild(tempInput);
+
+          // Select the text in the temporary input element
+          tempInput.select();
+          tempInput.setSelectionRange(0, 99999); // For mobile devices
+
+          // Execute the copy command
+          document.execCommand('copy');
+
+          // Remove the temporary input element
+          document.body.removeChild(tempInput);
+         tokenElement.innerHTML = "Token Di Copy"
+                setTimeout(() => {
+                  tokenElement.innerHTML =`Token : ${tempInput.value}`
+                }, 2000);
+          
+      });
+  });
+</script>

@@ -1,105 +1,71 @@
 import {
-    Table,
-    TableBody,
-    TableCaption,
-    TableCell,
-    TableFooter,
-    TableHead,
-    TableHeader,
-    TableRow,
-  } from "@/components/ui/table";
-  import { Input } from "../ui/input";
-  import { Label } from "../ui/label";
-  import { Button } from "../ui/button";
-  
-  const invoices = [
-    {
-      invoice: "INV001",
-      paymentStatus: "Paid",
-      totalAmount: "$250.00",
-      paymentMethod: "Credit Card",
-    },
-    {
-      invoice: "INV002",
-      paymentStatus: "Pending",
-      totalAmount: "$150.00",
-      paymentMethod: "PayPal",
-    },
-    {
-      invoice: "INV003",
-      paymentStatus: "Unpaid",
-      totalAmount: "$350.00",
-      paymentMethod: "Bank Transfer",
-    },
-    {
-      invoice: "INV004",
-      paymentStatus: "Paid",
-      totalAmount: "$450.00",
-      paymentMethod: "Credit Card",
-    },
-    {
-      invoice: "INV005",
-      paymentStatus: "Paid",
-      totalAmount: "$550.00",
-      paymentMethod: "PayPal",
-    },
-    {
-      invoice: "INV006",
-      paymentStatus: "Pending",
-      totalAmount: "$200.00",
-      paymentMethod: "Bank Transfer",
-    },
-    {
-      invoice: "INV007",
-      paymentStatus: "Unpaid",
-      totalAmount: "$300.00",
-      paymentMethod: "Credit Card",
-    },
-  ];
-  
-  const KuisSubmittion = () => {
-    return (
-      <div className="w-full border rounded-md ">
-        <div className="w-full flex justify-between items-end  border-b  p-2">
-          <div >
-            <Label htmlFor="search">Search</Label>
-            <Input type="search" id="search" placeholder="Search" />
-          </div>
-          <div className="flex items-end justify-end">
-              <Button className="w-max h-[40px]">Cetak</Button>
-          </div>
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Input } from "../ui/input";
+import { Label } from "../ui/label";
+import { Button } from "../ui/button";
+import { useQuery } from "@tanstack/react-query";
+import axios from "axios";
+import WithQuery from "@/utils/WithQuery";
+import { generatePdf } from "./generatePdf";
+
+
+const KuisSubmittion = ({ id,title }) => {
+  console.log(id)
+  const { data, isLoading, error } = useQuery({
+    queryKey: [`kuis${id}`], queryFn: async () => {
+      const submittionData = await axios.get(`/api/score?id=${id}`)
+      return submittionData.data.data
+    }, refetchInterval: 5000
+  })
+  console.log(error)
+  if (isLoading) {
+    return <div>Loading...</div>
+  }
+
+  return (
+    <div className="w-full border rounded-md ">
+      {console.log(data)}
+      <div className="w-full flex justify-between items-end  border-b  p-2">
+        <div >
+          <Label htmlFor="search">Search</Label>
+          <Input type="search" id="search" placeholder="Search" />
         </div>
-        <Table>
-          <TableCaption>A list of your recent invoices.</TableCaption>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="w-[100px]">Invoice</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Method</TableHead>
-              <TableHead className="text-right">Amount</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {invoices.map((invoice) => (
-              <TableRow key={invoice.invoice}>
-                <TableCell className="font-medium">{invoice.invoice}</TableCell>
-                <TableCell>{invoice.paymentStatus}</TableCell>
-                <TableCell>{invoice.paymentMethod}</TableCell>
-                <TableCell className="text-right">
-                  {invoice.totalAmount}
-                </TableCell>
-              </TableRow>
-            ))}
-          </TableBody>
-          <TableFooter>
-            <TableRow>
-              <TableCell colSpan={3}>Total</TableCell>
-              <TableCell className="text-right">$2,500.00</TableCell>
-            </TableRow>
-          </TableFooter>
-        </Table>
+        <div className="flex items-end justify-end gap-2">
+          <Button className="w-max h-[40px]" onClick={()=>generatePdf(title,id)}>Cetak</Button>
+          <Button className="w-max h-[40px]" >Cetak Soal</Button>
+        </div>
       </div>
-    );
-  };
-  export default KuisSubmittion;
-  
+      <Table>
+        <TableCaption>Daftar Hasil Kuis</TableCaption>
+        <TableHeader>
+          <TableRow>
+            <TableHead className="w-[100px]">No</TableHead>
+            <TableHead>Nama Lengkap</TableHead>
+            <TableHead>Nilai</TableHead>
+            <TableHead className="text-right">Aksi</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {data.map(({ id_user, namaLengkap, score, total }, i) => (
+            <TableRow key={i}>
+              <TableCell className="font-medium">{i + 1}</TableCell>
+              <TableCell>{namaLengkap}</TableCell>
+              <TableCell>{(score / total * 100).toFixed(1)}</TableCell>
+              <TableCell className="text-right">
+                oke
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
+    </div>
+  );
+};
+export default WithQuery(KuisSubmittion);

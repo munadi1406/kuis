@@ -34,7 +34,11 @@ export const POST = async ({ params, request, url }) => {
   const { data: urls, error: err } = supabase.storage
     .from("test")
     .getPublicUrl(`public/${uniqueFileName}`);
-
+    console.log("api image run")
+    console.log({datas})
+    console.log({error})
+    console.log({urls})
+    console.log({err})
 
 
   // console.log("Current working directory:", process.cwd());
