@@ -11,7 +11,7 @@ const generateCustomToken = (length = 12) => {
 };
 export const POST = async ({ params, request, url }) => {
   const { idQuiz, idUser, idQuestion, idOption } = await request.json();
-  console.log(idUser)
+  // console.log(idUser)
   const { data: existingData, error: fetchError } = await supabase
   .from('answers')
   .select('id')
@@ -40,7 +40,7 @@ export const POST = async ({ params, request, url }) => {
         { status: 500 }
       );
     } else {
-      console.log('Data updated successfully:', data);
+      // console.log('Data updated successfully:', data);
       return new Response(
         JSON.stringify({
           message: "201",

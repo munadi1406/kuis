@@ -81,7 +81,7 @@ export const POST = async ({ params, request, url }) => {
       }));
       answerInsertData.push(...answers);
     });
-    console.log({answerInsertData})
+    // console.log({answerInsertData})
 
     // Insert all answers in bulk
     const { data: answerData, error: answerError } = await supabase
@@ -179,6 +179,34 @@ export const GET = async ({ params, url }) => {
         data: [],
       }),
       { status: 404 }
+    );
+  }
+};
+export const DELETE = async ({ params, url }) => {
+  
+  const id = url.searchParams.get("id");
+  // console.log(id)
+  const perPage = 10
+  const {error} =await  supabase.from("quiz").delete().eq('id',id)
+
+  // Kondisi untuk id
+  // console.log({error})
+ 
+  if (error) {
+    return new Response(
+      JSON.stringify({
+        message: "gagal menghapus kuis",
+       
+      }),
+      { status: 404 }
+    );
+  } else {
+    return new Response(
+      JSON.stringify({
+        message: "kuis berhasil dihapus",
+       
+      }),
+      { status: 200 }
     );
   }
 };

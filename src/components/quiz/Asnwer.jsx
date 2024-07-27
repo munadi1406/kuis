@@ -28,7 +28,7 @@ const Asnwer = ({ id, time, id_user }) => {
   const [timeLeft, setTimeLeft] = useState(time * 60); // Waktu dalam detik
   const [isEnd, setIsEnd] = useState(false);
   useEffect(() => {
-    const quizStartTime = localStorage.getItem(`quiz_start_time_${id}`);
+    const quizStartTime = localStorage.getItem(`quiz_start_time_${id}${id_user}`);
 
     if (quizStartTime) {
       const startTime = new Date(quizStartTime);
@@ -50,7 +50,7 @@ const Asnwer = ({ id, time, id_user }) => {
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [id, time,localStorage.getItem(`quiz_start_time_${id}`)]);
+  }, [id, time,localStorage.getItem(`quiz_start_time_${id}${id_user}`)]);
 
   useEffect(() => {
     if (timeLeft <= 0) {
@@ -112,18 +112,18 @@ const Asnwer = ({ id, time, id_user }) => {
     };
     setAnswers(newAnswers);
     setCurrentOption(optionId);
-    localStorage.setItem(`answers${id}`, JSON.stringify(newAnswers));
+    localStorage.setItem(`answers${id}${id_user}`, JSON.stringify(newAnswers));
 
   };
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [markedQuestions, setMarkedQuestions] = useState({});
   useEffect(() => {
-    const storedAnswers = localStorage.getItem(`answers${id}`);
+    const storedAnswers = localStorage.getItem(`answers${id}${id_user}`);
     if (storedAnswers) {
       setAnswers(JSON.parse(storedAnswers));
     }
-    const storedMarkedQuestions = localStorage.getItem(`markedQuestions${id}`);
+    const storedMarkedQuestions = localStorage.getItem(`markedQuestions${id}${id_user}`);
     if (storedMarkedQuestions) {
       setMarkedQuestions(JSON.parse(storedMarkedQuestions));
     }
@@ -131,7 +131,7 @@ const Asnwer = ({ id, time, id_user }) => {
 
   useEffect(() => {
     localStorage.setItem(
-      `markedQuestions${id}`,
+      `markedQuestions${id}${id_user}`,
       JSON.stringify(markedQuestions)
     );
   }, [markedQuestions]);
@@ -156,7 +156,7 @@ const Asnwer = ({ id, time, id_user }) => {
   };
 
   const postStatusAnswer = async (status)=>{
-    console.log(status)
+    // console.log(status)
     const submitQuiz = await axios.post('/api/answer/status', {
       idQuiz: id,
       idUser: id_user,
@@ -167,7 +167,7 @@ const Asnwer = ({ id, time, id_user }) => {
  
       const startTime = new Date(localTime);
     
-      localStorage.setItem(`quiz_start_time_${id}`, startTime);
+      localStorage.setItem(`quiz_start_time_${id}${id_user}`, startTime);
     return submitQuiz.data
   }
 
@@ -206,9 +206,9 @@ const Asnwer = ({ id, time, id_user }) => {
 
   const handleSubmit = () => {
     postStatusAnswer(true);
-    localStorage.removeItem(`markedQuestions${id}`)
-    localStorage.removeItem(`quiz_start_time_${id}`)
-    localStorage.removeItem(`answers${id}`)
+    localStorage.removeItem(`markedQuestions${id}${id_user}`)
+    localStorage.removeItem(`quiz_start_time_${id}${id_user}`)
+    localStorage.removeItem(`answers${id}${id_user}`)
     window.location.href = `/result/${id}/${id_user}`; 
 
   }

@@ -23,7 +23,7 @@ class CustomImage extends ImageTool {
       })
         .then((res) => res.text())
         .then((data) => {
-          console.log(data)
+          // console.log(data)
           // console.log("Hapus Gambar:", data);
         })
         .catch((err) => {
@@ -60,11 +60,11 @@ const EditorInput = ({ name,onChange,id }) => {
             },
 
             onUploadError: (error) => {
-              console.error("Upload Error:", error);
+              // console.error("Upload Error:", error);
               alert("Failed to upload image: " + error.message);
             },
             onUploadSuccess: (file, response) => {
-              console.log("Upload Successful:", file, response);
+              // console.log("Upload Successful:", file, response);
             },
           },
         },

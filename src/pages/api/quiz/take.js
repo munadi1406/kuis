@@ -32,7 +32,7 @@ export const POST = async ({ params, request, url }) => {
         )`)
         .eq("token", tokenQuiz).single();
 
-    console.log(error);
+    // console.log(error);
     if (!quizData) {
         return new Response(
             JSON.stringify({
@@ -80,7 +80,7 @@ export const GET = async ({ params, url,cookies }) => {
     
     try {
         const id = url.searchParams.get("id");
-        console.log({iniID :id})
+        // console.log({iniID :id})
        
         
         
@@ -115,8 +115,8 @@ export const GET = async ({ params, url,cookies }) => {
             const quizStartTime = new Date(status.created_at); // Waktu mulai quiz
             const now = new Date(); // Waktu saat ini
             const elapsedTimeMinutes = (now - quizStartTime) / (1000 * 60);
-            console.log({ elapsedTimeMinutes })
-            console.log({ quizDurationMinutes })
+            // console.log({ elapsedTimeMinutes })
+            // console.log({ quizDurationMinutes })
             if (elapsedTimeMinutes > quizDurationMinutes) {
                 return new Response(
                     JSON.stringify({
@@ -140,7 +140,7 @@ export const GET = async ({ params, url,cookies }) => {
             { status: 200 }
         );
     } catch (error) {
-        console.log(error);
+        // console.log(error);
         return new Response(
             JSON.stringify({
                 message: "Internal Server Error",

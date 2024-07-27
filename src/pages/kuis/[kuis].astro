@@ -7,8 +7,9 @@ import KuisSubmittion from "../../components/quiz/KuisSubmittion";
 import { supabase } from "@/lib/supabase";
 import { getStatus } from "../../components/Card";
 import { localTime } from "@/utils/localTime";
-import ShareQuiz from '../../components/quiz/ShareQuiz'
- 
+import QuizMenu from '@/components/quiz/QuizMenu'
+import QuizAction from "@/components/quiz/QuizAction";
+
 const { data: quiz, error } = await supabase
   .from("quiz")
   .select(
@@ -42,13 +43,11 @@ const status = getStatus(quiz?.start_quiz, quiz?.end_quiz);
     <div
       class="grid grid-cols-1 order-1 gap-2 p-2 rounded-md border md:col-span-4"
     >
-      <div>
+      <div class="h-full">
         <CardUser title={"Jumlah Kuis Dikerjakan"} value={participantCount} client:idle/>
       </div>
       <div class="flex justify-center items-center gap-2 flex-wrap">
-        <Button>Cetak Nilai</Button>
-        <Button>Pertanyaan Paling Sering Salah</Button>
-        <Button>Analisis Kesulitan Soal</Button>
+        <QuizMenu id={kuis} title={quiz?.title} client:idle/>
       </div>
     </div>
     <div
@@ -74,16 +73,16 @@ const status = getStatus(quiz?.start_quiz, quiz?.end_quiz);
         {`${localTime(quiz.start_quiz)} - ${localTime(quiz.end_quiz)}`}
       </p>
       <p
-        class="text-md border-blue-600 border py-2 px-2 w-full rounded-md font-bold" id="token"
+        class="text-md cursor-pointer border-blue-600 border py-2 px-2 w-full rounded-md font-bold" id="token"
       >
         Token : {quiz.token}
       </p>
       <p class="leading-7">
         {quiz.desc}
       </p> 
-      <Button>Edit Kuis</Button>
-  
-      <ShareQuiz id={kuis} client:idle />
+      
+      <QuizAction client:idle data={{id:kuis,title:quiz?.title}}/>
+      
     </div>
     <div
       class="w-full order-3 col-span-full flex flex-col gap-2 border p-2 rounded-md"

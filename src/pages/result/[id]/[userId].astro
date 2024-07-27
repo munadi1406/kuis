@@ -17,8 +17,8 @@ const {
   .eq("questions.options.option_is_true", true)
   .eq("id", id)
   .single();
-console.log(quiz);
-console.log(err);
+// console.log(quiz);
+// console.log(err);
 const { data: answers, error } = await supabase
   .from("answers")
   .select(`*, options(*)`)

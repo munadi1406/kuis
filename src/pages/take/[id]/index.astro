@@ -15,14 +15,21 @@ import { supabase } from "@/lib/supabase";
 //     },
 //   },
 // );
-
+const { cookies, redirect } = Astro;
 const { id } = Astro.params;
+const accessToken = cookies.get("sb-access-token");
+const refreshToken = cookies.get("sb-refresh-token");
 
-const {
-  data: { user },error:err,
-} = await supabase.auth.getUser();
 
-let userId = user?.id || "";
+
+const { data:{user}, error:err } = await supabase.auth.setSession({
+  refresh_token: refreshToken?.value,
+  access_token: accessToken?.value,
+});
+
+
+
+
 
 
 const { data: quiz, error } = await supabase
@@ -33,15 +40,10 @@ const { data: quiz, error } = await supabase
 
 let status = "false";
 
-if (error) {
-  console.error("Error fetching quiz:", error);
-}
-const { cookies } = Astro;
-// console.log({ user });
-if (!user) {
-  const refresh_token = cookies.get("sb-refresh-token")?.value;
-  console.log({refresh_token})
-  console.log({refresh_token})
+
+let userId = user?.id || "";
+
+if (err) {
   status = "guest"
 } else {
   if (quiz) {
@@ -53,7 +55,7 @@ if (!user) {
     }
   }
 }
-// console.log(quiz)
+// console.log(status)
 
 
 ---

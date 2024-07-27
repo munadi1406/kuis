@@ -62,7 +62,7 @@ const CreateQuiz = () => {
 
   const handleInputChange = (event) => {
     const { name, value, id } = event.target;
-    console.log("run")
+    // console.log("run")
     // Memeriksa apakah input merupakan input soal atau jawaban
 
     if (name.startsWith("soal")) {

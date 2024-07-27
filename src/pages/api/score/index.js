@@ -3,8 +3,9 @@ import { supabase } from "@/lib/supabase";
 export const GET = async ({ params, url }) => {
     try {
       const id = url.searchParams.get("id");
-      const perPage = 10;
-  
+     
+     
+
       // Fetch answers with their corresponding option details
       const { data: answers, error: answersError } = await supabase
         .from("answers")
@@ -67,14 +68,14 @@ export const GET = async ({ params, url }) => {
       });
     
   
-      // Convert the userScores object into an array
+     
       const userScoresArray = Object.keys(userScores).map(userId => ({
         userId,
         namaLengkap: userScores[userId].namaLengkap,
         score: userScores[userId].score,
         total: count,
       })); 
-      
+      userScoresArray.sort((a, b) => a.namaLengkap.localeCompare(b.namaLengkap));
    
       return new Response(
         JSON.stringify({

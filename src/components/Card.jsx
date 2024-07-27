@@ -14,6 +14,9 @@ import {
 } from "@/components/ui/context-menu";
 import { localTime } from "@/utils/localTime";
 import { Badge } from "./ui/badge";
+import WithQuery from "@/utils/WithQuery";
+import DeleteQuiz from "./quiz/DeleteQuiz";
+import { useState } from "react";
 
 export const getStatus = (startDate, endDate) => {
   const now = new Date();
@@ -27,6 +30,10 @@ export const getStatus = (startDate, endDate) => {
 };
 const Cards = ({ title, startDate, endDate, skor, id ,desc}) => {
   // Fungsi untuk menentukan status
+  const [isDelete,setIsDelete] = useState(false);
+  const [currentData,setCurrentData] = useState({id:0,title:""})
+ 
+
 
   const status = getStatus(startDate, endDate);
   const truncateDesc = (desc, wordLimit) => {
@@ -36,10 +43,15 @@ const Cards = ({ title, startDate, endDate, skor, id ,desc}) => {
     }
     return desc;
   };
-
+  const handleClick = (e)=>{
+    setIsDelete(!isDelete)
+    setCurrentData({id:e.id,title:e.title});
+  }
   const truncatedDesc = truncateDesc(desc, 25);
 
   return (
+    <>
+    <DeleteQuiz isOpen={isDelete} data={currentData} setIsOpen={setIsDelete}/>
     <ContextMenu>
       <ContextMenuTrigger>
         <Card>
@@ -65,7 +77,7 @@ const Cards = ({ title, startDate, endDate, skor, id ,desc}) => {
                 <a
                   href={`/kuis/${id}`}
                   className={buttonVariants({ className: "w-full" })}
-                >
+                  >
                   Lihat Selengkapnya
                 </a>
               </div>
@@ -77,13 +89,14 @@ const Cards = ({ title, startDate, endDate, skor, id ,desc}) => {
         <ContextMenuItem>
           <a href={`/kuis/${id}`}>Detail</a>
         </ContextMenuItem>
-        <ContextMenuItem className="bg-red-500 text-white">Hapus</ContextMenuItem>
+        <ContextMenuItem className="bg-red-500 text-white" onClick={()=>handleClick({id,title})}>Hapus</ContextMenuItem>
       </ContextMenuContent>
     </ContextMenu>
+                  </>
   );
 };
 
 
 
 
-export default Cards;
+export default WithQuery(Cards);
