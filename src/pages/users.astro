@@ -29,10 +29,11 @@ oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
 
 newUsersThisWeek = users.filter((user) => {
   const createdAt = new Date(user.created_at);
+  console.log(createdAt)
   return createdAt >= oneWeekAgo;
 }).length;
 
-
+ 
 ---
 
 <Dashboard title="Users">

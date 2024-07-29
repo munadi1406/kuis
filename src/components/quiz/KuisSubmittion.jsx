@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/table";
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
-import { Button } from "../ui/button";
+import { Button, buttonVariants } from "../ui/button";
 import { useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import WithQuery from "@/utils/WithQuery";
@@ -44,6 +44,8 @@ const KuisSubmittion = ({ id, title }) => {
   const { data, isLoading, error } = useQuery({
     queryKey: [`kuis${id}`], queryFn: async () => {
       const submittionData = await axios.get(`/api/score?id=${id}`)
+      
+
       return submittionData.data.data
     }, refetchInterval: 5000
   })
@@ -126,6 +128,7 @@ const KuisSubmittion = ({ id, title }) => {
   const [duration, setDuration] = useState(null);
 
   useEffect(() => {
+    
     if (detailAnswer.isSuccess ) {
       const { hours, minutes, seconds } = calculateDuration(detailAnswer.data.created_at, detailAnswer.data.updated_at);
       // console.log(hours, minutes)
@@ -156,6 +159,10 @@ const KuisSubmittion = ({ id, title }) => {
               </thead>
               <tbody>
                 <tr>
+                  <td className="border border-gray-300 p-2 text-gray-700">Nama Lengkap</td>
+                  <td className="border border-gray-300 p-2 text-gray-700">{detailData.namaLengkap}</td>
+                </tr>
+                <tr>
                   <td className="border border-gray-300 p-2 text-gray-700">Jumlah Soal</td>
                   <td className="border border-gray-300 p-2 text-gray-700">{detailData.total}</td>
                 </tr>
@@ -167,7 +174,7 @@ const KuisSubmittion = ({ id, title }) => {
                   <td className="border border-gray-300 p-2 text-gray-700">Jumlah Jawaban Salah Atau Tidak Terjawab</td>
                   <td className="border border-gray-300 p-2 text-gray-700">{detailData.total - detailData.score}</td>
                 </tr>
-                <tr>
+                <tr> 
                   <td className="border border-gray-300 p-2 text-gray-700">Nilai</td>
                   <td className="border border-gray-300 p-2 text-gray-700">{(detailData.score / detailData.total * 100).toFixed(1)}</td>
                 </tr>
@@ -180,9 +187,8 @@ const KuisSubmittion = ({ id, title }) => {
                   <td className="border border-gray-300 p-2 text-gray-700">
                     {!detailAnswer.isFetched
                       ? 'Loading...'
-                      : detailAnswer.data.status
-                        ? localTime(detailAnswer.data.updated_at)
-                        : 'Kuis Tidak Selesai Atau Waktu Pengerjaan Kuis Habis'}
+                      : localTime(detailAnswer.data.updated_at)
+                       }
                   </td>
                 </tr>
                 <tr>
@@ -197,11 +203,15 @@ const KuisSubmittion = ({ id, title }) => {
                   <td className="border border-gray-300 p-2 text-gray-700">Keterangan</td>
                   <td className="border border-gray-300 p-2 text-gray-700">{getConclusion(detailData.score, detailData.total)}</td>
                 </tr>
+                <tr>
+                  <td className="border border-gray-300 p-2 text-gray-700">Lihat Jawaban</td>
+                  <td className="border border-gray-300 p-2 text-gray-700">
+                    <a href={`/result/${id}/${detailAnswer?.data?.id_user}`} className={buttonVariants()} target="_blank">Jawaban</a>
+                  </td>
+                </tr>
               </tbody>
             </table>
           </div>
-
-
         </SheetContent>
       </Sheet>
       

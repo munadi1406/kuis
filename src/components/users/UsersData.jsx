@@ -225,14 +225,14 @@ const UsersData = () => {
             <DialogTrigger asChild>
               <Button>Cetak</Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[900px]">
+            <DialogContent className="sm:max-w-[900px] overflow-y-scroll max-h-screen">
               <DialogHeader>
                 <DialogTitle>Cetak</DialogTitle>
               </DialogHeader>
-              <div>
-                <div ref={tableRef}>
-                  <div className="w-full mb-4 text-center text-xl font-semibold uppercase underline underline-offset-2">
-                    Laporan Surat Masuk
+              <div className="">
+                <div ref={tableRef} >
+                  <div className="w-full mb-4 text-center text-xl font-semibold uppercase underline underline-offset-2 ">
+                    Daftar User
                   </div>
                   <table className="border-collapse border border-black w-full">
                     <thead>
@@ -248,7 +248,7 @@ const UsersData = () => {
                       {userData &&
                         userData.map(
                           ({ email, username, role, id }, i) =>
-                            role !== "admin" && (
+                             (
                               <tr key={i}>
                                 <td
                                   className={
@@ -264,6 +264,7 @@ const UsersData = () => {
                                   {email}
                                 </td>
                                 <td className={"border border-black p-1"}>
+                                
                                   {role}
                                 </td>
                               </tr>

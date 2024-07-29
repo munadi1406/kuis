@@ -1,5 +1,5 @@
 import WithQuery from "@/utils/WithQuery";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import {
   Drawer,
@@ -14,6 +14,7 @@ import { Button, buttonVariants } from "../ui/button";
 import { useEffect, useState } from "react";
 import edjsHTML from "editorjs-html";
 import AlertDialog from "./AlertDialog";
+import { toast } from "../ui/use-toast";
 
 
 const HtmlRender = ({ data }) => {
@@ -40,6 +41,7 @@ const Asnwer = ({ id, time, id_user }) => {
         setTimeLeft(remainingTime);
       } else {
         setTimeLeft(0);
+        handleSubmit()
         setIsEnd(true);
         return;
       }
@@ -97,24 +99,32 @@ const Asnwer = ({ id, time, id_user }) => {
       checkAnswer(id_user, quizData.id);
     }
   }, [quizData]);
-  const handleAnswerChange = async (questionId, optionId) => {
-    setCurrentOption(optionId);
+
+  const handleAnswerChange = useMutation({mutationFn: async(e)=>{
+    const {idQuestion,idOption} =  e
+   
+    setCurrentOption(idOption);
 
     const data = await axios.post("/api/answer", {
       idQuiz: id,
-      idQuestion: questionId,
-      idOption: optionId,
+      idQuestion: idQuestion,
+      idOption: idOption,
       idUser: id_user,
     });
     const newAnswers = {
       ...answers,
-      [questionId]: optionId,
+      [idQuestion]: idOption,
     };
     setAnswers(newAnswers);
-    setCurrentOption(optionId);
+    setCurrentOption(idOption);
     localStorage.setItem(`answers${id}${id_user}`, JSON.stringify(newAnswers));
+    return data.data
+  },
+  retry: 3, // Retry up to 3 times
+  retryDelay: (attempt) => Math.min(1000 * 2 ** attempt, 30000), 
+})
 
-  };
+  
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [markedQuestions, setMarkedQuestions] = useState({});
@@ -317,8 +327,8 @@ const Asnwer = ({ id, time, id_user }) => {
             {quizData.options.map((e, i) => (
               <div
                 key={i}
-                className={`${e.id === currentOption && '!bg-blue-300'} flex hover:bg-blue-500/30 active:scale-x-95 gap-2 items-start justify-start p-2 border-l-2 mb-2 bg-slate-300/30 rounded-md backdrop-blur-md border-blue-600`}
-                onClick={() => handleAnswerChange(quizData.id, e.id)}
+                className={`${e.id === currentOption  && '!bg-blue-300'} flex hover:bg-blue-500/30 active:scale-x-95 gap-2 items-start justify-start p-2 border-l-2 mb-2 bg-slate-300/30 rounded-md backdrop-blur-md border-blue-600`}
+                onClick={() => handleAnswerChange.mutate({idQuestion:quizData.id, idOption:e.id})}
               >
                 <div>
                   <input 
@@ -328,7 +338,7 @@ const Asnwer = ({ id, time, id_user }) => {
                     value={e.id}
                     name={`question_${quizData.id}`}
                     checked={e.id === currentOption}
-                    onChange={() => handleAnswerChange(quizData.id, e.id)}
+                    onChange={() => handleAnswerChange.mutate({idQuestion:quizData.id, idOption:e.id})}
                   />
                 </div>
                 <label className="capitalize" htmlFor={e.id}>
