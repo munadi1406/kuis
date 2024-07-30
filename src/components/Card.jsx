@@ -28,11 +28,11 @@ export const getStatus = (startDate, endDate) => {
   }
   return "Tutup";
 };
-const Cards = ({ title, startDate, endDate, skor, id ,desc}) => {
+const Cards = ({ title, startDate, endDate, skor, id, desc }) => {
   // Fungsi untuk menentukan status
-  const [isDelete,setIsDelete] = useState(false);
-  const [currentData,setCurrentData] = useState({id:0,title:""})
- 
+  const [isDelete, setIsDelete] = useState(false);
+  const [currentData, setCurrentData] = useState({ id: 0, title: "" })
+
 
 
   const status = getStatus(startDate, endDate);
@@ -43,56 +43,56 @@ const Cards = ({ title, startDate, endDate, skor, id ,desc}) => {
     }
     return desc;
   };
-  const handleClick = (e)=>{
+  const handleClick = (e) => {
     setIsDelete(!isDelete)
-    setCurrentData({id:e.id,title:e.title});
+    setCurrentData({ id: e.id, title: e.title });
   }
   const truncatedDesc = truncateDesc(desc, 25);
 
   return (
     <>
-    <DeleteQuiz isOpen={isDelete} data={currentData} setIsOpen={setIsDelete}/>
-    <ContextMenu>
-      <ContextMenuTrigger>
-        <Card>
-          <CardHeader>
-            <div>
-              <div className="flex flex-wrap gap-2 py-2">
-                <CardTitle>{title}</CardTitle>
-                <Badge variant={`${status == "Buka" ? 'primary' : 'destructive'}`}>{status}</Badge>
+      <DeleteQuiz isOpen={isDelete} data={currentData} setIsOpen={setIsDelete} />
+      <ContextMenu>
+        <ContextMenuTrigger>
+          <Card className="h-full flex flex-col justify-between">
+            <CardHeader>
+              <div>
+                <div className="flex flex-wrap gap-2 py-2">
+                  <CardTitle>{title}</CardTitle>
+                  <Badge variant={`${status == "Buka" ? 'primary' : 'destructive'}`}>{status}</Badge>
+                </div>
+                <CardDescription>{`${localTime(startDate)} - ${localTime(endDate)}`}</CardDescription>
               </div>
-              <CardDescription>{`${localTime(startDate)} - ${localTime(endDate)}`}</CardDescription>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="flex flex-col gap-2 justify-start items-start">
-              <p className="text-xs">
-              {truncatedDesc}
-              </p>
-              {/* <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl">
+            </CardHeader>
+            <CardContent>
+              <div className="flex flex-col gap-2 justify-start items-start">
+                <p className="text-xs">
+                  {truncatedDesc}
+                </p>
+                {/* <h1 className="scroll-m-20 text-4xl font-extrabold tracking-tight lg:text-5xl">
                 {skor}
               </h1> */}
 
-              <div className="w-full border">
-                <a
-                  href={`/kuis/${id}`}
-                  className={buttonVariants({ className: "w-full" })}
+                <div className="w-full border">
+                  <a
+                    href={`/kuis/${id}`}
+                    className={buttonVariants({ className: "w-full" })}
                   >
-                  Lihat Selengkapnya
-                </a>
+                    Lihat Selengkapnya
+                  </a>
+                </div>
               </div>
-            </div>
-          </CardContent>
-        </Card>
-      </ContextMenuTrigger>
-      <ContextMenuContent>
-        <ContextMenuItem>
-          <a href={`/kuis/${id}`}>Detail</a>
-        </ContextMenuItem>
-        <ContextMenuItem className="bg-red-500 text-white" onClick={()=>handleClick({id,title})}>Hapus</ContextMenuItem>
-      </ContextMenuContent>
-    </ContextMenu>
-                  </>
+            </CardContent>
+          </Card>
+        </ContextMenuTrigger>
+        <ContextMenuContent>
+          <ContextMenuItem>
+            <a href={`/kuis/${id}`}>Detail</a>
+          </ContextMenuItem>
+          <ContextMenuItem className="bg-red-500 text-white" onClick={() => handleClick({ id, title })}>Hapus</ContextMenuItem>
+        </ContextMenuContent>
+      </ContextMenu>
+    </>
   );
 };
 

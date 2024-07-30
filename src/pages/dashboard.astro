@@ -1,27 +1,18 @@
 ---
-
 import DashboardLayout from "@/layouts/Dashboard.astro";
-import Cards from "@/components/Card";
-import { supabase } from "@/lib/supabase";
+import DashboardData from "@/components/dashboard/DashboardData";
+const data:any = Astro.locals;
 
 
-let { data: user } = await supabase.auth.getUser()
+const {id,role,roleUser} = data
 
-
-let { data: quiz, error } = await supabase
-  .from('quiz')
-  .select('*')
-  .eq('id_user',user.user.id)
-  .order('created_at',{ascending:false});
-         
 ---
 
 <DashboardLayout title="dashboard">
-  <div class="grid lg:grid-cols-4 sm:grid-cols-2 grid-cols-1 gap-2">
-    {
+  <!-- {
       quiz.map((e) => (
         <Cards title={e.title} skor={e.skor ? e.skor : ""} id={e.id} startDate={e.start_quiz} endDate={e.end_quiz} desc={e.desc} client:only="react"/>
       ))
-    }
-  </div>
+    } -->
+  <DashboardData client:idle idUser={id} role={role} roleUser={roleUser.toLowerCase()}/>
 </DashboardLayout>

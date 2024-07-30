@@ -15,7 +15,7 @@ export const GET = async ({ params, url }) => {
       
 
     if (answersError) {
-      console.log({ answersError });
+      // console.log({ answersError });
       return new Response(
         JSON.stringify({
           message: "Error fetching answers",
@@ -32,7 +32,7 @@ export const GET = async ({ params, url }) => {
       .eq('id_quiz', id);
 
     if (questionsError) {
-      console.log(questionsError);
+      // console.log(questionsError);
       return new Response(
         JSON.stringify({
           message: "Error fetching questions",

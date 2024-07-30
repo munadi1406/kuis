@@ -31,6 +31,7 @@ export default function Navbar({ data, role, path }) {
                     <NavigationMenuLink
                       href="/dashboard"
                       className={navigationMenuTriggerStyle()}
+                      
                       active={path === "/dashboard" && true}
                     >
                       Dashboard

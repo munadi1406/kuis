@@ -157,15 +157,7 @@ const MapelData = () => {
   return (
     <div>
       <div className="w-full flex justify-between items-end  border-b  p-2">
-        <div>
-          <Label htmlFor="search">Search</Label>
-          <Input
-            type="search"
-            id="search"
-            placeholder="Search"
-            onChange={search}
-          />
-        </div>
+        c
         <div className="flex items-end justify-end gap-2">
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>

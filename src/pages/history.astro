@@ -1,8 +1,13 @@
 ---
 import Dashboard from "@/layouts/Dashboard.astro";
+import HistorySubmittion from "@/components/history/HistorySubmittion";
+const data:any = Astro.locals;
 
+
+const {id,role,roleUser} = data
 
 ---
+
 <Dashboard title="histori pengerjaan kuis">
- <h1>histori pengerjaan kuis</h1>
+    <HistorySubmittion client:idle idUser={id} />
 </Dashboard>
