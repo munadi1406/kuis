@@ -65,7 +65,8 @@ const Difficulty = ({ id }) => {
                     </TableRow>
                 </TableHeader>
                 <TableBody>
-                    {data.data.map((item, index) => (<TableRow key={index}>
+                    {data.data.map((item, index) => (
+                    <TableRow key={index}>
                         <TableCell className="font-medium"><HtmlRender data={item.soal} /></TableCell>
                         <TableCell className="font-medium">{item.kesulitan}</TableCell>
                         <TableCell className="font-medium">{item.detailKesulitan}</TableCell>

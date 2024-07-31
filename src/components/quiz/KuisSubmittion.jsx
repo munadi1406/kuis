@@ -145,11 +145,11 @@ const KuisSubmittion = ({ id, title }) => {
     <div className="w-full border rounded-md ">
      
         <Sheet open={detailIsOpen} onOpenChange={setDetailIsOpen}>
-        <SheetContent>
+        <SheetContent className="overflow-y-scroll">
           <SheetHeader>
             <SheetTitle>Detail {detailData.namaLengkap}</SheetTitle>
           </SheetHeader>
-          <div className="pt-2 bg-white rounded-lg shadow-md">
+          <div className="pt-2 shadow-md ">
             <table className="w-full border-collapse border border-gray-300">
               <thead>
                 <tr className="bg-gray-100">
@@ -230,30 +230,6 @@ const KuisSubmittion = ({ id, title }) => {
 
         </div>
       </div>
-      {/* <Table>
-        <TableCaption>Daftar Hasil Kuis</TableCaption>
-        <TableHeader>
-          <TableRow>
-            <TableHead className="w-[100px]">No</TableHead>
-            <TableHead>Nama Lengkap</TableHead>
-            <TableHead>Nilai</TableHead>
-            <TableHead >Aksi</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {data.map(({ id_user, namaLengkap, score, total }, i) => (
-            <TableRow key={i}>
-              <TableCell className="font-medium">{i + 1}</TableCell>
-              <TableCell>{namaLengkap}</TableCell>
-              <TableCell>{(score / total * 100).toFixed(1)}</TableCell>
-              <TableCell >
-                <Button>Detail</Button>
-              </TableCell>
-            </TableRow>
-          ))}
-        </TableBody>
-      </Table> */}
-
       <div className="min-h-[600px]">
         <Table>
           <TableHeader>

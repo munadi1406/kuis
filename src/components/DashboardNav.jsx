@@ -7,14 +7,11 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-
 import Link from "./Link";
-
 import ButtonLabel from "./ButtonLabel";
 import { useMutation } from "@tanstack/react-query";
 import axios from "axios";
 import WithQuery from "@/utils/WithQuery";
-import ButtonLoader from "./ButtonLoader";
 import TakeQuiz from "./quiz/TakeQuiz";
 
 const DashboardNav = ({ title, role }) => {
@@ -26,7 +23,7 @@ const DashboardNav = ({ title, role }) => {
   const { mutate, isPending } = useMutation({
     mutationFn: async (e) => {
       e.preventDefault()
-    
+
       const take = await axios.post('/api/quiz/take', {
         tokenQuiz: token
       })
@@ -46,11 +43,11 @@ const DashboardNav = ({ title, role }) => {
 
 
   return (
-    <div className="flex justify-between py-2 md:p-0 p-2 md:border-b-0 border-b-2 border-black md:relative sticky top-0 bg-white/90 backdrop-blur-sm z-10">
-      <h1 className="capitalize scroll-m-20 text-2xl font-semibold tracking-tight">
+    <div className="grid grid-cols-2 gap-2 py-2 md:p-0 p-2 md:border-b-0 border-b-2 border-black md:relative sticky top-0 bg-white/90 backdrop-blur-sm z-10">
+      <h1 className="capitalize scroll-m-20  text-2xl text-wrap font-semibold tracking-tight">
         {title}
       </h1>
-      <div className=" gap-2 md:flex hidden">
+      <div className=" gap-2 md:flex hidden flex-wrap justify-end">
         <Dialog>
           <DialogTrigger className={buttonVariants({ variant: "outline" })}>
             Kerjakan Kuis
@@ -59,7 +56,7 @@ const DashboardNav = ({ title, role }) => {
             <DialogHeader>
               <DialogTitle>Kerjakan Kuis</DialogTitle>
             </DialogHeader>
-            <TakeQuiz isPending={isPending} mutate={mutate} setToken={setToken} data={dataQuiz} msg={msg} status={status}/>
+            <TakeQuiz isPending={isPending} mutate={mutate} setToken={setToken} data={dataQuiz} msg={msg} status={status} />
           </DialogContent>
         </Dialog>
 
@@ -69,9 +66,14 @@ const DashboardNav = ({ title, role }) => {
           variants={"outline"}
         />
 
-        {role !== "Siswa" && <Link to={"/createKuis"} text={"Buat Kuis"} />}
+        {role !== "Siswa" && (
+          <>
+            <Link to={"/createKuis"} text={"Buat Kuis"} />
+            <Link to={"/laporan"} text={"Laporan"} />
+          </>
+        )}
       </div>
-      <div className="md:hidden gap-2 flex">
+      <div className="md:hidden gap-2 flex flex-wrap justify-end items-center">
         <Dialog>
           <DialogTrigger className="flex justify-center items-center ">
             <ButtonLabel
@@ -85,7 +87,7 @@ const DashboardNav = ({ title, role }) => {
             <DialogHeader>
               <DialogTitle>Kerjakan Kuis</DialogTitle>
             </DialogHeader>
-            <TakeQuiz isPending={isPending} mutate={mutate} setToken={setToken} data={dataQuiz} msg={msg} status={status}/>
+            <TakeQuiz isPending={isPending} mutate={mutate} setToken={setToken} data={dataQuiz} msg={msg} status={status} />
           </DialogContent>
         </Dialog>
 
@@ -98,15 +100,29 @@ const DashboardNav = ({ title, role }) => {
           />
         </a>
         {role !== "Siswa" && (
-          <a href="/createKuis">
-            <ButtonLabel
-              text={"Buat Kuis"}
-              trigger={
-                <span className="material-symbols-outlined">add_circle</span>
-              }
-            />
-          </a>
+          <>
+            <a href="/createKuis">
+              <ButtonLabel
+                text={"Buat Kuis"}
+                trigger={
+                  <span className="material-symbols-outlined">add_circle</span>
+                }
+              />
+            </a>
+            <a href="/laporan">
+              <ButtonLabel
+                text={"Laporan"}
+                trigger={
+                  <span className="material-symbols-outlined">
+                  partner_reports
+                  </span>
+                } 
+              />
+            </a>
+          </>
+          
         )}
+        
       </div>
     </div>
   );

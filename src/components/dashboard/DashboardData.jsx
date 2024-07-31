@@ -49,9 +49,8 @@ const DashboardData = ({ idUser, role, roleUser }) => {
         data,
         refetch,
         isRefetching,
-
     } = useInfiniteQuery({
-        queryKey: [`quiz${filter}`],
+        queryKey: [`quiz${idUser}${filter}`],
         queryFn: async ({ pageParam }) => {
             const response = await axios.get(
                 `/api/quiz/data?id_u=${idUser}&id=${pageParam || 0}&search=${query}&filter=${filter}`

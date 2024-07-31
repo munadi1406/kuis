@@ -6,7 +6,7 @@ import { defineMiddleware } from "astro:middleware";
 export const auth = defineMiddleware(async (context, next) => {
   const { request } = context;
   const url = new URL(request.url);
-  const protectedPaths = ["/dashboard", "/profile", "/feedback", "/log", "/kuis", '/createKuis', '/history', '/users', '/mapel', '/kelas'];
+  const protectedPaths = ["/dashboard", "/profile", "/feedback", "/log", "/kuis", '/createKuis', '/history', '/users', '/mapel', '/kelas','/laporan'];
   if (protectedPaths.includes(url.pathname)) {
     // console.log("middleware running");
 

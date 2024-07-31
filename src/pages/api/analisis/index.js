@@ -9,7 +9,10 @@ export const GET = async ({ params, url }) => {
         .from("answers")
         .select(`id_user, id_question, options(option_is_true)`)
         .eq('id_quiz', id);
-  
+        const { data: quiz, error:err} = await supabase
+        .from("quiz")
+        .select(`id,title`)
+        .eq('id', id).single();
       if (answersError) {
         // console.log({answersError})
         return new Response(
@@ -67,6 +70,7 @@ export const GET = async ({ params, url }) => {
         question: questionMap[questionId],
         errors: questionErrors[questionId],
         total: questionTotal[questionId],
+        
       }));
   
       questionErrorsArray.sort((a, b) => b.errors - a.errors);
@@ -81,6 +85,7 @@ export const GET = async ({ params, url }) => {
         JSON.stringify({
           message: 200,
           data: formattedResults,
+          title:quiz.title
         }),
         { status: 200 }
       );
