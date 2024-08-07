@@ -2,13 +2,25 @@ import { supabase } from "../../../lib/supabase";
 
 export const POST = async ({ request, redirect }) => {
   const { email, password, passwordConfirm, username } = await request.json();
-
-  if (!email || !password || !passwordConfirm) {
+ 
+  if (!email || !password || !passwordConfirm || !username) {
     return new Response(
       JSON.stringify({
         message: "Semua Kolom Wajib Di Isi",
       }),
       { status: 400 }
+    );
+  }
+  const { data: existingUser, error: checkError } = await supabase
+    .from('detail_user')
+    .select('id_user')
+    .eq('username', username);
+  if (existingUser.length > 0) {
+    return new Response(
+      JSON.stringify({
+        message: "Username sudah digunakan",
+      }),
+      { status: 409 }
     );
   }
   if (password !== passwordConfirm) {
@@ -40,18 +52,18 @@ export const POST = async ({ request, redirect }) => {
       { status: 400 }
     );
   }
- const test =  await supabase
+  const test = await supabase
     .from("detail_user")
     .insert([
       {
         id_user: data.user.id,
         username: username,
         email: data.user.email,
-        role:"users"
+        role: "users"
       },
     ])
     .select();
-    
+
   return new Response("Berhasil", {
     status: 200,
   });

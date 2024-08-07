@@ -38,7 +38,7 @@ const ReportData = ({ idUser }) => {
             return data.data
         },
         onSuccess: (data) => {
-            console.log(data)
+        
             setScoreData(data.data);
         }
     })
@@ -86,7 +86,7 @@ const ReportData = ({ idUser }) => {
     const sortedUsers = [...usersArray].sort((a, b) => a.namaLengkap.localeCompare(b.namaLengkap));
     return (
         <div>
-            {console.log({ data })}
+          
             <h3 className="text-2xl font-semibold">Daftar Kuis Anda</h3>
             <div className="my-5 grid md:grid-cols-6 grid-cols-3">
                 {data.map(({ id, title,kelas:{kelas},mapel:{mapel} }) => (

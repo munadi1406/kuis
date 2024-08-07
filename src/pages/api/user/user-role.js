@@ -11,23 +11,93 @@ const supabase = createClient(
   }
 );
 
-export const POST = async ({ request, cookies, redirect }) => {
-  const { role, id, namaLengkap } = await request.json();
+export const POST = async ({ request }) => {
+  const { role, id, nisnOrNip } = await request.json();
 
   if (!role) {
     return new Response(
       JSON.stringify({
         message: "Role Tidak Boleh Kosong",
       }),
-      { status: 500 }
+      { status: 400 }
     );
   }
 
-  // Simpan data pengguna sebelum update
-  let previousUserMetadata;
   let rollbackRequired = false;
 
-  // 1. Update User Metadata
+  if (role === "Siswa") {
+    const { data: siswa, error: siswaError } = await supabase
+      .from('siswa')
+      .select('id_user')
+      .eq('nisn', nisnOrNip)
+      .single();
+
+    if (siswaError) {
+      return new Response(
+        JSON.stringify({
+          message: "NISN tidak terdaftar",
+          error: siswaError.message,
+        }),
+        { status: 500 }
+      );
+    }
+
+    if (!siswa) {
+      return new Response(
+        JSON.stringify({
+          message: "NISN tidak terdaftar",
+        }),
+        { status: 404 }
+      );
+    }
+
+    if (siswa.id_user) {
+      return new Response(
+        JSON.stringify({
+          message: "NISN sudah terhubung dengan akun lain, silahkan hubungi admin",
+        }),
+        { status: 409 }
+      );
+    }
+  }
+
+  if (role === "Guru") {
+    const { data: guru, error: guruError } = await supabase
+      .from('guru')
+      .select('id_user')
+      .eq('nip', nisnOrNip)
+      .single();
+
+    if (guruError) {
+      return new Response(
+        JSON.stringify({
+          message: "NIP tidak terdaftar",
+          error: guruError.message,
+        }),
+        { status: 500 }
+      );
+    }
+
+    if (!guru) {
+      return new Response(
+        JSON.stringify({
+          message: "NIP tidak terdaftar",
+        }),
+        { status: 404 }
+      );
+    }
+
+    if (guru.id_user) {
+      return new Response(
+        JSON.stringify({
+          message: "NIP sudah terhubung dengan akun lain, silahkan hubungi admin",
+        }),
+        { status: 409 }
+      );
+    }
+  }
+
+  // Update User Metadata
   const { data: user, error: userError } = await supabase.auth.admin.updateUserById(id, {
     user_metadata: {
       roleUser: role,
@@ -43,15 +113,28 @@ export const POST = async ({ request, cookies, redirect }) => {
     );
   }
 
- 
-  const { data: detailData, error: detailError } = await supabase
-    .from('detail_user')
-    .update({ nama_lengkap: namaLengkap })
-    .eq('id_user', id)
-    .select();
+  if (role === "Siswa") {
+    const { data: siswaUpdate, error: siswaUpdateError } = await supabase
+      .from('siswa')
+      .update({ id_user: id })
+      .eq('nisn', nisnOrNip)
+      .select();
 
-  if (detailError) {
-    rollbackRequired = true;
+    if (siswaUpdateError) {
+      rollbackRequired = true;
+    }
+  }
+
+  if (role === "Guru") {
+    const { data: guruUpdate, error: guruUpdateError } = await supabase
+      .from('guru')
+      .update({ id_user: id })
+      .eq('nip', nisnOrNip)
+      .select();
+
+    if (guruUpdateError) {
+      rollbackRequired = true;
+    }
   }
 
   if (rollbackRequired) {
@@ -71,7 +154,7 @@ export const POST = async ({ request, cookies, redirect }) => {
 
     return new Response(
       JSON.stringify({
-        message: `Update failed and rollback completed: ${detailError.message}`,
+        message: `Update failed and rollback completed`,
       }),
       { status: 500 }
     );
@@ -84,4 +167,5 @@ export const POST = async ({ request, cookies, redirect }) => {
     { status: 200 }
   );
 };
+
 

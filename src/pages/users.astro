@@ -1,25 +1,16 @@
 ---
 import Dashboard from "../layouts/Dashboard.astro";
-import { createClient } from "@supabase/supabase-js";
 import UsersData from "../components/users/UsersData";
 import CardUser from "@/components/users/CardUser";
+import { supabase } from "@/lib/supabase";
 
 
-const supabaseAD = createClient(
-  import.meta.env.SUPABASE_URL,
-  import.meta.env.SUPABASE_SERVICE_KEY,
-  {
-    auth: {
-      autoRefreshToken: false,
-      persistSession: false,
-    },
-  }
-);
+
 
 
 const {
-  data: { users },
-} = await supabaseAD.auth.admin.listUsers();
+  data:users,
+} = await supabase.from('detail_user').select('created_at');
 let totalUsers = 0;
 let newUsersThisWeek = 0;
 totalUsers = users.length;
@@ -29,7 +20,6 @@ oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
 
 newUsersThisWeek = users.filter((user) => {
   const createdAt = new Date(user.created_at);
-  console.log(createdAt)
   return createdAt >= oneWeekAgo;
 }).length;
 

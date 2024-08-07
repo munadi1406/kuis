@@ -24,27 +24,9 @@ export const GET = async ({ params, url }) => {
       );
     }
 
-    // Fetch all questions
-    const { data: questions, error: questionsError } = await supabase
-      .from("questions")
-      .select("id, question")
-      .eq('id_quiz', id);
+   
 
-    if (questionsError) {
-      return new Response(
-        JSON.stringify({
-          message: "Error fetching questions",
-          data: [],
-        }),
-        { status: 500 }
-      );
-    }
-
-    // Create a map of questionId to questionText
-    const questionMap = questions.reduce((acc, question) => {
-      acc[question.id] = question.question;
-      return acc;
-    }, {});
+    
 
     // Initialize data structures for IRT
     const questionCorrectCounts = {};
@@ -85,31 +67,22 @@ export const GET = async ({ params, url }) => {
       }
 
       // Add description for user-friendly interpretation
-      let difficultyDescription = '';
+   
       if (attemptCount > 0) {
         if (p === 1) {
-          difficultyDescription = 'Mudah';
+        
           difficulty = -1.5; // Assign a finite low value for easy questions
         } else if (p === 0) {
-          difficultyDescription = 'Sulit';
+          
           difficulty = 1.5; // Assign a finite high value for difficult questions
-        } else if (difficulty < -1) {
-          difficultyDescription = 'Mudah';
-        } else if (difficulty <= 1) {
-          difficultyDescription = 'Sedang';
-        } else {
-          difficultyDescription = 'Sulit';
-        }
+        } 
       } else {
-        difficultyDescription = 'Tidak Ada Jawaban';
+        
         difficulty = 0;
       }
 
       return {
-        questionId,
-        question: questionMap[questionId],
         difficulty: isFinite(difficulty) ? difficulty.toFixed(2) : 'N/A',
-        difficultyDescription,
         correctCount,
         attemptCount,
       };
@@ -137,29 +110,14 @@ export const GET = async ({ params, url }) => {
     }
 
     // Determine if ready to proceed to the next material
-    let readyToProceed = '';
-    if (overallSuccessRate >= 0.7 || overallDifficultyDescription === 'Mudah') {
-      readyToProceed = 'Siswa siap untuk melanjutkan ke materi berikutnya.';
-    } else {
-      readyToProceed = 'Siswa perlu lebih banyak pemahaman pada materi ini sebelum melanjutkan ke materi selanjutnya.';
-    }
-
-    // Format results for output
-    const formattedResults = questionDifficulty.map(q => ({
-      soal: q.question,
-      kesulitan: q.difficultyDescription,
-      detailKesulitan: q.difficulty,
-      hasil: `${q.correctCount}/${q.attemptCount} siswa benar`
-    }));
+    
 
     // Add overall difficulty and recommendation to results
     const output = {
       message: 200,
-      data: formattedResults,
       overallDifficulty: overallDifficultyDescription,
       averageDifficulty: isFinite(averageDifficulty) ? averageDifficulty.toFixed(2) : 'N/A',
       overallSuccessRate: (overallSuccessRate * 100).toFixed(2) + '%',
-      readyToProceed,
       ...quiz
     };
 

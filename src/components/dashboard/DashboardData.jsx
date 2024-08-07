@@ -50,7 +50,7 @@ const DashboardData = ({ idUser, role, roleUser }) => {
         refetch,
         isRefetching,
     } = useInfiniteQuery({
-        queryKey: [`quiz${idUser}${filter}`],
+        queryKey: [`quiz${idUser}${filter}${query}`],
         queryFn: async ({ pageParam }) => {
             const response = await axios.get(
                 `/api/quiz/data?id_u=${idUser}&id=${pageParam || 0}&search=${query}&filter=${filter}`
@@ -63,7 +63,6 @@ const DashboardData = ({ idUser, role, roleUser }) => {
         initialPageParam: 0,
     });
     useEffect(() => {
-        setQuery('')
         refetch()
     }, [filter,query])
     
@@ -81,6 +80,7 @@ const DashboardData = ({ idUser, role, roleUser }) => {
             }, 2000);
         } else {
             setQuery("");
+            refetch()
         }
     };
     useEffect(() => {
@@ -97,9 +97,10 @@ const DashboardData = ({ idUser, role, roleUser }) => {
                         placeholder="Search"
                         onChange={search}
                         defaultValue={query}
+                        disabled={isLoading}
                     />
                 </div>
-                <Select onValueChange={handleChange} value={filter}>
+                <Select onValueChange={handleChange} value={filter} disabled={isLoading}>
                     <SelectTrigger className="w-[180px]">
                         <SelectValue placeholder="Filter" />
                     </SelectTrigger>
@@ -112,7 +113,7 @@ const DashboardData = ({ idUser, role, roleUser }) => {
                     </SelectContent>
                 </Select>
             </div>
-            {!isLoading && !isRefetching ? (<>
+            {!isLoading  ? (<>
                 <div className="grid lg:grid-cols-4 sm:grid-cols-2 grid-cols-1 gap-2 w-full">
                     {data.pages && filter === "kuis" &&
                         data.pages

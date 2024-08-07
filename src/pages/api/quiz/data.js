@@ -49,6 +49,7 @@ export const GET = async ({ params, url }) => {
   // Kondisi untuk search
   if (search) {
     if (filter === "kuis") {
+     
       query = query.ilike("title", `%${search}%`);
     } else if (filter === 'kelas') {
       query = query.ilike("kelas", `%${search}%`);
@@ -58,7 +59,7 @@ export const GET = async ({ params, url }) => {
   }
 
   const { data, error } = await query;
-
+  // console.log({data})
   if (error) {
     return new Response(
       JSON.stringify({
@@ -80,7 +81,7 @@ export const GET = async ({ params, url }) => {
     data,
     perPage
   };
-
+  
   if (data) {
     return new Response(
       JSON.stringify({

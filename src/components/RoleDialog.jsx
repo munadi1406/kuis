@@ -2,6 +2,7 @@ import WithQuery from "@/utils/WithQuery";
 import {
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogHeader,
   DialogTitle,
   DialogTrigger,
@@ -23,27 +24,25 @@ import ButtonLoader from "./ButtonLoader";
 
 const RoleDialog = ({ open, id }) => {
   const [isOpen, setIsOpen] = useState(open);
-  const [namaLengkap,setNamaLengkap] = useState("")
-  const [role,setRole] = useState("")
+  const [nisnOrNip, setNisnOrNip] = useState("")
+  const [role, setRole] = useState("")
+  const [msg,setMsg] = useState("");
 
-  const { mutate,isPending } = useMutation({
+  const { mutate, isPending } = useMutation({
     mutationFn: async (e) => {
       e.preventDefault()
       const setRole = await axios.post("api/user/user-role", {
         role,
         id,
-        namaLengkap
+        nisnOrNip
       });
       return setRole;
     },
     onSuccess: () => {
-      setIsOpen(false);
+      window.location.reload()
     },
-    onError: () => {
-      toast({
-        title: "Gagal",
-        description: `Internal Server Error`,
-      });
+    onError: (error) => {
+     setMsg(error.response.data.message)
     },
   });
 
@@ -51,12 +50,12 @@ const RoleDialog = ({ open, id }) => {
     <Dialog open={isOpen}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Deskripsikan Diri Anda</DialogTitle>
+          <DialogTitle>Siliahkan isi data berikut untuk memvalidasi anda warga SDN Pingaran Ulu</DialogTitle>
+          <DialogDescription className="text-red-600">{msg}</DialogDescription>
         </DialogHeader>
         <form className="w-full space-y-2" onSubmit={mutate}>
-          <Label>Nama Lengkap</Label>
-          <Input placeholder="Masukkan Nama Lengkap Anda" type="text" onChange={(e)=>setNamaLengkap(e.target.value)}/>
-          <Select onValueChange={(e)=>setRole(e)}>
+          <Label>Peran Anda Di SDN Pingaran Ulu</Label>
+          <Select onValueChange={(e) => setRole(e)}>
             <SelectTrigger className="w-full">
               <SelectValue placeholder="Silahkan Pilih Peran Anda" />
             </SelectTrigger>
@@ -64,8 +63,21 @@ const RoleDialog = ({ open, id }) => {
               <SelectItem value="Guru">Guru</SelectItem>
               <SelectItem value="Siswa">Siswa</SelectItem>
             </SelectContent>
-            <ButtonLoader text={"Simpan"} loading={isPending}/>
+
           </Select>
+          {role === "Guru" && (
+            <>
+              <Label>NIP</Label>
+              <Input placeholder="Masukkan NIP Anda" type="number" onChange={(e) => setNisnOrNip(e.target.value)} required/>
+            </>
+          )}
+          {role === "Siswa" && (
+            <>
+              <Label>NISN</Label>
+              <Input placeholder="Masukkan NISN Anda" type="number" onChange={(e) => setNisnOrNip(e.target.value)} required/>
+            </>
+          )}
+          <ButtonLoader text={"Simpan"} loading={isPending} />
         </form>
       </DialogContent>
     </Dialog>

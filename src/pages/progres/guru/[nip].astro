@@ -1,0 +1,29 @@
+---
+import Dashboard from "@/layouts/Dashboard.astro";
+import { supabase } from "@/lib/supabase";
+import DataProgressGuru from "@/components/progress/guru/DataProgressGuru";
+import { Button } from "@/components/ui/button";
+
+const { nip } = Astro.params;
+
+const { data: guru ,error} = await supabase
+    .from("guru")
+    .select("nama_lengkap,id_user,created_at")
+    .eq("nip", nip)
+    .single();
+
+if (!guru || error) {
+    return Astro.redirect("/guru");
+}
+console.log({error})
+---
+
+<Dashboard title={`Progress Guru ${guru?.nama_lengkap}`}>
+    <DataProgressGuru
+        transition:animate={"slide"}
+        client:load="react"
+        idUser={guru.id_user}
+        namaLengkap={guru.nama_lengkap}
+        createdAt={guru.created_at}
+    />
+</Dashboard>

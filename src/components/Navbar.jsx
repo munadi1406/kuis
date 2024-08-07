@@ -76,6 +76,12 @@ export default function Navbar({ data, role, path }) {
                             <a href="/kelas">
                               <DropdownMenuItem>Kelas</DropdownMenuItem>
                             </a>
+                            <a href="/guru">
+                              <DropdownMenuItem>Guru</DropdownMenuItem>
+                            </a>
+                            <a href="/siswa">
+                              <DropdownMenuItem>Siswa</DropdownMenuItem>
+                            </a>
                           </DropdownMenuContent>
                         </DropdownMenu>
                       </>
@@ -187,6 +193,14 @@ export default function Navbar({ data, role, path }) {
                 <DropdownMenuSeparator />
                 <a href="/kelas" className="cursor-pointer">
                   <DropdownMenuItem>Kelas</DropdownMenuItem>
+                </a>
+                <DropdownMenuSeparator />
+                <a href="/guru" className="cursor-pointer">
+                  <DropdownMenuItem>Guru</DropdownMenuItem>
+                </a>
+                <DropdownMenuSeparator />
+                <a href="/siswa" className="cursor-pointer">
+                  <DropdownMenuItem>Siswa</DropdownMenuItem>
                 </a>
               </DropdownMenuContent>
             </DropdownMenu>
