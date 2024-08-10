@@ -157,7 +157,7 @@ const MapelData = () => {
   return (
     <div>
       <div className="w-full flex justify-between items-end  border-b  p-2">
-        <div>
+      <div>
           <Label htmlFor="search">Search</Label>
           <Input
             type="search"

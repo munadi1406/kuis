@@ -1,0 +1,11 @@
+---
+import Dashboard from "@/layouts/Dashboard.astro";
+
+import Difficulty from "@/components/analize/Difficulty";
+
+const { id } = Astro.params;
+---
+
+<Dashboard title="Analisis Kesulitan Soal">
+    <Difficulty client:idle id={id} />
+</Dashboard>

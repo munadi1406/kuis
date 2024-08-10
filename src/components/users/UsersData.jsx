@@ -25,14 +25,15 @@ import axios from "axios";
 import { DialogDescription } from "@radix-ui/react-dialog";
 const ChangePassword = lazy(() => import("./ChangePassword"));
 import {
-  Select, 
+  Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
 import { toast } from "../ui/use-toast";
-import {  generatePdf } from "./generatePdf";
+import { generatePdf } from "./generatePdf";
+import DialogDelete from "./DialogDelete";
 
 
 const UsersData = () => {
@@ -41,6 +42,7 @@ const UsersData = () => {
   const [isDialogPasswordOpen, setIsDialogPasswordOpen] = useState(false);
   const [userData, setUserdata] = useState([]);
   const [isSearch, setIsSearch] = useState(false);
+  const [deleteOpen, setDeleteOpen] = useState(false);
 
   const [editUser, setEditUser] = useState({ username: "", id: 0 });
   const handleClickEditUser = ({ username, id }) => {
@@ -97,7 +99,7 @@ const UsersData = () => {
     try {
       const response = await axios.get(`/api/user/data?search=${query}`);
       const dataSearch = response.data.data;
-      
+
       setUserdata(dataSearch);
       return dataSearch;
     } catch (error) {
@@ -225,14 +227,14 @@ const UsersData = () => {
             <DialogTrigger asChild>
               <Button>Cetak</Button>
             </DialogTrigger>
-            <DialogContent className="sm:max-w-[900px]">
+            <DialogContent className="sm:max-w-[900px] overflow-y-scroll max-h-screen">
               <DialogHeader>
                 <DialogTitle>Cetak</DialogTitle>
               </DialogHeader>
-              <div>
-                <div ref={tableRef}>
-                  <div className="w-full mb-4 text-center text-xl font-semibold uppercase underline underline-offset-2">
-                    Laporan Surat Masuk
+              <div className="">
+                <div ref={tableRef} >
+                  <div className="w-full mb-4 text-center text-xl font-semibold uppercase underline underline-offset-2 ">
+                    Daftar User
                   </div>
                   <table className="border-collapse border border-black w-full">
                     <thead>
@@ -248,36 +250,32 @@ const UsersData = () => {
                       {userData &&
                         userData.map(
                           ({ email, username, role, id }, i) =>
-                            role !== "admin" && (
-                              <tr key={i}>
-                                <td
-                                  className={
-                                    "border border-black text-center p-1 "
-                                  }
-                                >
-                                  {i + 1}
-                                </td>
-                                <td className={"border border-black p-1"}>
-                                  {username}
-                                </td>
-                                <td className={"border border-black p-1"}>
-                                  {email}
-                                </td>
-                                <td className={"border border-black p-1"}>
-                                  {role}
-                                </td>
-                              </tr>
-                            )
+                          (
+                            <tr key={i}>
+                              <td
+                                className={
+                                  "border border-black text-center p-1 "
+                                }
+                              >
+                                {i + 1}
+                              </td>
+                              <td className={"border border-black p-1"}>
+                                {username}
+                              </td>
+                              <td className={"border border-black p-1"}>
+                                {email}
+                              </td>
+                              <td className={"border border-black p-1"}>
+
+                                {role}
+                              </td>
+                            </tr>
+                          )
                         )}
                     </tbody>
                   </table>
                 </div>
-                {/* <ReactToPrint
-                  trigger={() => {
-                    return <a href="#">Print this out!</a>;
-                  }}
-                  // content={() => tableRef.current}
-                /> */}
+
               </div>
               <Button className="w-max " onClick={() => generatePdf(userData)}>
                 Cetak
@@ -303,46 +301,61 @@ const UsersData = () => {
           {userData &&
             userData.map(
               ({ email, username, role, id_user }, i) =>
-                (
-                  <TableRow key={email}>
-                    <TableCell className="font-medium">{i + 1}</TableCell>
-                    <TableCell className="font-medium">{username}</TableCell>
-                    <TableCell className="font-medium">{email}</TableCell>
-                    <TableCell className="font-medium">
-                      <Select
-                        onValueChange={(e) =>
-                          roleChange.mutate({ role: e, id:id_user })
-                        }
-                        disabled={roleChange.isPending}
-                      >
-                        <SelectTrigger className="w-[180px]">
-                          <SelectValue placeholder={role} />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="admin" >
-                            Admin
-                          </SelectItem>
-                          <SelectItem value="users" > 
-                            Users
-                          </SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </TableCell>
-                    <TableCell>
+              (
+                <TableRow key={email}>
+                  <TableCell className="font-medium">{i + 1}</TableCell>
+                  <TableCell className="font-medium">{username}</TableCell>
+                  <TableCell className="font-medium">{email}</TableCell>
+                  <TableCell className="font-medium">
+                    <Select
+                      onValueChange={(e) =>
+                        roleChange.mutate({ role: e, id: id_user })
+                      }
+                      disabled={roleChange.isPending}
+                    >
+                      <SelectTrigger className="w-[180px]">
+                        <SelectValue placeholder={role} />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="admin" >
+                          Admin
+                        </SelectItem>
+                        <SelectItem value="users" >
+                          Users
+                        </SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </TableCell>
+                  <TableCell className="flex gap-2">
+                    <Button
+                      onClick={() => {
+                        setIsDialogPasswordOpen(true),
+                          handleClickEditUser({
+                            username: username,
+                            id: id_user,
+                          });
+                      }}
+                    >
+                      Edit
+                    </Button>
+                    {role !== "admin" && (
+
                       <Button
+                        className="bg-red-500"
                         onClick={() => {
-                          setIsDialogPasswordOpen(true),
+                          setDeleteOpen(true),
                             handleClickEditUser({
                               username: username,
-                              id:id_user,
+                              id: id_user,
                             });
                         }}
                       >
-                        Edit
+                        Hapus
                       </Button>
-                    </TableCell>
-                  </TableRow>
-                )
+                    )}
+                  </TableCell>
+                </TableRow>
+              )
             )}
         </TableBody>
       </Table>
@@ -351,7 +364,8 @@ const UsersData = () => {
         setIsDialogOpen={setIsDialogPasswordOpen}
         data={editUser}
       />
+      <DialogDelete isOpen={deleteOpen} setIsOpen={setDeleteOpen} data={editUser} refetch={getUserData}/>
     </div>
   );
-};
+}; 
 export default WithQuery(UsersData);

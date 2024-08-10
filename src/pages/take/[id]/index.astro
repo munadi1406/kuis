@@ -1,0 +1,62 @@
+---
+import Answer from "@/components/quiz/Asnwer";
+import Layout from "@/layouts/Layout.astro";
+import GuestForm from "@/components/quiz/GuestForm";
+import { supabase } from "@/lib/supabase";
+
+const { cookies, redirect ,} = Astro;
+const { id } = Astro.params;
+const accessToken = cookies.get("sb-access-token");
+const refreshToken = cookies.get("sb-refresh-token");
+
+const {
+  data: { user },
+  error: err,
+} = await supabase.auth.setSession({
+  refresh_token: refreshToken?.value,
+  access_token: accessToken?.value,
+});
+
+const { data: quiz, error } = await supabase
+  .from("quiz")
+  .select("title,waktu,token,end_quiz,questions(count)")
+  .eq("id", id)
+  .single();
+let status = "false";
+
+const nisn = Astro.url.searchParams.get("nisn");
+const token = Astro.url.searchParams.get("token")
+if (nisn) {
+    if (quiz) {
+      const today = new Date();
+      const endQuizDate = new Date(quiz.end_quiz);
+      if (today <= endQuizDate) {
+        status = "true";
+      }
+    status="guest"
+  }else{
+    status="guest"
+  }
+} else {
+  status = "guest";
+}
+const checkReady = cookies.get(`${id}-status`)
+if(checkReady){
+  status="true"
+}
+console.log(status)
+---
+
+<Layout title={quiz?.title || ""}>
+  <h3 class="text-xl w-full bg-blue-600 text-white p-2 font-semibold">
+    {quiz?.title || ""}
+  </h3>
+  {
+    status === "true" && (
+      <Answer client:only="react" id={id} time={quiz?.waktu} nisnV={nisn} />
+    )
+  }
+  {status === "false" && <div>Kuis tidak tersedia</div>}
+  {status === "guest" && <GuestForm client:only="react" id={id} nisn={nisn} token={token} data={quiz}/>}
+</Layout>
+

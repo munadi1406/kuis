@@ -3,7 +3,7 @@ import { supabase } from "../../../lib/supabase";
 export const POST = async ({ request, redirect }) => {
   const formData = await request.formData();
   const name = formData.get("name")?.toString();
-
+      
   if (!name) {
     return new Response("Masukkan Nama Lengkap Anda", { status: 400 });
   }

@@ -11,15 +11,40 @@ import DashboardNav from "../components/DashboardNav";
 import { SEO } from "astro-seo";
 import { Toaster } from "@/components/ui/toaster";
 import RoleDialog from './../components/RoleDialog'
+import { ViewTransitions } from "astro:transitions";
+interface Locals {
+  id: string;       // Assuming 'id' is a string
+  role: string;     // Assuming 'role' is a string, adjust the type if needed
+  roleUser: string;
+  email:string; // Assuming 'roleUser' is a string, adjust the type if needed
+ 
+}
+const { locals } = Astro;
+const {id,role,roleUser,email} = locals as Locals
 
 
 
 const path = Astro.url.pathname;
 
 
-const {
-  data: { user ,},
-} = await supabase.auth.getUser();
+
+let open = false;
+
+const {data:checkNIP} = await supabase.from('guru').select('id_user').eq('id_user',id).single();
+
+
+const {data:checkNIS} = await supabase.from('siswa').select('id_user,nisn').eq('id_user',id).single();
+ 
+if(!checkNIS && !checkNIP){
+  open = true
+}
+if(role === "admin"){
+  open = false;
+}
+
+
+
+
 
 
 
@@ -75,16 +100,16 @@ const {
     <!-- <ViewTransitions /> -->
   </head>
   <body>
-    <Navbar client:idle data={user} role={user.user_metadata.role} path={path} />
+    <Navbar client:idle data={{email}} role={role} roleUser={roleUser} path={path} />
     <main class="">
       <div class="md:p-2 p-0">
-        <DashboardNav title={title} client:idle role={user.user_metadata.roleUser}/>
+        <DashboardNav title={title} client:idle roleUser={roleUser} role={role} nisn={checkNIS?.nisn}/>
       </div>
       <div class="mt-3 md:mb-0 mb-24 p-2">
         <slot />
       </div>
     </main>
-    <RoleDialog client:idle open={user.user_metadata.roleUser ? false : true} id={user.id}/>
+    <RoleDialog client:idle open={open} id={id}/>
     <Toaster client:idle/>
   </body>
 </html>

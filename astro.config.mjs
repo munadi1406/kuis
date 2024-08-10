@@ -12,7 +12,7 @@ export default defineConfig({
   }), react()],
   output: "server",
   adapter: vercel(), 
-  
+   
 });
 
 // testt

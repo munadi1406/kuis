@@ -1,0 +1,16 @@
+---
+import Dashboard from "@/layouts/Dashboard.astro";
+import ReportData from "@/components/report/ReportData";
+const data:any = Astro.locals;
+
+
+const {id} = data
+
+
+
+
+---
+
+<Dashboard title="Laporan">
+    <ReportData client:load="react" idUser={id}/>
+</Dashboard>

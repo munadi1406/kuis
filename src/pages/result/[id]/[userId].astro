@@ -1,0 +1,103 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import { supabase } from "@/lib/supabase";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import CardCount from "@/components/result/CardCount";
+import HtmlRender from '@/utils/HtmlRender'
+
+const { id, userId } = Astro.params;
+
+const {
+  count,
+  data: quiz,
+  error: err,
+} = await supabase
+  .from("quiz")
+  .select(`title,questions(question,id,options(option_is_true,option,id))`)
+  .eq("questions.options.option_is_true", true)
+  .eq("id", id)
+  .single();
+// console.log(quiz);
+// console.log(err);
+const { data: answers, error } = await supabase
+  .from("answers")
+  .select(`*, options(*)`)
+  .eq("id_quiz", id)
+  .eq("nisn", userId);
+const getQuizScore = async () => {
+  if (error) {
+    // console.error("Error fetching answers:", error);
+    return { score: 0, totalQuestions: 0, correctAnswers: 0 };
+  }
+
+  // Filter correct answers
+  const correctAnswers = answers.filter(
+    (answer) => answer.options.option_is_true,
+  );
+  // console.log(count);
+  // Calculate score
+  const totalQuestions = quiz.questions.length;
+  const score = (correctAnswers.length / totalQuestions) * 100;
+
+  return { score, totalQuestions, correctAnswers: correctAnswers.length };
+};
+
+const { score, totalQuestions, correctAnswers } = await getQuizScore();
+---
+
+<Layout title={quiz.title}>
+  <div class="p-2 space-y-2">
+    <Card>
+      <CardHeader>
+        <CardTitle>{quiz.title}</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <div class="grid md:grid-cols-3 grid-cols-1 gap-2">
+          <CardCount title={"Total Soal"} value={totalQuestions} />
+          <CardCount
+            title={"Total Jawaban Yang Benar"}
+            value={correctAnswers}
+          />
+          <CardCount title={"Nilai"} value={score.toFixed(2)} />
+        </div>
+      </CardContent>
+    </Card>
+  </div>
+  <div class="my-2">
+    <table
+      class="border-collapse table-auto border-slate-500 w-full rounded-md"
+    >
+      <thead>
+        <tr>
+          <th class="border font-semibold text-base bg-blue2"> Soal </th>
+          <th class="border font-semibold text-base bg-blue2">
+            Jawaban Yang Benar
+          </th>
+          <th class="border font-semibold text-base bg-blue2">
+            Jawaban Anda
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        {quiz && quiz.questions && quiz.questions.map((e, i) => {
+          const userAnswer = answers.find(ans => ans.id_question === e.id);
+          const correctOption = e.options.find(opt => opt.option_is_true);
+          return (
+            <tr>
+              <td class="p-2">
+                <HtmlRender data={e.question} />
+              </td>
+              <td class="text-center bg-green-300">
+                {correctOption ? correctOption.option : "Tidak ada jawaban benar"}
+              </td>
+              <td class={`text-center ${userAnswer && userAnswer.options.option_is_true ? "bg-green-300" : "bg-red-300"}`}>
+                {userAnswer ? userAnswer.options.option : "Tidak ada jawaban"}
+              </td>
+            </tr>
+          );
+        })}
+      </tbody>
+    </table>
+    <!-- {console.log(answers)} -->
+  </div>
+</Layout>

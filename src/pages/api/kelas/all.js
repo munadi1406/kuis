@@ -5,7 +5,7 @@ export const GET = async ({ params, url }) => {
   const { data:kelas,error } = await supabase
     .from("kelas")
     .select("*")
-    .order("created_at", { ascending: false });
+    .order("kelas", { ascending: true });
  
 
   if (!error) {

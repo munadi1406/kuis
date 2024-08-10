@@ -5,7 +5,7 @@ export const GET = async ({ params, url }) => {
   const { data:mapel,error } = await supabase
     .from("mapel")
     .select("*")
-    .order("created_at", { ascending: false });
+    .order("mapel", { ascending: true });
  
 
   if (!error) {

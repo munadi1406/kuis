@@ -1,6 +1,6 @@
 import { supabase } from "../../../lib/supabase";
 
-export const POST = async ({ request, cookies, redirect }) => {
+export const POST = async ({ request, cookies, redirect,context }) => {
   const { email, password } = await request.json();
 
   if (!email || !password) {
@@ -16,6 +16,7 @@ export const POST = async ({ request, cookies, redirect }) => {
     email,
     password,
   });
+  // console.log({error})
 
   if (error) {
     return new Response(
@@ -33,6 +34,7 @@ export const POST = async ({ request, cookies, redirect }) => {
   cookies.set("sb-refresh-token", refresh_token, {
     path: "/",
   });
+  
   
   return new Response(
     JSON.stringify({

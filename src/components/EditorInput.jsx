@@ -4,23 +4,16 @@ import List from "@editorjs/list";
 import ImageTool from "@editorjs/image";
 import edjsHTML from "editorjs-html";
 
-const getImageNameFromUrl = (url) => {
-  try {
-    const parsedUrl = new URL(url);
-    const name = parsedUrl.searchParams.get("name");
-    return name;
-  } catch (error) {
-    console.error("Gagal mem-parsing URL:", error);
-    return null;
-  }
+const getImageName = (url) => {
+  const parts = url.split('/');
+  return parts[parts.length - 1];
 };
 // extend the image tool to enhance the image removal lifecycle
 class CustomImage extends ImageTool {
   removed() {
     // access the image block's file data
     const data = this._data.file.url;
-    const imageName = getImageNameFromUrl(data);
-   
+    const imageName = getImageName(data);
     if (imageName) {
       fetch("/api/image?name=" + imageName, {
         method: "DELETE",
@@ -30,6 +23,7 @@ class CustomImage extends ImageTool {
       })
         .then((res) => res.text())
         .then((data) => {
+          // console.log(data)
           // console.log("Hapus Gambar:", data);
         })
         .catch((err) => {
@@ -66,11 +60,11 @@ const EditorInput = ({ name,onChange,id }) => {
             },
 
             onUploadError: (error) => {
-              console.error("Upload Error:", error);
+              // console.error("Upload Error:", error);
               alert("Failed to upload image: " + error.message);
             },
             onUploadSuccess: (file, response) => {
-              console.log("Upload Successful:", file, response);
+              // console.log("Upload Successful:", file, response);
             },
           },
         },
