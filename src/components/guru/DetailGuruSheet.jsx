@@ -20,7 +20,7 @@ const DetailGuruSheet = ({ open, setOpen, data }) => {
                         detail data guru {data.nama_lengkap}
                     </SheetDescription>
                 </SheetHeader>
-                <div className="pt-2 shadow-md ">
+                <div className="pt-2 shadow-md overflow-auto">
                     <table className="w-full border-collapse border border-gray-300">
                         
                         <tbody>

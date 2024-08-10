@@ -14,7 +14,6 @@ import { Button, buttonVariants } from "../ui/button";
 import { useEffect, useState } from "react";
 import edjsHTML from "editorjs-html";
 import AlertDialog from "./AlertDialog";
-import { toast } from "../ui/use-toast";
 
 
 const HtmlRender = ({ data }) => {
@@ -22,26 +21,42 @@ const HtmlRender = ({ data }) => {
   const HTML = edjsParser.parse(data);
   return <div dangerouslySetInnerHTML={{ __html: HTML }} />;
 };
-const Asnwer = ({ id, time, id_user }) => {
+const Asnwer = ({ id, time,nisnV }) => {
   const [quizData, setQuizData] = useState({});
   const [answers, setAnswers] = useState({});
 
   const [timeLeft, setTimeLeft] = useState(time * 60); // Waktu dalam detik
-  const [isEnd, setIsEnd] = useState(false);
+  let nisn = localStorage.getItem(id);
+
   useEffect(() => {
-    const quizStartTime = localStorage.getItem(`quiz_start_time_${id}${id_user}`);
+    // Jika nisn belum ada di localStorage atau nisnV berbeda, set ke localStorage
+    if (!nisn || (nisnV && nisnV !== nisn)) {
+      console.log("setting nisn", nisnV);
+      localStorage.setItem(id, nisnV);
+      nisn = nisnV; // Perbarui nisn di memori
+    }
+  }, [nisnV, id, nisn]);
+
+  const [isEnd, setIsEnd] = useState(false);
+  const removeSes = () =>{
+    postStatusAnswer(true);
+    localStorage.removeItem(`markedQuestions${id}${nisn}`)
+    localStorage.removeItem(`quiz_start_time_${id}${nisn}`)
+    localStorage.removeItem(`answers${id}${nisn}`)
+  }
+  useEffect(() => {
+    const quizStartTime = localStorage.getItem(`quiz_start_time_${id}${nisn}`);
 
     if (quizStartTime) {
       const startTime = new Date(quizStartTime);
       const currentTime = new Date();
       const elapsedTime = Math.floor((currentTime - startTime) / 1000);
       const remainingTime = time * 60 - elapsedTime;
-
+      // untuk perhtungan waktu dari waktu sistem
       if (remainingTime > 0) {
         setTimeLeft(remainingTime);
       } else {
         setTimeLeft(0);
-        handleSubmit()
         setIsEnd(true);
         return;
       }
@@ -52,8 +67,12 @@ const Asnwer = ({ id, time, id_user }) => {
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [id, time,localStorage.getItem(`quiz_start_time_${id}${id_user}`)]);
+  }, [id, time,localStorage.getItem(`quiz_start_time_${id}${nisn}`)]);
+  const handleSubmit = () => {
+    removeSes()
+    window.location.href = `/result/${id}/${nisn}`; 
 
+  }
   useEffect(() => {
     if (timeLeft <= 0) {
       setIsEnd(true);
@@ -67,10 +86,10 @@ const Asnwer = ({ id, time, id_user }) => {
   };
 
  
-  const { data, isLoading, isSuccess,isLoadingError,fetchStatus,error } = useQuery({
+  const { data, isLoading, isSuccess,error } = useQuery({
     queryKey: [`quiz${id}`],
     queryFn: async () => {
-      const datas = await axios.get(`/api/quiz/take?id=${id}`);
+      const datas = await axios.get(`/api/quiz/take?id=${id}&nisn=${nisn}`);
       return datas.data;
     },
    
@@ -79,9 +98,9 @@ const Asnwer = ({ id, time, id_user }) => {
     refetchOnReconnect: false, // Disable refetch on network reconnect
   });
   const [currentOption, setCurrentOption] = useState();
-  const checkAnswer = async (idUser, questionId) => {
+  const checkAnswer = async (nisn, questionId) => {
     const isAnswer = await axios.get(
-      `/api/answer?id_u=${idUser}&id_q=${questionId}`
+      `/api/answer?id_u=${nisn}&id_q=${questionId}`
     );
 
     if (isAnswer.data.data.id_option) {
@@ -96,7 +115,7 @@ const Asnwer = ({ id, time, id_user }) => {
 
   useEffect(() => {
     if (quizData.id) {
-      checkAnswer(id_user, quizData.id);
+      checkAnswer(nisn, quizData.id);
     }
   }, [quizData]);
 
@@ -109,7 +128,7 @@ const Asnwer = ({ id, time, id_user }) => {
       idQuiz: id,
       idQuestion: idQuestion,
       idOption: idOption,
-      idUser: id_user,
+      nisn: nisn,
     });
     const newAnswers = {
       ...answers,
@@ -117,7 +136,7 @@ const Asnwer = ({ id, time, id_user }) => {
     };
     setAnswers(newAnswers);
     setCurrentOption(idOption);
-    localStorage.setItem(`answers${id}${id_user}`, JSON.stringify(newAnswers));
+    localStorage.setItem(`answers${id}${nisn}`, JSON.stringify(newAnswers));
     return data.data
   },
   retry: 3, // Retry up to 3 times
@@ -129,11 +148,11 @@ const Asnwer = ({ id, time, id_user }) => {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [markedQuestions, setMarkedQuestions] = useState({});
   useEffect(() => {
-    const storedAnswers = localStorage.getItem(`answers${id}${id_user}`);
+    const storedAnswers = localStorage.getItem(`answers${id}${nisn}`);
     if (storedAnswers) {
       setAnswers(JSON.parse(storedAnswers));
     }
-    const storedMarkedQuestions = localStorage.getItem(`markedQuestions${id}${id_user}`);
+    const storedMarkedQuestions = localStorage.getItem(`markedQuestions${id}${nisn}`);
     if (storedMarkedQuestions) {
       setMarkedQuestions(JSON.parse(storedMarkedQuestions));
     }
@@ -141,7 +160,7 @@ const Asnwer = ({ id, time, id_user }) => {
 
   useEffect(() => {
     localStorage.setItem(
-      `markedQuestions${id}${id_user}`,
+      `markedQuestions${id}${nisn}`,
       JSON.stringify(markedQuestions)
     );
   }, [markedQuestions]);
@@ -169,7 +188,7 @@ const Asnwer = ({ id, time, id_user }) => {
     // console.log(status)
     const submitQuiz = await axios.post('/api/answer/status', {
       idQuiz: id,
-      idUser: id_user,
+      nisn: nisn,
       status,
     })
     
@@ -177,7 +196,7 @@ const Asnwer = ({ id, time, id_user }) => {
  
       const startTime = new Date(localTime);
     
-      localStorage.setItem(`quiz_start_time_${id}${id_user}`, startTime);
+      localStorage.setItem(`quiz_start_time_${id}${nisn}`, startTime);
     return submitQuiz.data
   }
 
@@ -201,8 +220,7 @@ const Asnwer = ({ id, time, id_user }) => {
     return <div>Memuat Soal...</div>;
   }
   if(error){
-    
-    return <AlertDialog id={id} msg={error.response.data.message} userId={id_user}/>
+    return <AlertDialog id={id} msg={error.response.data.message} userId={nisn}/>
   }
 
     
@@ -212,16 +230,9 @@ const Asnwer = ({ id, time, id_user }) => {
     data.data.length > 0 && Object.keys(answers).length === data.data.length;
   const noSoal = currentIndex + 1;
 
+  
 
-
-  const handleSubmit = () => {
-    postStatusAnswer(true);
-    localStorage.removeItem(`markedQuestions${id}${id_user}`)
-    localStorage.removeItem(`quiz_start_time_${id}${id_user}`)
-    localStorage.removeItem(`answers${id}${id_user}`)
-    window.location.href = `/result/${id}/${id_user}`; 
-
-  }
+  
   const hurufAbjad = [
     "a",
     "b",
@@ -254,7 +265,8 @@ const Asnwer = ({ id, time, id_user }) => {
   return (
     <div className="col-span-9 w-full rounded-md p-2 h-max">
       {isEnd && (
-       <AlertDialog id={id} msg={"Waktu Pengerjaan Sudah Habis !!!"} userId={id_user}/>
+        
+       <AlertDialog id={id} msg={"Waktu Pengerjaan Sudah Habis !!!"} userId={nisn}/>
       )}
       <div className="sticky top-0 bg-white pt-2 border-b-2 border-blue-400">
         <div className="bg-blue-600/80 text-center w-full text-white rounded-full">

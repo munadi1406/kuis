@@ -11,7 +11,7 @@ const QuizAction = ({ data }) => {
     return (
         <>
             <DeleteQuiz isOpen={isDelete} data={{ id: data.id, title: data.title }} setIsOpen={setIsDelete} />
-            <ShareQuiz id={data.id} />
+            <ShareQuiz id={data.id} idKelas={data.idKelas} token={data.token} title={data.title}/>
             <Button>Edit Kuis</Button>
             <Button variant="destructive" onClick={() => setIsDelete(!isDelete)}>Hapus Kuis</Button>
         </>

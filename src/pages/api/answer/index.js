@@ -1,22 +1,14 @@
 import { supabase } from "../../../lib/supabase";
 
-const generateCustomToken = (length = 12) => {
-  const chars = 'abcdefghijklmnopqrstuvwxyz0123456789';
-  let token = '';
-  for (let i = 0; i < length; i++) {
-    const randomIndex = Math.floor(Math.random() * chars.length);
-    token += chars[randomIndex];
-  }
-  return token;
-};
+
 export const POST = async ({ params, request, url }) => {
-  const { idQuiz, idUser, idQuestion, idOption } = await request.json();
+  const { idQuiz, nisn, idQuestion, idOption } = await request.json();
   // console.log(idUser)
   const { data: existingData, error: fetchError } = await supabase
   .from('answers')
   .select('id')
   .eq('id_quiz', idQuiz)
-  .eq('id_user', idUser)
+  .eq('nisn', nisn)
   .eq('id_question', idQuestion);
   if (existingData.length > 0) {
     // Jika data sudah ada, lakukan update
@@ -27,7 +19,7 @@ export const POST = async ({ params, request, url }) => {
       })
       .match({
         id_quiz: idQuiz,
-        id_user: idUser,
+        nisn: nisn,
         id_question: idQuestion
       });
   
@@ -54,7 +46,7 @@ export const POST = async ({ params, request, url }) => {
       .from('answers')
       .insert({
         id_quiz: idQuiz,
-        id_user: idUser,
+        nisn: nisn,
         id_question: idQuestion,
         id_option: idOption
       });

@@ -34,17 +34,18 @@ import {
 } from "@/components/ui/sheet"
 import { localTime } from "@/utils/localTime";
 import { calculateDuration, getConclusion } from "@/utils/calculateDuration";
+import { Badge } from "../ui/badge";
 
 
 
-
+ 
 const KuisSubmittion = ({ id, title }) => {
   const [quizData, setQuizData] = useState([])
 
   const { data, isLoading, error } = useQuery({
     queryKey: [`kuis${id}`], queryFn: async () => {
       const submittionData = await axios.get(`/api/score?id=${id}`)
-      
+
 
       return submittionData.data.data
     }, refetchInterval: 5000
@@ -58,11 +59,11 @@ const KuisSubmittion = ({ id, title }) => {
   }
 
   const detailAnswer = useQuery({
-    queryKey: [`data-${detailData.userId}`], queryFn: async () => {
-      const { data } = await axios.get(`/api/answer/status?id_u=${detailData.userId}&id_q=${id}`)
+    queryKey: [`data-${detailData.nisn}`], queryFn: async () => {
+      const { data } = await axios.get(`/api/answer/status?id_u=${detailData.nisn}&id_q=${id}`)
       return data.data
     },
-    enabled: !!detailData.userId && !!id,
+    enabled: !!detailData.nisn && !!id,
   })
 
 
@@ -96,10 +97,27 @@ const KuisSubmittion = ({ id, title }) => {
         </div>
       ),
     },
+    {
+      accessorKey: 'status',
+      header: ({ column }) => {
+        return (
+          <div
 
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          >
+            Status Pengerjaan
+
+          </div>
+        )
+      },
+      cell: ({ row }) => <div className="Capitalize">
+        {row.getValue("status") ? <Badge className={"bg-green-600"}>Sudah Mengerjakan</Badge> : <Badge className={"bg-red-600"}>Belum Mengerjakan</Badge>}
+      </div>,
+
+    },
     {
       accessorKey: 'Aksi',
-      cell: ({ row }) => <Button onClick={() => handleIsDetail(row.original)}>Detail</Button>
+      cell: ({ row }) => row.getValue('status') ? <Button onClick={() => handleIsDetail(row.original)}>Detail</Button> : "Detail Tidak Tersedia"
       ,
       header: '',
     },
@@ -128,8 +146,8 @@ const KuisSubmittion = ({ id, title }) => {
   const [duration, setDuration] = useState(null);
 
   useEffect(() => {
-    
-    if (detailAnswer.isSuccess ) {
+
+    if (detailAnswer.isSuccess) {
       const { hours, minutes, seconds } = calculateDuration(detailAnswer.data.created_at, detailAnswer.data.updated_at);
       // console.log(hours, minutes)
       setDuration({ hours, minutes, seconds });
@@ -143,8 +161,8 @@ const KuisSubmittion = ({ id, title }) => {
 
   return (
     <div className="w-full border rounded-md ">
-     
-        <Sheet open={detailIsOpen} onOpenChange={setDetailIsOpen}>
+
+      <Sheet open={detailIsOpen} onOpenChange={setDetailIsOpen}>
         <SheetContent className="overflow-y-scroll">
           <SheetHeader>
             <SheetTitle>Detail {detailData.namaLengkap}</SheetTitle>
@@ -174,7 +192,7 @@ const KuisSubmittion = ({ id, title }) => {
                   <td className="border border-gray-300 p-2 text-gray-700">Jumlah Jawaban Salah Atau Tidak Terjawab</td>
                   <td className="border border-gray-300 p-2 text-gray-700">{detailData.total - detailData.score}</td>
                 </tr>
-                <tr> 
+                <tr>
                   <td className="border border-gray-300 p-2 text-gray-700">Nilai</td>
                   <td className="border border-gray-300 p-2 text-gray-700">{(detailData.score / detailData.total * 100).toFixed(1)}</td>
                 </tr>
@@ -188,7 +206,7 @@ const KuisSubmittion = ({ id, title }) => {
                     {!detailAnswer.isFetched
                       ? 'Loading...'
                       : localTime(detailAnswer.data.updated_at)
-                       }
+                    }
                   </td>
                 </tr>
                 <tr>
@@ -206,7 +224,7 @@ const KuisSubmittion = ({ id, title }) => {
                 <tr>
                   <td className="border border-gray-300 p-2 text-gray-700">Lihat Jawaban</td>
                   <td className="border border-gray-300 p-2 text-gray-700">
-                    <a href={`/result/${id}/${detailAnswer?.data?.id_user}`} className={buttonVariants()} target="_blank">Jawaban</a>
+                    <a href={`/result/${id}/${detailAnswer?.data?.nisn}`} className={buttonVariants()} target="_blank">Jawaban</a>
                   </td>
                 </tr>
               </tbody>
@@ -214,7 +232,7 @@ const KuisSubmittion = ({ id, title }) => {
           </div>
         </SheetContent>
       </Sheet>
-      
+
       <div className="w-full flex justify-between items-end  border-b  p-2">
         <div >
           <Label htmlFor="search">Search</Label>

@@ -1,14 +1,14 @@
 import { supabase } from "@/lib/supabase";
 
 export const POST = async ({ params, request, url }) => {
-  const { idQuiz, idUser, status } = await request.json();
+  const { idQuiz, nisn, status } = await request.json();
   // console.log(status);
 
   // Step 1: Check if the data already exists
   const { data: existingData, error: checkError } = await supabase
     .from('answer_status')
     .select('id')
-    .eq('id_user', idUser)
+    .eq('nisn', nisn)
     .eq('id_quiz', idQuiz)
     .single();
 
@@ -41,7 +41,7 @@ export const POST = async ({ params, request, url }) => {
   } else {
     const { data: insertData, error: insertError } = await supabase
       .from('answer_status')
-      .insert([{ id_user: idUser, id_quiz: idQuiz, status }])
+      .insert([{ nisn: nisn, id_quiz: idQuiz, status }])
       .select().single();
 
     result = insertData;
@@ -80,7 +80,7 @@ export const GET = async ({ params, url }) => {
     const { data: existingData, error: fetchError } = await supabase
       .from('answer_status')
       .select('*')
-      .eq('id_user', idUser)
+      .eq('nisn', idUser)
       .eq('id_quiz', idQuiz).single();
 
     
@@ -95,7 +95,6 @@ export const GET = async ({ params, url }) => {
     return new Response(
       JSON.stringify({
         message: "internal server error",
-
       }),
       { status: 500 }
     );

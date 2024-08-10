@@ -80,21 +80,33 @@ export const GET = async ({ params, url,cookies }) => {
     
     try {
         const id = url.searchParams.get("id");
+        const nisn = url.searchParams.get("nisn");
         // console.log({iniID :id})
        
-        
-        
-    
-        // Set the session in supabase
      
        
 
-        const { data: users,error:e1 } = await supabase.auth.getUser()
-        // console.log({data})
-        // console.log({e1})
-        const { data: status,error:e2 } = await supabase.from('answer_status').select('*').match({ id_quiz: id, id_user: users.user.id }).single();
+        
+        
+        const { data: status,error:e2 } = await supabase.from('answer_status').select('*').match({ id_quiz: id, nisn: nisn }).single();
         // console.log({e2});
-        const { data: quiz,error:e3 } = await supabase.from('quiz').select('waktu').eq('id', id).single()
+        // console.log({status});
+        const { data: quiz,error:e3 } = await supabase.from('quiz').select('waktu,id_kelas').eq('id', id).single()
+
+        const {data:getIdKelas} = await supabase.from('siswa').select('id_kelas').eq('nisn',nisn).single();
+
+       if(getIdKelas?.id_kelas !== quiz?.id_kelas){
+        const {data:kelasName} = await supabase.from('kelas').select('kelas').eq('id',quiz.id_kelas).single();
+        return new Response(
+            JSON.stringify({
+                message: `anda tidak bisa mengerjakan kuis ini karena anda bukan siswa di kelas ${kelasName.kelas}`,
+            }),
+            { status: 401 }
+        );
+       }
+
+
+        
         // console.log({e3})
 
 
@@ -140,7 +152,7 @@ export const GET = async ({ params, url,cookies }) => {
             { status: 200 }
         );
     } catch (error) {
-        // console.log(error);
+        
         return new Response(
             JSON.stringify({
                 message: "Internal Server Error",

@@ -1,7 +1,5 @@
 ---
 const { kuis } = Astro.params;
-import { Button } from "@/components/ui/button";
-import CardUser from "@/components/users/CardUser";
 import Dashboard from "@/layouts/Dashboard.astro";
 import KuisSubmittion from "../../components/quiz/KuisSubmittion";
 import { supabase } from "@/lib/supabase";
@@ -9,6 +7,7 @@ import { getStatus } from "../../components/Card";
 import { localTime } from "@/utils/localTime";
 import QuizMenu from '@/components/quiz/QuizMenu'
 import QuizAction from "@/components/quiz/QuizAction";
+import QuizStat from "@/components/quiz/QuizStat";
 
 const { data: quiz, error } = await supabase
   .from("quiz")
@@ -19,6 +18,7 @@ const { data: quiz, error } = await supabase
       mapel
     ),
     kelas(
+      id,
       kelas
     )
   `,
@@ -27,12 +27,7 @@ const { data: quiz, error } = await supabase
   .single();
 
 
-const { data: answers } = await supabase
-  .from("answers")
-  .select("*")
-  .eq("id_quiz", kuis);
-const uniqueUsers = new Set(answers.map((answer) => answer.id_user));
-const participantCount = uniqueUsers.size;
+
 
 
 const status = getStatus(quiz?.start_quiz, quiz?.end_quiz);
@@ -44,9 +39,9 @@ const status = getStatus(quiz?.start_quiz, quiz?.end_quiz);
       class="grid grid-cols-1 order-1 gap-2 p-2 rounded-md border md:col-span-4"
     >
       <div class="h-full">
-        <CardUser title={"Jumlah Kuis Dikerjakan"} value={participantCount} client:idle/>
+        <QuizStat id={kuis} client:load="react"/>
       </div>
-      <div class="flex justify-center items-center gap-2 flex-wrap">
+      <div class="grid md:grid-cols-3 grid-cols-1 gap-2">
         <QuizMenu id={kuis} title={quiz?.title} client:idle/>
       </div>
     </div>
@@ -81,7 +76,7 @@ const status = getStatus(quiz?.start_quiz, quiz?.end_quiz);
         {quiz.desc}
       </p> 
       
-      <QuizAction client:idle data={{id:kuis,title:quiz?.title}}/>
+      <QuizAction client:idle data={{id:kuis,title:quiz?.title,idKelas:quiz.kelas.id,token:quiz.token}} />
       
     </div>
     <div

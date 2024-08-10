@@ -23,7 +23,7 @@ const { data: answers, error } = await supabase
   .from("answers")
   .select(`*, options(*)`)
   .eq("id_quiz", id)
-  .eq("id_user", userId);
+  .eq("nisn", userId);
 const getQuizScore = async () => {
   if (error) {
     // console.error("Error fetching answers:", error);

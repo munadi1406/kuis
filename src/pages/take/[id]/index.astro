@@ -4,60 +4,47 @@ import Layout from "@/layouts/Layout.astro";
 import GuestForm from "@/components/quiz/GuestForm";
 import { supabase } from "@/lib/supabase";
 
-// import { createClient } from "@supabase/supabase-js";
-// const supabase = createClient(
-//   import.meta.env.SUPABASE_URL,
-//   import.meta.env.SUPABASE_SERVICE_KEY,
-//   {
-//     auth: {
-//       autoRefreshToken: false,
-//       persistSession: false,
-//     },
-//   },
-// );
-const { cookies, redirect } = Astro;
+const { cookies, redirect ,} = Astro;
 const { id } = Astro.params;
 const accessToken = cookies.get("sb-access-token");
 const refreshToken = cookies.get("sb-refresh-token");
 
-
-
-const { data:{user}, error:err } = await supabase.auth.setSession({
+const {
+  data: { user },
+  error: err,
+} = await supabase.auth.setSession({
   refresh_token: refreshToken?.value,
   access_token: accessToken?.value,
 });
 
-
-
-
-
-
 const { data: quiz, error } = await supabase
   .from("quiz")
-  .select("title,waktu,token,end_quiz")
+  .select("title,waktu,token,end_quiz,questions(count)")
   .eq("id", id)
   .single();
-
 let status = "false";
 
-
-let userId = user?.id || "";
-
-if (err) {
-  status = "guest"
-} else {
-  if (quiz) {
-    const today = new Date();
-    const endQuizDate = new Date(quiz.end_quiz);
-
-    if (today <= endQuizDate) {
-      status = "true";
-    }
+const nisn = Astro.url.searchParams.get("nisn");
+const token = Astro.url.searchParams.get("token")
+if (nisn) {
+    if (quiz) {
+      const today = new Date();
+      const endQuizDate = new Date(quiz.end_quiz);
+      if (today <= endQuizDate) {
+        status = "true";
+      }
+    status="guest"
+  }else{
+    status="guest"
   }
+} else {
+  status = "guest";
 }
-// console.log(status)
-
-
+const checkReady = cookies.get(`${id}-status`)
+if(checkReady){
+  status="true"
+}
+console.log(status)
 ---
 
 <Layout title={quiz?.title || ""}>
@@ -66,9 +53,10 @@ if (err) {
   </h3>
   {
     status === "true" && (
-      <Answer client:only="react" id={id} time={quiz?.waktu} id_user={userId} />
+      <Answer client:only="react" id={id} time={quiz?.waktu} nisnV={nisn} />
     )
   }
   {status === "false" && <div>Kuis tidak tersedia</div>}
-  {status === "guest" && <GuestForm client:only="react" id={id} />}
+  {status === "guest" && <GuestForm client:only="react" id={id} nisn={nisn} token={token} data={quiz}/>}
 </Layout>
+

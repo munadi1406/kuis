@@ -15,7 +15,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { buttonVariants } from "@/components/ui/button";
 
-export default function Navbar({ data, role, path }) {
+export default function Navbar({ data, role, path, roleUser }) {
   return (
     <>
       <div className="shadow bg-white font-poppins hidden md:block">
@@ -31,7 +31,7 @@ export default function Navbar({ data, role, path }) {
                     <NavigationMenuLink
                       href="/dashboard"
                       className={navigationMenuTriggerStyle()}
-                      
+
                       active={path === "/dashboard" && true}
                     >
                       Dashboard
@@ -52,15 +52,17 @@ export default function Navbar({ data, role, path }) {
                     >
                       Umpan Balik
                     </NavigationMenuLink>
-                    {role !== "users" && (
+                    {role === "admin" && (
+                      <NavigationMenuLink
+                        href="/log"
+                        active={path === "/log" && true}
+                        className={navigationMenuTriggerStyle()}
+                      >
+                        Log
+                      </NavigationMenuLink>
+                    )}
+                    {roleUser === "Guru" || roleUser === "admin" ? (
                       <>
-                        <NavigationMenuLink
-                          href="/log"
-                          active={path === "/log" && true}
-                          className={navigationMenuTriggerStyle()}
-                        >
-                          Log
-                        </NavigationMenuLink>
                         <DropdownMenu>
                           <DropdownMenuTrigger
                             className={navigationMenuTriggerStyle()}
@@ -68,14 +70,18 @@ export default function Navbar({ data, role, path }) {
                             Data Master
                           </DropdownMenuTrigger>
                           <DropdownMenuContent>
-                            <a href="/mapel">
-                              <DropdownMenuItem>
-                                Mata Pelajaran
-                              </DropdownMenuItem>
-                            </a>
-                            <a href="/kelas">
-                              <DropdownMenuItem>Kelas</DropdownMenuItem>
-                            </a>
+                            {roleUser === "admin" && (
+                              <>
+                                <a href="/mapel">
+                                  <DropdownMenuItem>
+                                    Mata Pelajaran
+                                  </DropdownMenuItem>
+                                </a>
+                                <a href="/kelas">
+                                  <DropdownMenuItem>Kelas</DropdownMenuItem>
+                                </a>
+                              </>
+                            )}
                             <a href="/guru">
                               <DropdownMenuItem>Guru</DropdownMenuItem>
                             </a>
@@ -85,7 +91,7 @@ export default function Navbar({ data, role, path }) {
                           </DropdownMenuContent>
                         </DropdownMenu>
                       </>
-                    )}
+                    ) : <></>}
                   </NavigationMenuItem>
                 </NavigationMenuList>
               </NavigationMenu>

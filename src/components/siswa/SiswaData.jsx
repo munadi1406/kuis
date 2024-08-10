@@ -36,15 +36,16 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select"
-const Print = lazy(()=>import( "./Print.jsx"));
+import { Badge } from "../ui/badge.jsx";
+const Print = lazy(() => import("./Print.jsx"));
 
 
-const SiswaData = () => {
+const SiswaData = ({ role }) => {
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [msg, setMsg] = useState("");
     const [currentData, setCurrentData] = useState({});
     const [query, setQuery] = useState("");
-    const [dialogPrint,setDiaglogPrint] = useState(false);
+    const [dialogPrint, setDiaglogPrint] = useState(false);
     const [sheetOpen, setSheetOpen] = useState(false);
     const handleDetail = (data) => {
         setSheetOpen(!sheetOpen)
@@ -174,7 +175,7 @@ const SiswaData = () => {
         },
     });
 
-const getKelasName = (idKelas) => {
+    const getKelasName = (idKelas) => {
         if (dataKelas.isSuccess) {
             return `${dataKelas.data.data.find(datas => datas.id === idKelas)?.kelas}`
         }
@@ -205,7 +206,7 @@ const getKelasName = (idKelas) => {
                                 disabled={dataKelas.isLoading}
                                 required
                                 onValueChange={(e) => {
-                                    if(e === "semua"){
+                                    if (e === "semua") {
                                         setFilter("")
                                         return
                                     }
@@ -229,24 +230,29 @@ const getKelasName = (idKelas) => {
                     </div>
                 </div>
                 <div className="flex items-end justify-end gap-2">
-                    <Dialog open={isDialogOpen} onOpenChange={() => { setIsDialogOpen(!isDialogOpen), setIsEdit(false) }} >
-                        <DialogTrigger asChild>
-                            <Button variant="outline" onClick={() => { setMsg(null), setIsDialogOpen(true) }}>
-                                Tambah Data Siswa
-                            </Button>
-                        </DialogTrigger>
-                        <DialogContent className="sm:max-w-[80vw] overflow-y-scroll max-h-screen">
-                            <DialogHeader>
-                                <DialogTitle>{isEdit ? "Edit Data Siswa" : "Tambah Data Siswa"}</DialogTitle>
-                                <DialogDescription className="text-red-600 text-xs">
-                                    {msg}
-                                </DialogDescription>
-                            </DialogHeader>
-                            <Suspense fallback={<ClipLoader />}>
-                                <Form mutate={mutate} isLoading={isPending} isEdit={isEdit} currentData={currentData} updateGuru={updateGuru} />
-                            </Suspense>
-                        </DialogContent>
-                    </Dialog>
+                    {role === "admin" && (
+                        <>
+
+                            <Dialog open={isDialogOpen} onOpenChange={() => { setIsDialogOpen(!isDialogOpen), setIsEdit(false) }} >
+                                <DialogTrigger asChild>
+                                    <Button variant="outline" onClick={() => { setMsg(null), setIsDialogOpen(true) }}>
+                                        Tambah Data Siswa
+                                    </Button>
+                                </DialogTrigger>
+                                <DialogContent className="sm:max-w-[80vw] overflow-y-scroll max-h-screen">
+                                    <DialogHeader>
+                                        <DialogTitle>{isEdit ? "Edit Data Siswa" : "Tambah Data Siswa"}</DialogTitle>
+                                        <DialogDescription className="text-red-600 text-xs">
+                                            {msg}
+                                        </DialogDescription>
+                                    </DialogHeader>
+                                    <Suspense fallback={<ClipLoader />}>
+                                        <Form mutate={mutate} isLoading={isPending} isEdit={isEdit} currentData={currentData} updateGuru={updateGuru} />
+                                    </Suspense>
+                                </DialogContent>
+                            </Dialog>
+                        </>
+                    )}
                     <Button
                         onClick={() => setDiaglogPrint(true)}
                         disabled={!data || data.length <= 0}
@@ -263,6 +269,7 @@ const getKelasName = (idKelas) => {
                         <TableHead>NISN</TableHead>
                         <TableHead>Nama Lengkap</TableHead>
                         <TableHead>Kelas</TableHead>
+                        <TableHead>Akun</TableHead>
                         <TableHead>Created At</TableHead>
                         <TableHead>Updated At</TableHead>
                     </TableRow>
@@ -277,24 +284,29 @@ const getKelasName = (idKelas) => {
                                     <TableCell>{e.nisn}</TableCell>
                                     <TableCell>{e.nama_lengkap}</TableCell>
                                     <TableCell>{getKelasName(e.id_kelas)}</TableCell>
+                                    <TableCell >{e.detail_user ? <Badge className={"bg-green-600"}>{e.detail_user.email}</Badge> : <Badge className={"bg-red-600"}>Siswa Tidak Punya Akun</Badge>}</TableCell>
                                     <TableCell>{localTime(e.created_at)}</TableCell>
                                     <TableCell>{localTime(e.updated_at)}</TableCell>
                                     <TableCell className="flex  items-center gap-2 flex-wrap">
-                                        <Button
-                                            onClick={() => {
-                                                setIsEdit(true)
-                                                setIsDialogOpen(true)
-                                                setCurrentData({ ...e });
-                                            }}
-                                        >
-                                            Edit
-                                        </Button>
+                                        {role === "admin" &&
+                                            <Button
+                                                onClick={() => {
+                                                    setIsEdit(true)
+                                                    setIsDialogOpen(true)
+                                                    setCurrentData({ ...e });
+                                                }}
+                                            >
+                                                Edit
+                                            </Button>
+                                        }
                                         <Button className="bg-blue-600" onClick={() => handleDetail(e)}>
                                             Detail
                                         </Button>
-                                        <Button onClick={() => deleteSiswa.mutate(e.nisn)} variant="destructive">
-                                            Hapus
-                                        </Button>
+                                        {role === "admin" &&
+                                            <Button onClick={() => deleteSiswa.mutate(e.nisn)} variant="destructive">
+                                                Hapus
+                                            </Button>
+                                        }
                                     </TableCell>
                                 </TableRow>
                             ))}
@@ -310,7 +322,7 @@ const getKelasName = (idKelas) => {
             )}
             <Suspense>
                 <DetailSiswaSheet open={sheetOpen} setOpen={setSheetOpen} data={currentData} getKelasName={getKelasName} />
-                <Print open={dialogPrint} setOpen={setDiaglogPrint} dataKelas={dataKelas} getKelasName={getKelasName}/>
+                <Print open={dialogPrint} setOpen={setDiaglogPrint} dataKelas={dataKelas} getKelasName={getKelasName} />
             </Suspense>
 
         </div>

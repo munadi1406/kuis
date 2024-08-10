@@ -6,7 +6,7 @@ import { Badge } from '../ui/badge'
 import { localTime } from '@/utils/localTime'
 import { buttonVariants } from '../ui/button'
 
-const TakeQuiz = ({ isPending, mutate, setToken, data, msg, status }) => {
+const TakeQuiz = ({ isPending, mutate, setToken, data, msg, status,nisn,token }) => {
    
     return (
         <>
@@ -38,7 +38,7 @@ const TakeQuiz = ({ isPending, mutate, setToken, data, msg, status }) => {
                     <p>{`${localTime(data.start_quiz)} - ${localTime(data.end_quiz)}`}</p>
                     <p>Jumlah Soal : {data.questions}</p>
                     <p>Waktu Pengerjaan : {data.waktu} Menit</p>
-                    <a href={`/take/${data.id}`} className={buttonVariants()}>Kerjakan Sekarang</a>
+                    <a href={`/take/${data.id}?nisn=${nisn}&token=${token}`} className={buttonVariants()}>Kerjakan Sekarang</a>
                 </div>
             )}
         </>

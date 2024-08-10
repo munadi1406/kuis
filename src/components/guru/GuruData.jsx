@@ -28,17 +28,18 @@ import { toast } from "../ui/use-toast.js";
 import { generatePdf } from "./generatePdf.js";
 import ButtonLoader from "../ButtonLoader.jsx";
 import ClipLoader from "react-spinners/ClipLoader.js";
+import { Badge } from "../ui/badge.jsx";
 const DetailGuruSheet = lazy(() => import("./DetailGuruSheet.jsx"));
 const Form = lazy(() => import("./Form.jsx"));
 
 
 
-const GuruData = () => {
+const GuruData = ({ role }) => {
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [msg, setMsg] = useState("");
     const [currentData, setCurrentData] = useState({});
     const [query, setQuery] = useState("");
-   
+
     const [sheetOpen, setSheetOpen] = useState(false);
     const handleDetail = (data) => {
         setSheetOpen(!sheetOpen)
@@ -66,7 +67,7 @@ const GuruData = () => {
     });
     const { mutate, isPending } = useMutation({
         mutationFn: async (formData) => {
-            
+
             const insertGuru = await axios.post("api/guru", formData);
             return insertGuru;
         },
@@ -113,12 +114,12 @@ const GuruData = () => {
             });
         },
     });
-    const [isEdit,setIsEdit] = useState(false)
+    const [isEdit, setIsEdit] = useState(false)
 
 
     const updateGuru = useMutation({
         mutationFn: async (formData) => {
-           
+
             const isUpdate = await axios.put(`api/guru`, formData);
             return isUpdate;
         },
@@ -176,24 +177,27 @@ const GuruData = () => {
                     />
                 </div>
                 <div className="flex items-end justify-end gap-2">
-                    <Dialog open={isDialogOpen} onOpenChange={()=>{setIsDialogOpen(!isDialogOpen),setIsEdit(false)}} >
-                        <DialogTrigger asChild>
-                            <Button variant="outline" onClick={() => setIsDialogOpen(true)}>
-                                Tambah Data Guru
-                            </Button>
-                        </DialogTrigger>
-                        <DialogContent className="sm:max-w-[80vw] overflow-y-scroll max-h-screen">
-                            <DialogHeader>
-                                <DialogTitle>{isEdit ? "Edit Data Guru" : "Tambah Data Guru"}</DialogTitle>
-                                <DialogDescription className="text-red-600 text-xs">
-                                    {msg}
-                                </DialogDescription>
-                            </DialogHeader>
-                            <Suspense fallback={<ClipLoader />}>
-                                <Form  mutate={mutate}  isLoading={isPending} isEdit={isEdit} currentData={currentData} updateGuru={updateGuru}/>
-                            </Suspense>
-                        </DialogContent>
-                    </Dialog>
+                    {role === "admin" && (
+
+                        <Dialog open={isDialogOpen} onOpenChange={() => { setIsDialogOpen(!isDialogOpen), setIsEdit(false) }} >
+                            <DialogTrigger asChild>
+                                <Button variant="outline" onClick={() => setIsDialogOpen(true)}>
+                                    Tambah Data Guru
+                                </Button>
+                            </DialogTrigger>
+                            <DialogContent className="sm:max-w-[80vw] overflow-y-scroll max-h-screen">
+                                <DialogHeader>
+                                    <DialogTitle>{isEdit ? "Edit Data Guru" : "Tambah Data Guru"}</DialogTitle>
+                                    <DialogDescription className="text-red-600 text-xs">
+                                        {msg}
+                                    </DialogDescription>
+                                </DialogHeader>
+                                <Suspense fallback={<ClipLoader />}>
+                                    <Form mutate={mutate} isLoading={isPending} isEdit={isEdit} currentData={currentData} updateGuru={updateGuru} />
+                                </Suspense>
+                            </DialogContent>
+                        </Dialog>
+                    )}
                     <Button
                         onClick={() => generatePdf()}
                         disabled={!data || data.length <= 0}
@@ -209,6 +213,7 @@ const GuruData = () => {
                         <TableHead className="w-[100px]">No</TableHead>
                         <TableHead>NIP</TableHead>
                         <TableHead>Nama Lengkap</TableHead>
+                        <TableHead>Akun</TableHead>
                         <TableHead>Created At</TableHead>
                         <TableHead>Updated At</TableHead>
                     </TableRow>
@@ -222,24 +227,29 @@ const GuruData = () => {
                                     <TableCell className="font-medium">{i + 1}</TableCell>
                                     <TableCell>{e.nip}</TableCell>
                                     <TableCell>{e.nama_lengkap}</TableCell>
+                                    <TableCell >{e.detail_user ? <Badge className={"bg-green-600"}>{e.detail_user.email}</Badge> : <Badge className={"bg-red-600"}>Guru Tidak Punya Akun</Badge>}</TableCell>
                                     <TableCell>{localTime(e.created_at)}</TableCell>
                                     <TableCell>{localTime(e.updated_at)}</TableCell>
                                     <TableCell className="flex  items-center gap-2 flex-wrap">
-                                        <Button
-                                            onClick={() => {
-                                                setIsEdit(true)
-                                                setIsDialogOpen(true)
-                                                setCurrentData({ ...e });
-                                            }}
-                                        >
-                                            Edit
-                                        </Button>
+                                        {role === "admin" &&
+                                            <Button
+                                                onClick={() => {
+                                                    setIsEdit(true)
+                                                    setIsDialogOpen(true)
+                                                    setCurrentData({ ...e });
+                                                }}
+                                            >
+                                                Edit
+                                            </Button>
+                                        }
                                         <Button className="bg-blue-600" onClick={() => handleDetail(e)}>
                                             Detail
                                         </Button>
-                                        <Button onClick={() => deleteGuru.mutate(e.nip)} variant="destructive">
-                                            Hapus
-                                        </Button>
+                                        {role === "admin" &&
+                                            <Button onClick={() => deleteGuru.mutate(e.nip)} variant="destructive">
+                                                Hapus
+                                            </Button>
+                                        }
                                     </TableCell>
                                 </TableRow>
                             ))}
@@ -256,7 +266,7 @@ const GuruData = () => {
             <Suspense>
                 <DetailGuruSheet open={sheetOpen} setOpen={setSheetOpen} data={currentData} />
             </Suspense>
-           
+
         </div>
     );
 };

@@ -5,10 +5,10 @@ import {
     AlertDialogFooter,
     AlertDialogHeader,
     AlertDialogTitle,
-  } from "@/components/ui/alert-dialog";
+} from "@/components/ui/alert-dialog";
 import { buttonVariants } from "../ui/button";
 
-const AlertDialog = ({ id,msg,userId }) => {
+const AlertDialog = ({ id, msg, userId }) => {
     return (
         <AlertDiaglogS open={true}>
             <AlertDialogContent>
@@ -21,7 +21,9 @@ const AlertDialog = ({ id,msg,userId }) => {
                     </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                    <a href={`/result/${id}/${userId}`} className={buttonVariants()}>
+                    <a href={`/result/${id}/${userId}`} className={buttonVariants()} onClick={() => {
+                        localStorage.removeItem(id)
+                    }}>
                         Lihat Nilai
                     </a>
                 </AlertDialogFooter>

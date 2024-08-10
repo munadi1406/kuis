@@ -7,7 +7,7 @@ export const GET = async ({ params, url }) => {
       // Fetch answers with their corresponding option details
       const { data: answers, error: answersError } = await supabase
         .from("answers")
-        .select(`id_user, id_question, options(option_is_true)`)
+        .select(`nisn, id_question, options(option_is_true)`)
         .eq('id_quiz', id);
         const { data: quiz, error:err} = await supabase
         .from("quiz")

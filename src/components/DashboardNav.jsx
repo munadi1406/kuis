@@ -14,19 +14,20 @@ import axios from "axios";
 import WithQuery from "@/utils/WithQuery";
 import TakeQuiz from "./quiz/TakeQuiz";
 
-const DashboardNav = ({ title, role }) => {
+const DashboardNav = ({ title, role, roleUser,nisn }) => {
+ 
   const [token, setToken] = useState("")
   const [msg, setMsg] = useState("")
   const [dataQuiz, setDataQuiz] = useState({});
   const [status, setStatus] = useState(false);
-
+ 
   const { mutate, isPending } = useMutation({
     mutationFn: async (e) => {
       e.preventDefault()
 
       const take = await axios.post('/api/quiz/take', {
         tokenQuiz: token
-      })
+      }) 
       return take.data
     }, onSuccess: (data) => {
       setDataQuiz(data.data)
@@ -48,25 +49,29 @@ const DashboardNav = ({ title, role }) => {
         {title}
       </h1>
       <div className=" gap-2 md:flex hidden flex-wrap justify-end">
-        <Dialog>
-          <DialogTrigger className={buttonVariants({ variant: "outline" })}>
-            Kerjakan Kuis
-          </DialogTrigger>
-          <DialogContent className="sm:max-w-[425px]">
-            <DialogHeader>
-              <DialogTitle>Kerjakan Kuis</DialogTitle>
-            </DialogHeader>
-            <TakeQuiz isPending={isPending} mutate={mutate} setToken={setToken} data={dataQuiz} msg={msg} status={status} />
-          </DialogContent>
-        </Dialog>
+        {roleUser === "Siswa" && (
+          <>
+            <Dialog>
+              <DialogTrigger className={buttonVariants({ variant: "outline" })}>
+                Kerjakan Kuis
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-[425px]">
+                <DialogHeader>
+                  <DialogTitle>Kerjakan Kuis</DialogTitle>
+                </DialogHeader>
+                <TakeQuiz isPending={isPending} nisn={nisn} token={token} mutate={mutate} setToken={setToken} data={dataQuiz} msg={msg} status={status} />
+              </DialogContent>
+            </Dialog>
 
-        <Link
-          to={"/history"}
-          text={"History Pengerjaan Kuis"}
-          variants={"outline"}
-        />
+            <Link
+              to={"/history"}
+              text={"History Pengerjaan Kuis"}
+              variants={"outline"}
+            />
+          </>
+        )}
 
-        {role !== "Siswa" && (
+        {roleUser !== "Siswa" && (
           <>
             <Link to={"/createKuis"} text={"Buat Kuis"} />
             <Link to={"/laporan"} text={"Laporan"} />
@@ -87,7 +92,7 @@ const DashboardNav = ({ title, role }) => {
             <DialogHeader>
               <DialogTitle>Kerjakan Kuis</DialogTitle>
             </DialogHeader>
-            <TakeQuiz isPending={isPending} mutate={mutate} setToken={setToken} data={dataQuiz} msg={msg} status={status} />
+            <TakeQuiz isPending={isPending} nisn={nisn} token={token} mutate={mutate} setToken={setToken} data={dataQuiz} msg={msg} status={status} />
           </DialogContent>
         </Dialog>
 
@@ -99,7 +104,7 @@ const DashboardNav = ({ title, role }) => {
             }
           />
         </a>
-        {role !== "Siswa" && (
+        {roleUser !== "Guru" && (
           <>
             <a href="/createKuis">
               <ButtonLabel
@@ -114,15 +119,15 @@ const DashboardNav = ({ title, role }) => {
                 text={"Laporan"}
                 trigger={
                   <span className="material-symbols-outlined">
-                  partner_reports
+                    partner_reports
                   </span>
-                } 
+                }
               />
             </a>
           </>
-          
+
         )}
-        
+
       </div>
     </div>
   );

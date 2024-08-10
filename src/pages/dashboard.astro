@@ -9,10 +9,5 @@ const {id,role,roleUser} = data
 ---
 
 <DashboardLayout title="dashboard">
-  <!-- {
-      quiz.map((e) => (
-        <Cards title={e.title} skor={e.skor ? e.skor : ""} id={e.id} startDate={e.start_quiz} endDate={e.end_quiz} desc={e.desc} client:only="react"/>
-      ))
-    } -->
   <DashboardData client:idle idUser={id} role={role} roleUser={roleUser?.toLowerCase()}/>
 </DashboardLayout>

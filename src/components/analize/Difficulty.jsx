@@ -12,13 +12,14 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table";
-import { lazy, Suspense } from 'react'
+import { lazy, Suspense, useState } from 'react'
 import { Skeleton } from '../ui/skeleton'
 import { printDifficulty } from './print'
+import Desc from './Desc'
 const Card = lazy(() => import('../users/CardUser'))
 
 const Difficulty = ({ id }) => {
-
+    const [desc, setDesc] = useState(false);
     const { data, isLoading } = useQuery({
         queryKey: [`id-a-${id}`], queryFn: async () => {
             const data = await axios.get(`/api/analisis/difficulty?id=${id}`)
@@ -34,12 +35,13 @@ const Difficulty = ({ id }) => {
     return (
         <div>
             <h1 className='text-2xl font-semibold'>Analisis {data.title}</h1>
+
             <Suspense fallback={
-            <div className='grid md:grid-cols-3 gap-2 p-2 grid-cols-1'>
-                <Skeleton className={"w-full h-[100px] rounded-md"}/>
-                <Skeleton className={"w-full h-[100px] rounded-md"}/>
-                <Skeleton className={"w-full h-[100px] rounded-md"}/>
-            </div>}>
+                <div className='grid md:grid-cols-3 gap-2 p-2 grid-cols-1'>
+                    <Skeleton className={"w-full h-[100px] rounded-md"} />
+                    <Skeleton className={"w-full h-[100px] rounded-md"} />
+                    <Skeleton className={"w-full h-[100px] rounded-md"} />
+                </div>}>
                 <div className='grid md:grid-cols-3 gap-2 p-2 grid-cols-1'>
                     <Card title={`Rata Rata Kesulitan Kuis (${data.overallDifficulty})`} value={data.averageDifficulty} />
                     <Card title={"Rata Rata Sukses"} value={data.overallSuccessRate} />
@@ -51,7 +53,11 @@ const Difficulty = ({ id }) => {
                         : "Kuis belum sukses karena rata-rata sukses kurang dari 70%."}
                 </div>
             </Suspense>
-            <Button onClick={()=>printDifficulty(data.title,data.id)}>Cetak</Button>
+            <div className='flex gap-2 p-2'>
+                <Button onClick={() => printDifficulty(data.title, data.id)}>Cetak</Button>
+                <Button onClick={() => setDesc(!desc)}>{desc ? "Tutup" : "Cara Perhitungan"}</Button>
+            </div>
+            {desc && <Desc />}
             <Table>
                 <TableCaption>Analisis Kesulitan Soal</TableCaption>
 
@@ -66,12 +72,12 @@ const Difficulty = ({ id }) => {
                 </TableHeader>
                 <TableBody>
                     {data.data.map((item, index) => (
-                    <TableRow key={index}>
-                        <TableCell className="font-medium"><HtmlRender data={item.soal} /></TableCell>
-                        <TableCell className="font-medium">{item.kesulitan}</TableCell>
-                        <TableCell className="font-medium">{item.detailKesulitan}</TableCell>
-                        <TableCell className="font-medium">{item.hasil}</TableCell>
-                    </TableRow>
+                        <TableRow key={index}>
+                            <TableCell className="font-medium"><HtmlRender data={item.soal} /></TableCell>
+                            <TableCell className="font-medium">{item.kesulitan}</TableCell>
+                            <TableCell className="font-medium">{item.detailKesulitan}</TableCell>
+                            <TableCell className="font-medium">{item.hasil}</TableCell>
+                        </TableRow>
                     ))}
                 </TableBody>
             </Table>
