@@ -3,6 +3,8 @@ import { supabase } from "@/lib/supabase";
 
 export const GET = async ({ params, url }) => {
   const idUser = url.searchParams.get("id");
+  const idKelas = url.searchParams.get("idKelas");
+  const idMapel = url.searchParams.get("idMapel");
 
 
   const perPage = 10;
@@ -10,11 +12,16 @@ export const GET = async ({ params, url }) => {
 
   query = supabase
     .from("quiz")
-    .select(`id,title,kelas(kelas),mapel(mapel)`)
-    .limit(perPage)
+    .select(`id,title,kelas(kelas),mapel(mapel),tahun_ajaran(nama)`)
+    
     .eq('id_user', idUser)
     .order("created_at", { ascending: false });
-
+  if (idKelas) {
+    query = query.eq('id_kelas', idKelas)
+  }
+  if (idMapel) {
+    query = query.eq('id_mapel', idMapel)
+  }
 
 
 
@@ -71,7 +78,7 @@ export const POST = async ({ params, request, url }) => {
     // Mengambil data kuis berdasarkan idQuiz
     const { data: quizzes, error: quizzesError } = await supabase
       .from("quiz")
-      .select(`id, title`)
+      .select(`id, title, id_tahun_ajaran,id_kelas`)
       .in('id', idQuiz)
       .limit(perPage)
       .order("created_at", { ascending: false });
@@ -86,7 +93,7 @@ export const POST = async ({ params, request, url }) => {
     // Fetch answers with their corresponding option details
     const { data: answers, error: answersError } = await supabase
       .from("answers")
-      .select(`id_user, id_option, id_quiz, options(option_is_true)`)
+      .select(`nisn, id_option, id_quiz, options(option_is_true)`)
       .in('id_quiz', quizIds);
 
     if (answersError) {
@@ -99,16 +106,15 @@ export const POST = async ({ params, request, url }) => {
       );
     }
 
-    // Extract unique user IDs from the answers
-    const userIds = [...new Set(answers.map(answer => answer.id_user))];
-
-    // Fetch user details
+    // Fetch all students in the class history for the active academic year
     const { data: users, error: usersError } = await supabase
-      .from("detail_user")
-      .select("id_user, nama_lengkap")
-      .in('id_user', userIds);
+      .from("kelas_history")
+      .select("nisn, siswa(nama_lengkap)")
+      .eq('id_tahun_ajaran', quizzes[0].id_tahun_ajaran)
+      .eq('id_kelas', quizzes[0].id_kelas);
 
     if (usersError) {
+      console.log(usersError);
       return new Response(
         JSON.stringify({
           message: "Error fetching users",
@@ -118,11 +124,6 @@ export const POST = async ({ params, request, url }) => {
       );
     }
 
-    // Create a map of userId to username
-    const userMap = users.reduce((acc, user) => {
-      acc[user.id_user] = user.nama_lengkap;
-      return acc;
-    }, {});
 
     // Fetch total questions for each quiz separately and include quiz title
     const questionCounts = await Promise.all(
@@ -153,34 +154,31 @@ export const POST = async ({ params, request, url }) => {
     // Process the data to calculate the score for each user per quiz
     const quizResults = [];
 
+    // Initialize results for each quiz
+    quizIds.forEach(quizId => {
+      const quizResult = {
+        quizId,
+        title: questionCountMap[quizId].title,
+        totalQuestions: questionCountMap[quizId].count,
+        users: users.map(user => ({
+          nisn: user.nisn,
+          namaLengkap: user.siswa.nama_lengkap,
+          score: 0 // default score is 0, indicating no answers submitted
+        }))
+      };
+      quizResults.push(quizResult);
+    });
+
+    // Map answers to the appropriate user in the result set
     answers.forEach(answer => {
-      const { id_user, id_quiz, options: { option_is_true } } = answer;
+      const { nisn, id_quiz, options: { option_is_true } } = answer;
 
-      let quizResult = quizResults.find(result => result.quizId === id_quiz);
-
-      if (!quizResult) {
-        quizResult = {
-          quizId: id_quiz,
-          title: questionCountMap[id_quiz].title,
-          totalQuestions: questionCountMap[id_quiz].count,
-          users: []
-        };
-        quizResults.push(quizResult);
-      }
-
-      let userScore = quizResult.users.find(user => user.userId === id_user);
-
-      if (!userScore) {
-        userScore = {
-          userId: id_user,
-          namaLengkap: userMap[id_user],
-          score: 0
-        };
-        quizResult.users.push(userScore);
-      }
-
-      if (option_is_true) {
-        userScore.score += 1;
+      const quizResult = quizResults.find(result => result.quizId === id_quiz);
+      if (quizResult) {
+        const userScore = quizResult.users.find(user => user.nisn === nisn);
+        if (userScore && option_is_true) {
+          userScore.score += 1; // Increment score for correct answer
+        }
       }
     });
 
@@ -202,6 +200,7 @@ export const POST = async ({ params, request, url }) => {
     );
   }
 };
+;
 
 
 

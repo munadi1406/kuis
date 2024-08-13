@@ -91,10 +91,10 @@ export const GET = async ({ params, url,cookies }) => {
         const { data: status,error:e2 } = await supabase.from('answer_status').select('*').match({ id_quiz: id, nisn: nisn }).single();
         // console.log({e2});
         // console.log({status});
-        const { data: quiz,error:e3 } = await supabase.from('quiz').select('waktu,id_kelas').eq('id', id).single()
-
-        const {data:getIdKelas} = await supabase.from('siswa').select('id_kelas').eq('nisn',nisn).single();
-
+        const { data: quiz,error:e3 } = await supabase.from('quiz').select('waktu,id_kelas,id_tahun_ajaran').eq('id', id).single()
+        
+        const {data:getIdKelas} = await supabase.from('kelas_history').select('nisn,id_kelas').eq('nisn',nisn).eq('id_tahun_ajaran',quiz.id_tahun_ajaran).eq('id_kelas',quiz.id_kelas).single();
+        
        if(getIdKelas?.id_kelas !== quiz?.id_kelas){
         const {data:kelasName} = await supabase.from('kelas').select('kelas').eq('id',quiz.id_kelas).single();
         return new Response(

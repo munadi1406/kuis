@@ -89,10 +89,10 @@ const Form = ({ mutate, isLoading, isEdit, currentData, updateGuru }) => {
                             name="tahunAkhir"
                             type="number"
                             className="col-span-3"
-                            value={isEdit ? currentData.tahun_akhir : Number(formData.tahunAwal) + 1}
+                            value={Number(formData.tahunAwal) + 1}
                             onChange={handleChange}
                             required
-                            readOnly
+                            disabled
                         />
                     </div>
                     {isEdit && (
