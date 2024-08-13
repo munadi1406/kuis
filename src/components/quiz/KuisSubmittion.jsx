@@ -9,7 +9,7 @@ import {
 import { Input } from "../ui/input";
 import { Label } from "../ui/label";
 import { Button, buttonVariants } from "../ui/button";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import WithQuery from "@/utils/WithQuery";
 import { generatePdf } from "./generatePdf";
@@ -35,18 +35,18 @@ import {
 import { localTime } from "@/utils/localTime";
 import { calculateDuration, getConclusion } from "@/utils/calculateDuration";
 import { Badge } from "../ui/badge";
+import { toast } from "../ui/use-toast";
+import ButtonLoader from "../ButtonLoader";
 
 
 
- 
+
 const KuisSubmittion = ({ id, title }) => {
   const [quizData, setQuizData] = useState([])
 
   const { data, isLoading, error } = useQuery({
     queryKey: [`kuis${id}`], queryFn: async () => {
       const submittionData = await axios.get(`/api/score?id=${id}`)
-
-
       return submittionData.data.data
     }, refetchInterval: 5000
   })
@@ -57,6 +57,53 @@ const KuisSubmittion = ({ id, title }) => {
     setDetailData(data)
     setDetailIsOpen(!detailIsOpen)
   }
+  const resetAnswer = useMutation({
+    mutationFn: async (resetData) => {
+      const reset = await axios.post('/api/answer/reset', {
+        nisn: resetData.nisn,
+        idQuiz: resetData.idQuiz
+      })
+      return reset.data
+    },
+    onSuccess: (data) => {
+     
+      toast({
+        title: "Berhasil",
+        description: data.message,
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Gagal",
+        variant: "destructive",
+        description: error.response.data.message,
+      });
+    }
+  })
+  const resetAll = useMutation({
+    mutationFn: async () => {
+      const reset = await axios.post('/api/answer/resetAll', {
+        idQuiz: id
+      })
+      return reset.data
+    },
+    onSuccess: (data) => {
+      
+      toast({
+        title: "Berhasil",
+        description: data.message,
+      });
+    },
+    onError: (error) => {
+      toast({
+        title: "Gagal",
+        variant: "destructive",
+        description: error.response.data.message,
+      });
+    }
+  })
+
+
 
   const detailAnswer = useQuery({
     queryKey: [`data-${detailData.nisn}`], queryFn: async () => {
@@ -117,7 +164,12 @@ const KuisSubmittion = ({ id, title }) => {
     },
     {
       accessorKey: 'Aksi',
-      cell: ({ row }) => row.getValue('status') ? <Button onClick={() => handleIsDetail(row.original)}>Detail</Button> : "Detail Tidak Tersedia"
+      cell: ({ row }) =>
+        row.getValue('status') ? <div className="flex flex-wrap gap-2">
+          <Button onClick={() => handleIsDetail(row.original)}>Detail</Button>
+          <Button className={"bg-blue-600"} disabled={resetAnswer.isPending} onClick={() => resetAnswer.mutate({ nisn: row.original.nisn, idQuiz: id })} >Reset</Button>
+        </div> : "Detail Tidak Tersedia"
+
       ,
       header: '',
     },
@@ -245,6 +297,7 @@ const KuisSubmittion = ({ id, title }) => {
         </div>
         <div className="flex items-end justify-end gap-2">
           <Button className="w-max h-[40px]" onClick={() => generatePdf(title, id)}>Cetak Nilai</Button>
+        <ButtonLoader className="w-max h-[40px] bg-red-600" onClick={() => resetAll.mutate()} text={"Reset Semua Jawaban"} loading={resetAll.isPending} disabled={resetAll.isPending}/>
 
         </div>
       </div>

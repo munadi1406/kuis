@@ -1,6 +1,6 @@
 
 import { useState } from 'react';
-import { Button } from '../ui/button'
+import { Button, buttonVariants } from '../ui/button'
 import ShareQuiz from './ShareQuiz'
 import DeleteQuiz from './DeleteQuiz';
 import WithQuery from '@/utils/WithQuery';
@@ -11,8 +11,8 @@ const QuizAction = ({ data }) => {
     return (
         <>
             <DeleteQuiz isOpen={isDelete} data={{ id: data.id, title: data.title }} setIsOpen={setIsDelete} />
-            <ShareQuiz id={data.id} idKelas={data.idKelas} token={data.token} title={data.title}/>
-            <Button>Edit Kuis</Button>
+            <ShareQuiz quizData={data}/>
+            <a className={buttonVariants()} href={`/edit/${data.id}`}>Edit Kuis</a>
             <Button variant="destructive" onClick={() => setIsDelete(!isDelete)}>Hapus Kuis</Button>
         </>
     )

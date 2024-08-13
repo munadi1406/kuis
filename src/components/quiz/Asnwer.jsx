@@ -31,7 +31,7 @@ const Asnwer = ({ id, time,nisnV }) => {
   useEffect(() => {
     // Jika nisn belum ada di localStorage atau nisnV berbeda, set ke localStorage
     if (!nisn || (nisnV && nisnV !== nisn)) {
-      console.log("setting nisn", nisnV);
+      
       localStorage.setItem(id, nisnV);
       nisn = nisnV; // Perbarui nisn di memori
     }
@@ -353,7 +353,7 @@ const Asnwer = ({ id, time,nisnV }) => {
                     onChange={() => handleAnswerChange.mutate({idQuestion:quizData.id, idOption:e.id})}
                   />
                 </div>
-                <label className="capitalize" htmlFor={e.id}>
+                <label  htmlFor={e.id}>
                   {`${hurufAbjad[i]}. ${e.option}`}
                 </label>
               </div>

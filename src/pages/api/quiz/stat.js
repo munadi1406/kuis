@@ -13,7 +13,7 @@ export const GET = async ({ url }) => {
     // Fetch the quiz details
     const { data: quiz, error: quizError } = await supabase
       .from("quiz")
-      .select(`id, title,id_kelas`)
+      .select(`id, title,id_kelas,id_tahun_ajaran`)
       .eq('id', id)
       .single();
 
@@ -22,7 +22,7 @@ export const GET = async ({ url }) => {
       .from("questions")
       .select("id",{count:"exact",})
       .eq('id_quiz', id);
-      console.log({countQuestions}) 
+     
 
     if (answersError || quizError || questionsError) {
       return new Response(
@@ -34,9 +34,10 @@ export const GET = async ({ url }) => {
       );
     }
     const {  error: studentsError,count } = await supabase
-      .from("siswa")
-      .select(`nisn`,{count:"exact"})
-      .eq('id_kelas', quiz.id_kelas);
+      .from("kelas_history")
+      .select(`id`,{count:"exact"})
+      .eq('id_kelas', quiz.id_kelas)
+      .eq('id_tahun_ajaran', quiz.id_tahun_ajaran);
       
 
     const totalQuestions = countQuestions;

@@ -1,7 +1,16 @@
 ---
+import FeedbackData from "@/components/feedback/FeedbackData"
 import Dashboard from "../layouts/Dashboard.astro"
+
+interface local {
+    role:string,
+    id:string
+}
+const {role,id} = Astro.locals as local
+
+
 ---
 <Dashboard title="Umpan Balik">
 
-    <div>ini halaman feedback</div>
+    <FeedbackData client:only="react" role={role} idUser={id}/>
 </Dashboard>

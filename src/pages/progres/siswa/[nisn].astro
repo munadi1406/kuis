@@ -1,0 +1,26 @@
+---
+import DataProgressSiswa from "@/components/progress/siswa/DataProgressSiswa";
+import Dashboard from "@/layouts/Dashboard.astro";
+import { supabase } from "@/lib/supabase";
+
+const { nisn } = Astro.params;
+
+const { data: siswa, error } = await supabase
+    .from("siswa")
+    .select("nama_lengkap,id_user,created_at")
+    .eq("nisn", nisn)
+    .single();
+
+if (!siswa || error) {
+    return Astro.redirect("/siswa");
+}
+---
+
+<Dashboard title={`Progress Siswa ${siswa?.nama_lengkap}`}>
+    <DataProgressSiswa
+        nisn={nisn}
+        createdAt={siswa.created_at}
+        namaLengkap={siswa.nama_lengkap}
+        client:load="react"
+    />
+</Dashboard>

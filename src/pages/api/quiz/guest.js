@@ -7,7 +7,7 @@ import { supabase } from "@/lib/supabase";
 export const POST = async ({ request, cookies }) => {
   const { token, nisn } = await request.json();
 
-  console.log(nisn)
+
   const {data:nisnCheck,error:nisnError} = await supabase.from('siswa').select('nisn,id_kelas').eq('nisn',nisn).single()
   if (nisnError || !nisnCheck) {
     return new Response(
@@ -23,7 +23,7 @@ export const POST = async ({ request, cookies }) => {
     .select("id,id_kelas")
     .eq("token", token)
     .single();
-  console.log(quizData)
+
   if (quizError || !quizData) {
     return new Response(
       JSON.stringify({
