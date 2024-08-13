@@ -14,7 +14,7 @@ export const GET = async ({ params, url }) => {
   if (filter === "kuis") {
     query = supabase
       .from("quiz")
-      .select(`*, kelas(kelas), mapel(mapel)`)
+      .select(`*, kelas(kelas), mapel(mapel),tahun_ajaran(nama)`)
       .limit(perPage)
       .eq('id_user', idUser)
       .order("created_at", { ascending: false });

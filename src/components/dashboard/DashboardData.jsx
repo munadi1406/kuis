@@ -2,7 +2,7 @@ import WithQuery from "@/utils/WithQuery";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { useEffect, useState } from "react";
-import Cards from "@/components/Card";
+
 import {
     Select,
     SelectContent,
@@ -27,8 +27,8 @@ import { Badge } from "../ui/badge";
 import ButtonLoader from "../ButtonLoader";
 
 import { Input } from "../ui/input";
-import { Label } from "../ui/label";
 import { Skeleton } from "../ui/skeleton";
+import QuizCard from "./QuizCard";
 
 
 
@@ -101,6 +101,7 @@ const DashboardData = ({ idUser, role, roleUser }) => {
                         disabled={isLoading}
                     />
                 </div>
+                {console.log(data)}
                 <Select onValueChange={handleChange} value={filter} disabled={isLoading}>
                     <SelectTrigger className="w-[180px]">
                         <SelectValue placeholder="Filter" />
@@ -119,8 +120,8 @@ const DashboardData = ({ idUser, role, roleUser }) => {
                     {data.pages && filter === "kuis" &&
                         data.pages
                             .flatMap((page) => page.data.data)
-                            .map(({ id, title, start_quiz, end_quiz, desc }, i) => (
-                                <Cards key={id} title={title} skor={""} id={id} startDate={start_quiz} endDate={end_quiz} desc={desc} />
+                            .map((e, i) => (
+                                <QuizCard key={i} data={e} />
                             ))
                     }
                     {data.pages && filter === "kelas" &&

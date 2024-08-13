@@ -14,7 +14,7 @@ export const reportQuiz = (quizzesArray, sortedUsers) => {
     tableBody.push([
         { text: 'No', alignment: 'center', fillColor: '#b3cde0' }, // Biru muda
         { text: 'Nama', fillColor: '#b3cde0' }, // Biru muda
-        ...quizzesArray.map(({ title }) => ({ text: title, alignment: 'center', fillColor: '#b3cde0' })), // Biru muda
+        ...quizzesArray.map(({ title },i) => ({ text: i + 1, alignment: 'center', fillColor: '#b3cde0' })), // Biru muda
         { text: 'Total', alignment: 'center', fillColor: '#b3cde0' }, // Biru muda
         { text: 'Rata Rata', alignment: 'center', fillColor: '#b3cde0' }, // Biru muda
         { text: 'Keterangan', alignment: 'center', fillColor: '#b3cde0' } // Biru muda
@@ -25,10 +25,10 @@ export const reportQuiz = (quizzesArray, sortedUsers) => {
         let totalScore = 0;
         let totalQuizzes = 0;
 
-        quizzesArray.forEach(({ totalQuestion, users }) => {
-            const score = users.find(e => e.userId === user.userId);
+        quizzesArray.forEach(({ totalQuestions, users }) => {
+            const score = users.find(e => e.nisn === user.nisn);
             if (score) {
-                totalScore += (score.score / totalQuestion) * 100;
+                totalScore += (score.score / totalQuestions) * 100;
             }
             totalQuizzes += 1;
         });
@@ -39,23 +39,23 @@ export const reportQuiz = (quizzesArray, sortedUsers) => {
 
         const rank = sortedUsers
             .map(u => ({
-                userId: u.userId,
-                totalScore: quizzesArray.reduce((acc, { totalQuestion, users }) => {
-                    const score = users.find(e => e.userId === u.userId);
-                    return acc + (score ? (score.score / totalQuestion) * 100 : 0);
+                nisn: u.nisn,
+                totalScore: quizzesArray.reduce((acc, { totalQuestions, users }) => {
+                    const score = users.find(e => e.nisn === u.nisn);
+                    return acc + (score ? (score.score / totalQuestions) * 100 : 0);
                 }, 0)
             }))
             .sort((a, b) => b.totalScore - a.totalScore)
-            .findIndex(u => u.userId === user.userId) + 1;
+            .findIndex(u => u.nisn === user.nisn) + 1;
 
         tableBody.push([
             { text: index + 1, alignment: 'center' },
             { text: user.namaLengkap},
-            ...quizzesArray.map(({ totalQuestion, users }) => {
-                const score = users.find(e => e.userId === user.userId);
+            ...quizzesArray.map(({ totalQuestions, users }) => {
+                const score = users.find(e => e.nisn === user.nisn);
                 return {
                     text: score
-                        ? ((score.score / totalQuestion) * 100).toFixed(1)
+                        ? ((score.score / totalQuestions) * 100).toFixed(1)
                         : '0.0',
                     alignment: 'center'
                 };
@@ -82,7 +82,10 @@ export const reportQuiz = (quizzesArray, sortedUsers) => {
                     body: tableBody
                 },
                 
-            }
+            },
+            { text: 'Keterangan Angka Kolom', alignment: 'left', fillColor: '#b3cde0' },
+            ...quizzesArray.map(({ title},i) => ({ text: `${i + 1}. ${title}`, alignment: 'left', fillColor: '#b3cde0' })),
+
         ],
         styles: {
             header: {

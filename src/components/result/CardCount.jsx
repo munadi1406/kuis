@@ -17,7 +17,7 @@ const CardCount = ( {title, value} ) => {
             </CardHeader>
             <CardContent>
                 <div class=" flex justify-center items-center">
-                    <h1 class="text-3xl font-bold">{value}</h1>
+                    <h1 className="text-3xl font-bold">{value}</h1>
                 </div>
             </CardContent>
         </Card>

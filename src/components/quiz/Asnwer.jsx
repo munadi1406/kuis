@@ -43,6 +43,7 @@ const Asnwer = ({ id, time,nisnV }) => {
     localStorage.removeItem(`markedQuestions${id}${nisn}`)
     localStorage.removeItem(`quiz_start_time_${id}${nisn}`)
     localStorage.removeItem(`answers${id}${nisn}`)
+    document.cookie = `${id}-status=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;`;
   }
   useEffect(() => {
     const quizStartTime = localStorage.getItem(`quiz_start_time_${id}${nisn}`);
