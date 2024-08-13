@@ -18,15 +18,10 @@ import { Button } from '@/components/ui/button';
 import { printTeacherReport } from './print';
 
 
-const DataProgressGuru = ({ idUser, namaLengkap, createdAt }) => {
-
-  const [filter, setFilter] = useState("kuis")
- 
+const DataProgressSiswa = ({ nisn, namaLengkap, createdAt }) => {
   const [filterYears, setFilterYears] = useState(`${new Date().getFullYear()}`);
   const [query, setQuery] = useState("");
-  const handleChange = (e) => {
-    setFilter(e)
-  }
+  
   const {
     isLoading,
     fetchNextPage,
@@ -36,10 +31,10 @@ const DataProgressGuru = ({ idUser, namaLengkap, createdAt }) => {
     error,
     refetch,
   } = useInfiniteQuery({
-    queryKey: [`progress-${idUser}`],
+    queryKey: [`progress-${nisn}`],
     queryFn: async ({ pageParam }) => {
       const response = await axios.get(
-        `/api/guru/progress/?id_u=${idUser}&id=${pageParam || 0}&search=${query}&years=${filterYears}`
+        `/api/siswa/progress/?nisn=${nisn}&id=${pageParam || 0}&search=${query}&years=${filterYears}`
       );
       return response.data;
     },
@@ -50,18 +45,18 @@ const DataProgressGuru = ({ idUser, namaLengkap, createdAt }) => {
   const handlePrint = useMutation({
     mutationFn: async () => {
       const response = await axios.get(
-        `/api/guru/progress/?id_u=${idUser}&search=${query}&years=${filterYears}&print=true`
+        `/api/siswa/progress/?nisn=${nisn}&search=${query}&years=${filterYears}&print=true`
       );
       return response.data.data;
     },
     onSuccess:(data)=>{
-      printTeacherReport({namaLengkap,kuisPerBulanTahun: data.kuisPerBulanTahun, data: data.data })
+      printTeacherReport({namaLengkap,kuisPerBulanTahun: data.kuisDikerjakanPerBulanTahun, data: data.data })
     },
     
   });
   useEffect(() => {
     refetch()
-  }, [filter, query, filterYears])
+  }, [ query, filterYears])
 
 
   let searchTimeout;
@@ -140,16 +135,17 @@ const DataProgressGuru = ({ idUser, namaLengkap, createdAt }) => {
             handlePrint.mutate()}} text={"Cetak"} loading={handlePrint.isPending} disabled={handlePrint.isPending}/>
         </div>
       </div>
-      <h1 className='text-gray-600 text-2xl py-2'>{namaLengkap} Total Membuat {data.pages
-        .flatMap((page) => page.data.total)} Kuis</h1>
+      <h1 className='text-gray-600 text-2xl py-2'>{namaLengkap} Total Mengerjakan Kuis {data.pages
+        .flatMap((page) => page.data.total)} Kuis </h1>
       <div className='bg-gray-100 p-3 rounded-md my-2'>
-        <p className='text-gray-800 font-semibold text-xl'>Detail Total Pembuatan Kuis</p>
-        {data.pages[0].data.kuisPerBulanTahun.map((e, i) => (
+        <p className='text-gray-800 font-semibold text-xl'>Detail Total Mengerjakan Kuis</p>
+        {data.pages[0].data.kuisDikerjakanPerBulanTahun.map((e, i) => (
           <p className="text-gray-900 " key={i}>{e.date} : {e.count}</p>
         ))
         }
       </div>
       <div className='flex flex-col gap-2'>
+     
         <Suspense fallback={<Skeleton className="w-full h-[350px] rounded-md" />}>
           {data.pages
             .flatMap((page) => page.data.data)
@@ -172,4 +168,4 @@ const DataProgressGuru = ({ idUser, namaLengkap, createdAt }) => {
   )
 }
 
-export default WithQuery(DataProgressGuru)
+export default WithQuery(DataProgressSiswa)

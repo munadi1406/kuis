@@ -11,12 +11,27 @@ const generateCustomToken = (length = 12) => {
 };
 export const POST = async ({ params, request, url }) => {
   const datasss = await request.json();
+  
   const { title, desc, duration, startDate, endDate, token, soalData, mapel, kelas, id_user } = datasss.data
   let quizId;
   let insertedQuestionIds = [];
 
   try {
-    
+    const { data: activeTahunAjaran, error: tahunAjaranError } = await supabase
+      .from("tahun_ajaran")
+      .select("id")
+      .eq("status", true)  // Get the active academic year
+      .single();
+
+    if (!activeTahunAjaran) {
+      return new Response(
+        JSON.stringify({
+          message: "Tidak Ada Tahun Ajaran Yang Aktif Saat Ini",
+          data: [],
+        }),
+        { status: 404 }
+      );
+    }
     let finalToken = token;
 
     // Jika token tidak disediakan atau kosong, buat token acak
@@ -39,16 +54,9 @@ export const POST = async ({ params, request, url }) => {
       );
     }
 
-
-    const {
-      data: { user, },
-    } = await supabase.auth.getUser();
-
-
-
     const { data: quizData, error: quizError } = await supabase
       .from("quiz")
-      .insert({ title, desc, start_quiz: startDate, end_quiz: endDate, token:finalToken, id_mapel: mapel, id_kelas: kelas, waktu: duration, id_user: user.id })
+      .insert({ title, desc, start_quiz: startDate, end_quiz: endDate, token:finalToken, id_mapel: mapel, id_kelas: kelas, waktu: duration, id_user: id_user ,id_tahun_ajaran:activeTahunAjaran.id})
       .select();
 
     if (quizError) throw new Error(`Quiz insert error: ${quizError.message}`);
@@ -112,6 +120,151 @@ export const POST = async ({ params, request, url }) => {
     return new Response(
       JSON.stringify({
         message: "Gagal Membuat Kuis, rollback dilakukan",
+        error: error.message
+      }),
+      { status: 500 }
+    );
+  }
+};
+
+
+export const PUT = async ({ params, request, url }) => {
+  const datasss = await request.json();
+  
+  const { title, desc, duration, startDate, endDate, token, soalData, mapel, kelas, id_user } = datasss.data;
+  let quizId = datasss.data.id; // Assuming the quiz ID is provided for updating
+  let insertedQuestionIds = [];
+  let existingQuestionIds = [];
+
+  try {
+    const { data: activeTahunAjaran, error: tahunAjaranError } = await supabase
+      .from("tahun_ajaran")
+      .select("id")
+      .eq("status", true)
+      .single();
+
+    if (!activeTahunAjaran) {
+      return new Response(
+        JSON.stringify({
+          message: "Tidak Ada Tahun Ajaran Yang Aktif Saat Ini",
+          data: [],
+        }),
+        { status: 404 }
+      );
+    }
+    
+    // Check if quiz ID is provided for updating
+    if (!quizId) {
+      return new Response(
+        JSON.stringify({
+          message: "Quiz ID is required for updating",
+        }),
+        { status: 400 }
+      );
+    }
+    let finalToken = token;
+
+    // Jika token tidak disediakan atau kosong, buat token acak
+    if (!finalToken) {
+      finalToken = generateCustomToken(8);
+      const tokenCheck = await supabase.from('quiz').select("*").eq('token', finalToken)
+      if (tokenCheck.data.length > 0) {
+        finalToken = `${generateCustomToken(8)}${generateCustomToken(4)}`
+      }
+    }
+    
+    
+    const tokenCheck = await supabase.from('quiz').select("*").eq('token', finalToken)
+    if (tokenCheck.data.length > 1) {
+      return new Response(
+        JSON.stringify({
+          message: "Token Sudah Digunakan",
+        }),
+        { status: 500 }
+      );
+    }
+    const { error: quizUpdateError } = await supabase
+      .from("quiz")
+      .update({ title, desc, start_quiz: startDate, end_quiz: endDate, id_mapel: mapel, id_kelas: kelas, waktu: duration, id_user: id_user ,token})
+      .eq('id', quizId);
+
+    if (quizUpdateError) throw new Error(`Quiz update error: ${quizUpdateError.message}`);
+
+    for (const e of soalData) {
+      let questionId = e.id; // id_question
+      let questionResult;
+
+      if (questionId) {
+        // Update the existing question
+        const { data: questionData, error: questionUpdateError } = await supabase
+          .from("questions")
+          .update({ question: e.question })
+          .eq('id', questionId)
+          .select();
+
+        if (questionUpdateError) throw new Error(`Question update error: ${questionUpdateError.message}`);
+        questionResult = questionData[0];
+        existingQuestionIds.push(questionId);
+      } else {
+        // Insert new question
+        const { data: questionData, error: questionInsertError } = await supabase
+          .from("questions")
+          .insert({ id_quiz: quizId, question: e.question })
+          .select();
+
+        if (questionInsertError) throw new Error(`Question insert error: ${questionInsertError.message}`);
+        questionResult = questionData[0];
+        insertedQuestionIds.push(questionResult.id);
+      }
+
+      // Now handle the answer options
+      const answerInsertData = [];
+      for (const answer of e.answerOption) {
+        if (answer.id) {
+          // Update existing answer option
+          const { error: answerUpdateError } = await supabase
+            .from("options")
+            .update({ option: answer.answerOption, option_is_true: answer.answerIsTrue })
+            .eq('id', answer.id);
+
+          if (answerUpdateError) throw new Error(`Answer update error: ${answerUpdateError.message}`);
+        } else {
+          // Insert new answer option
+          answerInsertData.push({
+            id_question: questionResult.id,
+            option: answer.answerOption,
+            option_is_true: answer.answerIsTrue
+          });
+        }
+      }
+
+      if (answerInsertData.length > 0) {
+        const { error: answerInsertError } = await supabase
+          .from("options")
+          .insert(answerInsertData);
+
+        if (answerInsertError) throw new Error(`Answer insert error: ${answerInsertError.message}`);
+      }
+    }
+
+    return new Response(
+      JSON.stringify({
+        message: "Kuis Berhasil Diperbarui",
+      }),
+      { status: 200 }
+    );
+  } catch (error) {
+    console.log(error)
+    console.error('Transaction error:', error.message);
+
+    // Rollback operations if necessary
+    if (insertedQuestionIds.length > 0) {
+      await supabase.from('questions').delete().in('id', insertedQuestionIds);
+    }
+
+    return new Response(
+      JSON.stringify({
+        message: "Gagal Memperbarui Kuis, rollback dilakukan",
         error: error.message
       }),
       { status: 500 }

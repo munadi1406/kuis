@@ -19,11 +19,12 @@ import { useInView } from 'react-intersection-observer';
 
 
 const CardProgress = ({ data }) => {
+  
     const { ref, inView } = useInView({
         triggerOnce: true, // Ensure the API is called only once
         threshold: 0.5, // Trigger when 10% of the card is visible
     });
-    const status = getStatus(data.start_quiz, data.end_quiz);
+   
     const { data: analisis, isLoading, error } = useQuery({
         queryKey: [`data-${data.id}`],
         queryFn: async () => {
@@ -45,12 +46,11 @@ const CardProgress = ({ data }) => {
             <CardHeader>
                 <CardTitle>{data.title}</CardTitle>
                 <div className="flex flex-wrap gap-2 ">
-                    <Badge variant={`${status === "Buka" ? 'primary' : 'destructive'}`}>{status}</Badge>
+                   
                     <Badge className={"bg-blue-600"}>{data.mapel.mapel}</Badge>
                     <Badge className={"bg-green-600"}>Kelas : {data.kelas.kelas}</Badge>
                 </div>
                 <CardDescription>{timeElapsed(data.created_at)} lalu</CardDescription>
-                <CardDescription>{`${localTime(data.start_quiz)} - ${localTime(data.end_quiz)}`}</CardDescription>
             </CardHeader>
             <CardContent className="flex gap-2 flex-col">
                 <div className="flex gap-2">
@@ -62,10 +62,10 @@ const CardProgress = ({ data }) => {
                     <p>Rata Rata Sukses</p>
                     {isLoading ? <Skeleton className={"w-[50px] h-[20px] rounded-md"} /> : <Badge className={"bg-blue-600"}>{analisis?.overallSuccessRate}</Badge>}
                 </div>
-                <div>Jumlah Kuis Dikerjakan: <Badge className={"bg-blue-600"}>{data.answer_status[0].count}</Badge></div>
+                
             </CardContent>
             <CardFooter>
-                <Button>Lihat Ringkasan Kuis</Button>
+               <h1 className="text-xl font-semibold">Nilai {(data.nilai).toFixed(1)}</h1>
             </CardFooter>
         </Card>
     );

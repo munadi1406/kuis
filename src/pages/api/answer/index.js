@@ -1,76 +1,86 @@
 import { supabase } from "../../../lib/supabase";
 
 
-export const POST = async ({ params, request, url }) => {
-  const { idQuiz, nisn, idQuestion, idOption } = await request.json();
-  // console.log(idUser)
-  const { data: existingData, error: fetchError } = await supabase
-  .from('answers')
-  .select('id')
-  .eq('id_quiz', idQuiz)
-  .eq('nisn', nisn)
-  .eq('id_question', idQuestion);
-  if (existingData.length > 0) {
-    // Jika data sudah ada, lakukan update
-    const { data, error } = await supabase
-      .from('answers')
-      .update({
-        id_option: idOption
-      })
-      .match({
-        id_quiz: idQuiz,
-        nisn: nisn,
-        id_question: idQuestion
-      });
-  
-    if (error) {
-      console.error('Error updating data:', error);
-      return new Response(
-        JSON.stringify({
-          message: "500",
-        }),
-        { status: 500 }
-      );
-    } else {
-      // console.log('Data updated successfully:', data);
-      return new Response(
-        JSON.stringify({
-          message: "201",
-        }),
-        { status: 201 }
-      );
-    }
-  } else {
-    // Jika data tidak ada, lakukan insert
-    const { data, error } = await supabase
-      .from('answers')
-      .insert({
-        id_quiz: idQuiz,
-        nisn: nisn,
-        id_question: idQuestion,
-        id_option: idOption
-      });
-  
-    if (error) {
-      console.error('Error inserting data:', error);
-      return new Response(
-        JSON.stringify({
-          message: "500",
-        }),
-        { status: 500 }
-      );
-    } else {
-      
-      return new Response(
-        JSON.stringify({
-          message: "201",
-        }),
-        { status: 201 }
-      );
-    }
-  }
+export const POST = async ({ request }) => {
+  try {
+    const { idQuiz, nisn, idQuestion, idOption } = await request.json();
 
-  
+    // Cek apakah jawaban sudah ada
+    const { data: existingData, error: fetchError } = await supabase
+      .from('answers')
+      .select('id')
+      .eq('id_quiz', idQuiz)
+      .eq('nisn', nisn)
+      .eq('id_question', idQuestion)
+      .single(); // Gunakan single() karena kita hanya mengharapkan satu hasil atau tidak ada
+
+    
+
+    let response;
+
+    if (existingData) {
+      // Jika jawaban sudah ada, lakukan update
+      const { data, error } = await supabase
+        .from('answers')
+        .update({ id_option: idOption })
+        .eq('id', existingData.id); // Update berdasarkan id jawaban
+
+      if (error) {
+        console.error('Error updating data:', error);
+        response = new Response(
+          JSON.stringify({
+            message: "500",
+          }),
+          { status: 500 }
+        );
+      } else {
+        response = new Response(
+          JSON.stringify({
+            message: "201",
+          }),
+          { status: 201 }
+        );
+      }
+    } else {
+      // Jika jawaban belum ada, lakukan insert
+      const { data, error } = await supabase
+        .from('answers')
+        .insert({
+          id_quiz: idQuiz,
+          nisn: nisn,
+          id_question: idQuestion,
+          id_option: idOption,
+        });
+
+      if (error) {
+        console.error('Error inserting data:', error);
+        response = new Response(
+          JSON.stringify({
+            message: "500",
+          }),
+          { status: 500 }
+        );
+      } else {
+        response = new Response(
+          JSON.stringify({
+            message: "201",
+          }),
+          { status: 201 }
+        );
+      }
+    }
+
+    return response;
+  } catch (error) {
+    console.error('Unexpected error:', error);
+    return new Response(
+      JSON.stringify({
+        message: "500",
+        error: error.message,
+      }),
+      { status: 500 }
+    );
+  }
 };
 
 

@@ -1,10 +1,16 @@
 ---
 import CreateQuiz from "@/components/quiz/CreateQuiz";
 import Dashboard from "../layouts/Dashboard.astro";
+
+
+interface Locals {
+    id:string,
+}
+const {id} = Astro.locals as Locals
 ---
 
 <Dashboard title="Buat Kuis">
   <div> 
-    <CreateQuiz client:only="react" />
+    <CreateQuiz client:only="react" idUser={id}/>
   </div>  
 </Dashboard>

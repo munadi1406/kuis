@@ -1,0 +1,25 @@
+---
+const { id } = Astro.params;
+import Dashboard from "@/layouts/Dashboard.astro";
+import { supabase } from "@/lib/supabase";
+import UpdateQuiz from '@/components/edit/UpdateQuiz'
+
+const { data: quiz, error } = await supabase
+  .from("quiz")
+  .select(`*,mapel(id,mapel),kelas(id,kelas),questions(*,options(*))`)
+  .eq("id", id)
+  .single();
+  
+interface Locals {
+    id:string,
+}
+const local = Astro.locals as Locals
+---
+
+<Dashboard title={quiz?.title}> 
+
+
+  <UpdateQuiz  client:only="react" quizData={quiz} idUser={local.id}/> 
+
+
+</Dashboard>

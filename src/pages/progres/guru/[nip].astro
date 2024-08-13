@@ -15,7 +15,7 @@ const { data: guru ,error} = await supabase
 if (!guru || error) {
     return Astro.redirect("/guru");
 }
-console.log({error})
+
 ---
 
 <Dashboard title={`Progress Guru ${guru?.nama_lengkap}`}>

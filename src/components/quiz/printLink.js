@@ -9,7 +9,6 @@ pdfMake.fonts = pdfMakeFonts;
 export const printLink = async (id, title, data, token) => {
   try {
     // Flatten the data to ensure all student entries are in a single array
-    const flattenedData = data.flatMap(({ siswa }) => siswa);
     const now = new Date();
     const formattedTime = localTime(now);
     const generateQRCodeDataURLs = async (textArray) => {
@@ -19,7 +18,7 @@ export const printLink = async (id, title, data, token) => {
       })));
       return urls;
     };
-    const links = flattenedData.map(e => `${import.meta.env.PUBLIC_BASE_URL}take/${id}/?nisn=${e.nisn}&token=${token}`);
+    const links = data.map(e => `${import.meta.env.PUBLIC_BASE_URL}take/${id}/?nisn=${e.nisn}&token=${token}`);
     const qrCodeDataURLs = await generateQRCodeDataURLs(links);
     const documentDefinition = {
       content: [
@@ -46,7 +45,7 @@ export const printLink = async (id, title, data, token) => {
                 { text: 'Link', alignment: 'center', fillColor: '#ADD8E6', bold: true, margin: [0, 5] },// Light blue
                 { text: 'QRCODE', alignment: 'center', fillColor: '#ADD8E6', bold: true, margin: [0, 5] } // Light blue
               ],
-              ...flattenedData.map((e, idx) => [
+              ...data.map((e, idx) => [
                 { text: idx + 1, alignment: 'center' }, // Center align the numbers
                 { text: e.nama_lengkap, alignment: 'left', margin: [5, 2] }, // Left align with some margin
                 {
@@ -87,3 +86,4 @@ export const printLink = async (id, title, data, token) => {
   }
 };
 
+ 

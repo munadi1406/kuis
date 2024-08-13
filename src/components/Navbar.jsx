@@ -70,7 +70,7 @@ export default function Navbar({ data, role, path, roleUser }) {
                             Data Master
                           </DropdownMenuTrigger>
                           <DropdownMenuContent>
-                            {roleUser === "admin" && (
+                            {role === "admin" && (
                               <>
                                 <a href="/mapel">
                                   <DropdownMenuItem>
@@ -80,6 +80,9 @@ export default function Navbar({ data, role, path, roleUser }) {
                                 <a href="/kelas">
                                   <DropdownMenuItem>Kelas</DropdownMenuItem>
                                 </a>
+                                <a href="/tahunajaran">
+                                  <DropdownMenuItem>Tahun Ajaran</DropdownMenuItem>
+                                </a>
                               </>
                             )}
                             <a href="/guru">
@@ -88,6 +91,7 @@ export default function Navbar({ data, role, path, roleUser }) {
                             <a href="/siswa">
                               <DropdownMenuItem>Siswa</DropdownMenuItem>
                             </a>
+
                           </DropdownMenuContent>
                         </DropdownMenu>
                       </>
@@ -193,14 +197,22 @@ export default function Navbar({ data, role, path, roleUser }) {
                 </div>
               </DropdownMenuTrigger>
               <DropdownMenuContent>
-                <a href="/mapel">
-                  <DropdownMenuItem>Mapel</DropdownMenuItem>
-                </a>
-                <DropdownMenuSeparator />
-                <a href="/kelas" className="cursor-pointer">
-                  <DropdownMenuItem>Kelas</DropdownMenuItem>
-                </a>
-                <DropdownMenuSeparator />
+                {role === "admin" && (
+                  <>
+                    <a href="/mapel">
+                      <DropdownMenuItem>Mapel</DropdownMenuItem>
+                    </a>
+                    <DropdownMenuSeparator />
+                    <a href="/kelas" className="cursor-pointer">
+                      <DropdownMenuItem>Kelas</DropdownMenuItem>
+                    </a>
+                    <a href="/tahunajaran" className="cursor-pointer">
+                      <DropdownMenuItem>Tahun Ajaran</DropdownMenuItem>
+                    </a>
+                    <DropdownMenuSeparator />
+                  </>
+                )}
+
                 <a href="/guru" className="cursor-pointer">
                   <DropdownMenuItem>Guru</DropdownMenuItem>
                 </a>

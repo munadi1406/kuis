@@ -6,8 +6,8 @@ import { useState, Suspense, lazy, useEffect } from "react";
 import { Input } from "../ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import Form from "./FormAnswer";
-import { Label } from "../ui/label";
-import { Button } from "../ui/button";
+import { Label } from "@/components/ui/label";
+import { Button } from "@/components/ui/button";
 import {
   Select,
   SelectContent,
@@ -18,11 +18,11 @@ import {
 import { useMutation, useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import WithQuery from "@/utils/WithQuery";
-import EditorInput from "../EditorInput";
 import { toast } from "../ui/use-toast";
 import ButtonLoader from "../ButtonLoader";
 
-const CreateQuiz = ({idUser}) => {
+const UpdateQuiz = ({ quizData,idUser }) => {
+  // console.log(quizData)
   const [jumlahSoal, setJumlahSoal] = useState(1);
   const [jumlahOpsiJawaban, setJumlahOpsiJawaban] = useState(4);
   const [judul, setJudul] = useState("");
@@ -34,6 +34,7 @@ const CreateQuiz = ({idUser}) => {
     mapel: 0,
     kelas: 0,
   });
+
   const handleSelectChange = (event) => {
     const { name, value } = event.target;
     setOption((prevState) => ({
@@ -62,22 +63,28 @@ const CreateQuiz = ({idUser}) => {
 
   const handleInputChange = (event) => {
     const { name, value, id } = event.target;
-    // console.log("run")
-    // Memeriksa apakah input merupakan input soal atau jawaban
-
+  
     if (name.startsWith("soal")) {
       const soalIndex = parseInt(name.split("soal-")[1]);
       setSoalData((prevData) => {
-        prevData[soalIndex] = { question: value, answerOption: [] };
+        // Include `id` in the `question` object
+        prevData[soalIndex] = {
+          id: prevData[soalIndex] ? prevData[soalIndex].id : null,
+          question: value,
+          answerOption: prevData[soalIndex] ? prevData[soalIndex].answerOption : [],
+        };
         return [...prevData];
       });
     } else if (name.startsWith("jawaban")) {
       const soalIndex = parseInt(name.split("jawaban")[1].split("-")[1]);
       const jawabanIndex = parseInt(name.split("jawaban")[1].split("-")[0]);
+  
       if (!soalData[soalIndex]) return;
+  
       setSoalData((prevData) => {
         if (!prevData[soalIndex].answerOption[jawabanIndex]) {
           prevData[soalIndex].answerOption[jawabanIndex] = {
+            id:prevData[soalIndex].answerOption[jawabanIndex]?.id ? prevData[soalIndex].answerOption[jawabanIndex].id : null,
             answerOption: value,
             answerIsTrue: false,
           };
@@ -87,39 +94,77 @@ const CreateQuiz = ({idUser}) => {
         return [...prevData];
       });
     } else if (name.startsWith("isTrue")) {
-      // console.log("radio run");
       const idSoal = parseInt(name.split("isTrue")[1]);
       const idJawaban = parseInt(id.split("jawabanId")[1]);
-      // console.log({ idJawaban });
-
+  
       setSoalData((prevData) => {
         const newData = [...prevData];
-
-        // Buat objek soal jika belum ada
+  
         if (!newData[idSoal]) {
-          newData[idSoal] = { question: "", answerOption: [] };
+          newData[idSoal] = {
+            id: null, // Initialize with null or update if ID is known
+            question: "",
+            answerOption: [],
+          };
         }
-
-        // Buat objek jawaban jika belum ada
+  
         if (!newData[idSoal].answerOption[idJawaban]) {
           newData[idSoal].answerOption[idJawaban] = {
             answerOption: "",
             answerIsTrue: false,
+            id:newData[idSoal].answerOption[idJawaban]?.id ? newData[idSoal].answerOption[idJawaban].id : null,
           };
         }
-
-        // Set answerIsTrue pada jawaban yang sesuai
+  
         newData[idSoal].answerOption.forEach((option, index) => {
           option.answerIsTrue = index === idJawaban;
         });
-
+  
         return newData;
       });
-
-      // console.log("done");
     }
   };
+  
+  useEffect(() => {
+    if (quizData) {
+      setJudul(quizData.title || "");
+      setDeskripsi(quizData.desc || "");
+      setDuration(quizData.waktu || 0);
+      setStartQuiz(quizData.start_quiz || "");
+      setEndQuiz(quizData.end_quiz || "");
+      setOption({
+        mapel: quizData.id_mapel || 0,
+        kelas: quizData.id_kelas || 0,
+      });
+      setToken(quizData.token || "");
 
+      // Mengatur jumlah soal dan opsi jawaban
+      const jumlahSoal = quizData.questions.length;
+      const jumlahOpsiJawaban = quizData.questions[0]?.options.length || 4;
+
+      setJumlahSoal(jumlahSoal);
+      setJumlahOpsiJawaban(jumlahOpsiJawaban);
+
+      // Mengatur data soal
+      const soalArr = quizData.questions.map((question) => {
+        return {
+          id:question.id,
+          question: question.question || "",
+          answerOption: question.options.map((option) => ({
+            id:option.id,
+            answerOption: option.option || "",
+            answerIsTrue: option.option_is_true || false,
+          })),
+        };
+      });
+
+      setSoalData(soalArr);
+    }
+  }, [quizData]);
+
+  
+
+ 
   const dataMapel = useQuery({
     queryKey: ["mapelForm"],
     queryFn: async () => {
@@ -140,6 +185,7 @@ const CreateQuiz = ({idUser}) => {
       e.preventDefault();
       const dataPayload = {
         id_user: idUser,
+        id:quizData.id,
         title: judul,
         desc: deskripsi,
         duration,
@@ -149,16 +195,17 @@ const CreateQuiz = ({idUser}) => {
         soalData,
         ...option
       };
-      // console.log(dataPayload)
-      const insert = await axios.post('api/quiz', { data: dataPayload })
+     
+      // return dataPayload
+      const insert = await axios.put('/api/quiz', { data: dataPayload })
       return insert
     },
     onSuccess: (data) => {
       toast({
         title: "berhasil",
-        description: "Kuis Berhasil Dibuat"
+        description:data.data.message
       })
-      window.location.href = '/dashboard'
+      // window.location.href = '/dashboard'
     },
     onError: (error) => {
       toast({
@@ -168,6 +215,8 @@ const CreateQuiz = ({idUser}) => {
       });
     },
   });
+
+  
 
   const handleDateChange = (e) => {
     const { id, value } = e.target;
@@ -203,21 +252,7 @@ const CreateQuiz = ({idUser}) => {
       }
     }
   };
-  // const mutate = (e)=>{
-  //   e.preventDefault()
-  //   const dataPayload = {
-  //           id_user: 1,
-  //           judul,
-  //           deskripsi,
-  //           duration,
-  //           startQuiz,
-  //           endQuiz,
-  //           token,
-  //           dataQuiz: soalData,
-  //           ...option,
-  //         };
-  //         console.log(dataPayload)
-  // }
+
   const [text, setText] = useState();
   const handleChangePdf = async (e) => {
     const file = e.target.files[0];
@@ -247,6 +282,9 @@ const CreateQuiz = ({idUser}) => {
       reader.readAsText(file);
     });
   };
+  if(soalData.length < 0){
+    return <div>Loadin....</div>
+  }
 
   return (
     <form className="grid md:grid-cols-6 grid-cols-1 gap-2" autoComplete="none" onSubmit={mutate}>
@@ -263,42 +301,47 @@ const CreateQuiz = ({idUser}) => {
               required={true}
               onChange={(e) => setJudul(e.target.value)}
               id="namaKuis"
+              defaultValue={judul}
             />
           </div>
           <div className="w-full gap-1.5">
             <Label htmlFor="Deskripsi">Deskripsi Quiz</Label>
-            <Textarea id="Deskripsi" onChange={(e) => setDeskripsi(e.target.value)} />
+            <Textarea id="Deskripsi" onChange={(e) => setDeskripsi(e.target.value)} defaultValue={deskripsi} />
           </div>
 
 
 
           <div className="w-full gap-1.5">
             <Label htmlFor="mapel">Pilih Mata Pelajaran</Label>
-            <Select id="mapel" name="mapel" disabled={dataMapel.isLoading} value={option.mapel === 0 ? "" : option.mapel} onValueChange={(e) => handleSelectChange({ target: { name: "mapel", value: e } })}>
-              <SelectTrigger className="w-full" >
-                <SelectValue placeholder="Mata Pelajaran" />
-              </SelectTrigger>
-              <SelectContent>
-                {dataMapel.isSuccess > 0 &&
-                  dataMapel.data.data.map(({ id, mapel }, i) => (
-                    <SelectItem value={id} key={id} id={id}>{mapel}</SelectItem>
-                  ))}
-              </SelectContent>
-            </Select>
+            {dataMapel.isSuccess && (
+              <Select id="mapel" name="mapel" disabled={dataMapel.isLoading} value={option.mapel === 0 ? "" : option.mapel} onValueChange={(e) => handleSelectChange({ target: { name: "mapel", value: e } })}>
+                <SelectTrigger className="w-full" >
+                  <SelectValue placeholder="Mata Pelajaran" />
+                </SelectTrigger>
+                <SelectContent>
+                  {dataMapel.isSuccess > 0 &&
+                    dataMapel.data.data.map(({ id, mapel }, i) => (
+                      <SelectItem value={id} key={id} id={id}>{mapel}</SelectItem>
+                    ))}
+                </SelectContent>
+              </Select>
+            )}
           </div>
           <div className="w-full gap-1.5">
             <Label htmlFor="Deskripsi">Kelas</Label>
-            <Select disabled={dataKelas.isLoading} value={option.kelas === 0 ? "" : option.kelas} onValueChange={(e) => handleSelectChange({ target: { name: "kelas", value: e } })}>
-              <SelectTrigger className="w-full">
-                <SelectValue placeholder="Pilih Kelas" />
-              </SelectTrigger>
-              <SelectContent>
-                {dataKelas.isSuccess > 0 &&
-                  dataKelas.data.data.map(({ id, kelas }, i) => (
-                    <SelectItem value={id} key={i} id={i}>{kelas}</SelectItem>
-                  ))}
-              </SelectContent>
-            </Select>
+            {dataKelas.isSuccess && (
+              <Select disabled={dataKelas.isLoading} value={option.kelas === 0 ? "" : option.kelas} onValueChange={(e) => handleSelectChange({ target: { name: "kelas", value: e } })}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Pilih Kelas" />
+                </SelectTrigger>
+                <SelectContent>
+                  {dataKelas.isSuccess > 0 &&
+                    dataKelas.data.data.map(({ id, kelas }, i) => (
+                      <SelectItem value={id} key={i} id={i}>{kelas}</SelectItem>
+                    ))}
+                </SelectContent>
+              </Select>
+            )}
           </div>
           <div className="grid grid-cols-2 gap-2 w-full">
             {!isFromFile ? (
@@ -309,10 +352,20 @@ const CreateQuiz = ({idUser}) => {
                     id="jumlahSoal"
                     placeholder={"Masukkan Jumlah Soal "}
                     value={jumlahSoal}
-                    onChange={(e) => setJumlahSoal(e.target.value)}
+                    onChange={(e) => {
+                      setJumlahSoal(e.target.value)
+                    }}
                     required={true}
                     type="number"
                     max="50"
+                    min={soalData.length}
+                    onInvalid={(e) => {
+                      e.target.setCustomValidity(
+                        `Jumlah soal harus antara ${soalData.length} dan 50.`
+                      );
+                    }}
+                    disabled
+                    onInput={(e) => e.target.setCustomValidity('')} 
                   />
                 </div>
                 <div className="w-full gap-1.5">
@@ -324,8 +377,31 @@ const CreateQuiz = ({idUser}) => {
                     value={jumlahOpsiJawaban}
                     onChange={(e) => setJumlahOpsiJawaban(e.target.value)}
                     required={true}
+                    disabled
+                    min={quizData.questions[0]?.options.length}
                   />
                 </div>
+              
+                <Button type="button" onClick={()=>{
+                 
+                  setJumlahSoal(soalData.length + 1)
+                   const newSoalData = [...soalData];
+                  
+                     newSoalData.push({
+                       id: null,
+                       question: "",
+                       answerOption: [
+                         { id: null, answerOption: "", answerIsTrue: false },
+                         { id: null, answerOption: "", answerIsTrue: false },
+                         { id: null, answerOption: "", answerIsTrue: false },
+                         { id: null, answerOption: "", answerIsTrue: false },
+                       ],
+                     });
+                    
+             
+                   setSoalData(newSoalData);
+                 
+                }}>Tambah Soal 1</Button>
               </>
             ) : (
               <div className="col-span-2">
@@ -379,6 +455,7 @@ const CreateQuiz = ({idUser}) => {
             placeholder={"Masukkan Lama Pengerjaan Kuis Dalam Menit..."}
             required={true}
             onChange={(e) => setDuration(e.target.value)}
+            value={duration}
             id="lamaPengerjaan"
           />
         </div>
@@ -389,7 +466,7 @@ const CreateQuiz = ({idUser}) => {
             type={"text"}
             label={"Lama Pengerjaan Quiz"}
             placeholder={"Masukkan Token Kuis..."}
-
+            defaultValue={token}
             onChange={(e) => setToken(e.target.value)}
             id="tokenKuis"
           />
@@ -403,10 +480,13 @@ const CreateQuiz = ({idUser}) => {
           opsiJawabanArray={opsiJawabanArray}
           handleInputChange={handleInputChange}
           soalArray={soalArray}
+          soalData={soalData}
+          setSoalData={setSoalData}
+          setJumlahSoal={setJumlahSoal}
         />
       </div>
     </form>
   );
 };
 
-export default WithQuery(CreateQuiz);
+export default WithQuery(UpdateQuiz);

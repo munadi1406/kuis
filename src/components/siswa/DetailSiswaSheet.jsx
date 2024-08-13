@@ -6,7 +6,7 @@ import {
     SheetTitle,
 } from "@/components/ui/sheet"
 import { localTime } from "@/utils/localTime"
-import { Button } from "../ui/button"
+import { Button, buttonVariants } from "../ui/button"
 
 
 const DetailSiswaSheet = ({ open, setOpen, data,getKelasName }) => {
@@ -66,7 +66,9 @@ const DetailSiswaSheet = ({ open, setOpen, data,getKelasName }) => {
                             <tr>
                                 <td className="border border-gray-300 p-2 text-gray-700">Progress Siswa</td>
                                 <td className="border border-gray-300 p-2 text-gray-700">
-                                    <Button>Lihar Progress Siswa</Button>
+                             
+                                    <a className={buttonVariants()} href={`/progres/siswa/${data.nisn}`}>Lihat Progress Siswa</a>
+                              
                                 </td>
                             </tr>
                         </tbody>
