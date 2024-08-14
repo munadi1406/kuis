@@ -9,5 +9,5 @@ const {id,role,roleUser} = data
 ---
 
 <DashboardLayout title="dashboard">
-  <DashboardData client:idle idUser={id} role={role} roleUser={roleUser?.toLowerCase()}/>
+  <DashboardData client:only="react" idUser={id} role={role} roleUser={roleUser?.toLowerCase()}/>
 </DashboardLayout>
