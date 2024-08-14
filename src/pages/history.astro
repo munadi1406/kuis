@@ -9,5 +9,5 @@ const {id,role,roleUser} = data
 ---
 
 <Dashboard title="histori pengerjaan kuis">
-    <HistorySubmittion client:idle idUser={id} />
+    <HistorySubmittion client:only="react" idUser={id} />
 </Dashboard>
