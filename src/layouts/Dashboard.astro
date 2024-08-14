@@ -100,16 +100,16 @@ if(role === "admin"){
     <ViewTransitions />
   </head>
   <body>
-    <Navbar client:idle data={{email}} role={role} roleUser={roleUser} path={path} />
+    <Navbar client:load data={{email}} role={role} roleUser={roleUser} path={path} />
     <main class="">
       <div class="md:p-2 p-0">
-        <DashboardNav title={title} client:idle roleUser={roleUser} role={role} nisn={checkNIS?.nisn}/>
+        <DashboardNav title={title} client:load roleUser={roleUser} role={role} nisn={checkNIS?.nisn}/>
       </div>
       <div class="mt-3 md:mb-0 mb-24 p-2">
         <slot />
       </div>
     </main>
-    <RoleDialog client:idle open={open} id={id}/>
-    <Toaster client:idle/>
+    <RoleDialog client:load open={open} id={id}/>
+    <Toaster client:load/>
   </body>
 </html>
