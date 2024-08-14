@@ -11,7 +11,7 @@ export const GET = async ({ params, url }) => {
     .eq('id_tahun_ajaran', tahunAjaran);
 
 
-
+  console.log({error})
   if (!error) {
     const sortedKelas = kelas.map(k => ({
       ...k,

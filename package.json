@@ -11,7 +11,7 @@
   },
   "dependencies": {
     "@astrojs/node": "^8.3.2",
-    "@astrojs/react": "^3.6.0",
+    "@astrojs/react": "^3.6.2",
     "@astrojs/tailwind": "^5.1.0",
     "@astrojs/vercel": "^7.7.2",
     "@editorjs/checklist": "^1.6.0",
@@ -42,7 +42,7 @@
     "@types/react": "^18.3.1",
     "@types/react-dom": "^18.3.0",
     "apexcharts": "^3.52.0",
-    "astro": "^4.12.2",
+    "astro": "^4.13.3",
     "astro-seo": "^0.8.4",
     "axios": "^1.6.8",
     "class-variance-authority": "^0.7.0",
