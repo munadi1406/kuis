@@ -23,7 +23,7 @@ import Charts from "react-apexcharts";
 
 
 const FeedbackData = ({ role, id }) => {
-  console.log(role)
+  
 
   const [isDialogEditOpen, setIsDialogEditOpen] = useState(false);
   const [mapel, setMapel] = useState("");
@@ -34,7 +34,7 @@ const FeedbackData = ({ role, id }) => {
   const [rating, setRating] = useState(0)
   const handleRatingChange = (rating) => {
     setRating(rating)
-    console.log("Selected rating:", rating);
+  
   };
 
 
@@ -162,7 +162,7 @@ const FeedbackData = ({ role, id }) => {
           const chart = chartRef.current.chart;
           const uri = await chart.dataURI();
           generatePdf(uri.imgURI)
-          console.log(uri); // Data URI dari PNG
+       
         } catch (error) {
           console.error('Error generating PNG URI:', error);
         }

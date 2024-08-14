@@ -21,7 +21,7 @@ if (!guru || error) {
 <Dashboard title={`Progress Guru ${guru?.nama_lengkap}`}>
     <DataProgressGuru
         transition:animate={"slide"}
-        client:load="react"
+        client:only="react"
         idUser={guru.id_user}
         namaLengkap={guru.nama_lengkap}
         createdAt={guru.created_at}

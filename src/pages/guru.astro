@@ -11,5 +11,5 @@ const {role} = Astro.locals as Locals
 
 
 <Dashboard title="Guru">
-<GuruData client:load="react" role={role}/>
+<GuruData client:only="react" role={role}/>
 </Dashboard>

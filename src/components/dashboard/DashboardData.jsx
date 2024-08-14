@@ -101,7 +101,7 @@ const DashboardData = ({ idUser, role, roleUser }) => {
                         disabled={isLoading}
                     />
                 </div>
-                {console.log(data)}
+             
                 <Select onValueChange={handleChange} value={filter} disabled={isLoading}>
                     <SelectTrigger className="w-[180px]">
                         <SelectValue placeholder="Filter" />

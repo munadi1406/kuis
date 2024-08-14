@@ -1,15 +1,13 @@
 import pdfMake from "pdfmake/build/pdfmake";
 import { pdfMakeFonts } from "../users/generatePdf";
-import { localTime } from "@/utils/localTime";
-import axios from "axios";
+
 
 
 pdfMake.fonts = pdfMakeFonts;
 
-export const generatePdf = async (filter,title,getKelasName,filterJenisKelamin) => {
-  const {data} = await axios.get(
-    `/api/siswa/all?filter=${filter}&jk=${filterJenisKelamin}`
-  );
+export const generatePdf = async (title,getKelasName,data) => {
+
+ 
  
   try {
     const documentDefinition = {
@@ -26,7 +24,7 @@ export const generatePdf = async (filter,title,getKelasName,filterJenisKelamin) 
             widths: ["auto", "auto", "auto", '*', '*','*'],
             body: [
               ["No", "NISN", "Nama lengkap","Kelas", "Jenis Kelamin", "alamat",],
-              ...data.data.data.map(({ nisn, nama_lengkap, jenis_kelamin, alamat,id_kelas }, i) => [
+              ...data.data.map(({ nisn, siswa:{nama_lengkap, jenis_kelamin, alamat,id_kelas} }, i) => [
                 i + 1,
                 nisn,
                 nama_lengkap,
@@ -39,7 +37,7 @@ export const generatePdf = async (filter,title,getKelasName,filterJenisKelamin) 
         },
         {
           width: '*',
-          text: `Total: ${data.data.data.length}`,
+          text: `Total: ${data.data.length}`,
           margin: [0, 10, 10, 10],
       },
       ],
