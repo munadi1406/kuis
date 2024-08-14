@@ -118,14 +118,14 @@ const DashboardData = ({ idUser, role, roleUser }) => {
             </div>
             {isSuccess  ? (<>
                 <div className="grid lg:grid-cols-4 sm:grid-cols-2 grid-cols-1 gap-2 w-full">
-                    {data.pages && filter === "kuis" &&
+                    {data.pages.length > 0 && filter === "kuis" &&
                         data.pages
                             .flatMap((page) => page.data.data)
                             .map((e, i) => (
                                 <QuizCard key={i} data={e} />
                             ))
                     }
-                    {data.pages && filter === "kelas" &&
+                    {data.pages.length > 0 && filter === "kelas" &&
                         data.pages
                             .flatMap((page) => page.data.data)
                             .map(({ id, kelas, quiz }, i) => (
@@ -136,7 +136,7 @@ const DashboardData = ({ idUser, role, roleUser }) => {
                                 </Card>
                             ))
                     }
-                    {data.pages && filter === "mapel" &&
+                    {data.pages.length > 0 && filter === "mapel" &&
                         data.pages
                             .flatMap((page) => page.data.data)
                             .map(({ id, mapel, quiz, id_user }, i) => (
