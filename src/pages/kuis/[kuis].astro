@@ -39,10 +39,10 @@ const status = getStatus(quiz?.start_quiz, quiz?.end_quiz);
       class="grid grid-cols-1 order-1 gap-2 p-2 rounded-md border md:col-span-4"
     >
       <div class="h-full">
-        <QuizStat id={kuis} client:load="react"/>
+        <QuizStat id={kuis} client:load/>
       </div>
       <div class="grid md:grid-cols-3 grid-cols-1 gap-2">
-        <QuizMenu id={kuis} title={quiz?.title} client:load="react"/>
+        <QuizMenu id={kuis} title={quiz?.title} client:load/>
       </div>
     </div>
     <div
@@ -76,14 +76,14 @@ const status = getStatus(quiz?.start_quiz, quiz?.end_quiz);
         {quiz.desc}
       </p> 
       
-      <QuizAction client:load="react" data={{id:kuis,title:quiz?.title,idKelas:quiz.kelas.id,token:quiz.token,id_tahun_ajaran:quiz.id_tahun_ajaran}} />
+      <QuizAction client:load data={{id:kuis,title:quiz?.title,idKelas:quiz.kelas.id,token:quiz.token,id_tahun_ajaran:quiz.id_tahun_ajaran}} />
       
     </div>
     <div
       class="w-full order-3 col-span-full flex flex-col gap-2 border p-2 rounded-md"
     >
     
-      <KuisSubmittion id={kuis} client:load="react" title={quiz.title}/>
+      <KuisSubmittion id={kuis} client:load title={quiz.title}/>
     </div>
   </div>
 </Dashboard>
