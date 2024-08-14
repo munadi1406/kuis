@@ -11,9 +11,10 @@ export const GET = async ({ params, url }) => {
 
 
     const perPage = 10;
-    let query = supabase.from('answer_status').select(`*,quiz!inner(title,detail_user(*),answers(options!inner(id)),questions(id),mapel(mapel),kelas(kelas))`)
-    .eq('id_user', idUser)
-    .eq('quiz.answers.id_user',idUser)
+    const {data:nisn} = await supabase.from('siswa').select('id_user,nisn').eq('id_user',idUser).single();
+    let query = supabase.from('answer_status').select(`*,quiz!inner(title,detail_user(*),answers(nisn,options!inner(id)),questions(id),mapel(mapel),kelas(kelas))`)
+    .eq('nisn', nisn.nisn)
+    .eq('quiz.answers.nisn',nisn.nisn)
     .eq('quiz.answers.options.option_is_true',true)
     .order('id',{ascending:false});
 
