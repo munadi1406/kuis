@@ -285,7 +285,7 @@ const KuisSubmittion = ({ id, title }) => {
         </SheetContent>
       </Sheet>
 
-      <div className="w-full flex justify-between items-end  border-b  p-2">
+      <div className="w-full flex flex-wrap justify-between items-end  border-b  p-2">
         <div >
           <Label htmlFor="search">Search</Label>
           <Input placeholder="Filter Nama Lengkap..."
