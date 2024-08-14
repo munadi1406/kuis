@@ -1,7 +1,7 @@
 import { defineConfig } from 'astro/config';
 import tailwind from "@astrojs/tailwind";
 import react from "@astrojs/react";
-import node from "@astrojs/node";
+
 
 import vercel from "@astrojs/vercel/serverless";
 
@@ -9,7 +9,10 @@ import vercel from "@astrojs/vercel/serverless";
 export default defineConfig({
   integrations: [tailwind({
     applyBaseStyles: false
-  }), react()],
+  }),react({
+    include: ['**/react/*'],
+    experimentalReactChildren: true,
+  }),],
   output: "server",
   adapter: vercel(), 
    
