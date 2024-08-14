@@ -48,7 +48,7 @@ const KuisSubmittion = ({ id, title }) => {
     queryKey: [`kuis${id}`], queryFn: async () => {
       const submittionData = await axios.get(`/api/score?id=${id}`)
       return submittionData.data.data
-    }, refetchInterval: 5000
+    }, staleTime: 10000
   })
 
   const [detailIsOpen, setDetailIsOpen] = useState(false);
