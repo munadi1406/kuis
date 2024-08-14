@@ -61,7 +61,7 @@ const DashboardData = ({ idUser, role, roleUser }) => {
         },
 
         getNextPageParam: (lastPage) => lastPage.data.lastId,
-        staleTime: 5000,
+        staleTime: 10000,
         initialPageParam: 0,
     });
     useEffect(() => {
