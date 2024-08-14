@@ -17,7 +17,8 @@ export const GET = async ({ params, url }) => {
       ...k,
       nama_lengkap: k.siswa.nama_lengkap
     }));
-
+    console.log({kelas})
+    console.log({sortedKelas})
     return new Response(
       JSON.stringify({
         message: "User details fetched successfully",
