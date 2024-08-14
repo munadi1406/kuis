@@ -76,7 +76,7 @@ const status = getStatus(quiz?.start_quiz, quiz?.end_quiz);
         {quiz.desc}
       </p> 
       
-      <QuizAction client:load data={{id:kuis,title:quiz?.title,idKelas:quiz.kelas.id,token:quiz.token,id_tahun_ajaran:quiz.id_tahun_ajaran}} />
+      <QuizAction client:visible data={{id:kuis,title:quiz?.title,idKelas:quiz.kelas.id,token:quiz.token,id_tahun_ajaran:quiz.id_tahun_ajaran}} />
       
     </div>
     <div
