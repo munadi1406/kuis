@@ -32,6 +32,6 @@ newUsersThisWeek = users.filter((user) => {
     <CardUser title={"Total User Baru"} value={newUsersThisWeek} />
   </div>
   <div class="py-2">
-    <UsersData client:only />
+    <UsersData client:idle />
   </div>
 </Dashboard>

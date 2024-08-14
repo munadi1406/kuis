@@ -6,12 +6,11 @@ import { defineMiddleware } from "astro:middleware";
 export const validate = defineMiddleware(async (context, next) => {
   const { request } = context;
   const url = new URL(request.url);
+  const role = context.locals.role
   const protectedPaths = ["/users","/mapel","/kelas"];
   if (protectedPaths.includes(url.pathname)) {
-    const {
-        data: { user },
-      } = await supabase.auth.getUser();
-    if(user.user_metadata.role === "admin"){
+   
+    if(role === "admin"){
         return next();
     }else{
         return context.redirect('/dashboard')
