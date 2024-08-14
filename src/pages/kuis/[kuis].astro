@@ -83,7 +83,7 @@ const status = getStatus(quiz?.start_quiz, quiz?.end_quiz);
       class="w-full order-3 col-span-full flex flex-col gap-2 border p-2 rounded-md"
     >
     
-      <KuisSubmittion id={kuis} client:load title={quiz.title}/>
+      <KuisSubmittion id={kuis} client:visible title={quiz.title}/>
     </div>
   </div>
 </Dashboard>
