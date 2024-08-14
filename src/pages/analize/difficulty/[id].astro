@@ -7,5 +7,5 @@ const { id } = Astro.params;
 ---
 
 <Dashboard title="Analisis Kesulitan Soal">
-    <Difficulty client:idle id={id} />
+    <Difficulty client:only="react" id={id} />
 </Dashboard>
