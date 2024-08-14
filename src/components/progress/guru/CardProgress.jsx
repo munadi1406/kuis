@@ -64,9 +64,7 @@ const CardProgress = ({ data }) => {
                 </div>
                 <div>Jumlah Kuis Dikerjakan: <Badge className={"bg-blue-600"}>{data.answer_status[0].count}</Badge></div>
             </CardContent>
-            <CardFooter>
-                <Button>Lihat Ringkasan Kuis</Button>
-            </CardFooter>
+           
         </Card>
     );
 };

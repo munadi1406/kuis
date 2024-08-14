@@ -44,6 +44,7 @@ const DashboardData = ({ idUser, role, roleUser }) => {
     }
     const {
         isLoading,
+        isSuccess,
         fetchNextPage,
         hasNextPage,
         isFetchingNextPage,
@@ -115,7 +116,7 @@ const DashboardData = ({ idUser, role, roleUser }) => {
                     </SelectContent>
                 </Select>
             </div>
-            {!isLoading  ? (<>
+            {isSuccess  ? (<>
                 <div className="grid lg:grid-cols-4 sm:grid-cols-2 grid-cols-1 gap-2 w-full">
                     {data.pages && filter === "kuis" &&
                         data.pages
