@@ -30,7 +30,8 @@ const ShareQuiz = ({ quizData}) => {
         queryKey: [`student`], queryFn: async () => {
             const datas = await axios.get(`/api/kelas/student?id_kelas=${quizData.idKelas}&t=${quizData.id_tahun_ajaran}`)
             return datas.data.data
-        } 
+        },
+        staleTime: 10000,
     })
   
     // console.log(data);
