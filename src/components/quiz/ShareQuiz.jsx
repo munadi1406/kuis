@@ -27,7 +27,7 @@ const ShareQuiz = ({ quizData}) => {
     };
 
     const { data, isLoading,isError,refetch } = useQuery({
-        queryKey: [`student-${quizData.id}-data`], queryFn: async () => {
+        queryKey: [`student`], queryFn: async () => {
             const datas = await axios.get(`/api/kelas/student?id_kelas=${quizData.idKelas}&t=${quizData.id_tahun_ajaran}`)
             return datas.data.data
         } 
