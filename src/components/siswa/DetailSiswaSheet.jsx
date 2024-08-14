@@ -35,7 +35,7 @@ const DetailSiswaSheet = ({ open, setOpen, data,getKelasName }) => {
                             </tr>
                             <tr>
                                 <td className="border border-gray-300 p-2 text-gray-700">Nama Lengkap</td>
-                                <td className="border border-gray-300 p-2 text-gray-700">{data.nama_lengkap}</td>
+                                <td className="border border-gray-300 p-2 text-gray-700">{data?.siswa?.nama_lengkap}</td>
                             </tr>
                             <tr>
                                 <td className="border border-gray-300 p-2 text-gray-700">Kelas</td>
@@ -43,24 +43,37 @@ const DetailSiswaSheet = ({ open, setOpen, data,getKelasName }) => {
                             </tr>
                             <tr>
                                 <td className="border border-gray-300 p-2 text-gray-700">Alamat</td>
-                                <td className="border border-gray-300 p-2 text-gray-700">{data.alamat}</td>
+                                <td className="border border-gray-300 p-2 text-gray-700">{data?.siswa?.alamat}</td>
                             </tr>
                             <tr>
                                 <td className="border border-gray-300 p-2 text-gray-700">Jenis Kelamin</td>
-                                <td className="border border-gray-300 p-2 text-gray-700">{data.jenis_kelamin}</td>
+                                <td className="border border-gray-300 p-2 text-gray-700">{data?.siswa?.jenis_kelamin}</td>
                             </tr>
                             <tr>
                                 <td className="border border-gray-300 p-2 text-gray-700">Created At</td>
-                                <td className="border border-gray-300 p-2 text-gray-700">{localTime(data.created_at)}</td>
+                                <td className="border border-gray-300 p-2 text-gray-700">{localTime(data?.siswa?.created_at)}</td>
                             </tr>
                             <tr>
                                 <td className="border border-gray-300 p-2 text-gray-700">Updated At</td>
-                                <td className="border border-gray-300 p-2 text-gray-700">{localTime(data.updated_at)}</td>
+                                <td className="border border-gray-300 p-2 text-gray-700">{localTime(data?.siswa?.updated_at)}</td>
+                            </tr>
+                            <tr>
+                                <td className="border border-gray-300 p-2 text-gray-700">Tahun Ajaran</td>
+                                
+                                <td className="border border-gray-300 p-2 text-gray-700">{data?.tahun_ajaran?.nama}</td>
+                            </tr>
+                            <tr>
+                                <td className="border border-gray-300 p-2 text-gray-700">Terdaftar Sejak</td>
+                                <td className="border border-gray-300 p-2 text-gray-700">{localTime(data?.start_date)}</td>
+                            </tr>
+                            <tr>
+                                <td className="border border-gray-300 p-2 text-gray-700">Sampai</td>
+                                <td className="border border-gray-300 p-2 text-gray-700">{data.end_date ? localTime(data.end_date) : '-'}</td>
                             </tr>
                             <tr>
                                 <td className="border border-gray-300 p-2 text-gray-700">Akun</td>
                                 <td className="border border-gray-300 p-2 text-gray-700">
-                                  {data.detail_user ? `${data.detail_user.email}` : "siswa tidak punya akun"}
+                                  {data?.siswa?.detail_user ? `${data?.siswa?.detail_user.email}` : "siswa tidak punya akun"}
                                 </td>
                             </tr>
                             <tr>

@@ -52,15 +52,7 @@ export default function Navbar({ data, role, path, roleUser }) {
                     >
                       Umpan Balik
                     </NavigationMenuLink>
-                    {role === "admin" && (
-                      <NavigationMenuLink
-                        href="/log"
-                        active={path === "/log" && true}
-                        className={navigationMenuTriggerStyle()}
-                      >
-                        Log
-                      </NavigationMenuLink>
-                    )}
+                  
                     {roleUser === "Guru" || roleUser === "admin" ? (
                       <>
                         <DropdownMenu>
@@ -169,21 +161,7 @@ export default function Navbar({ data, role, path, roleUser }) {
         </a>
         {role !== "users" && (
           <>
-            <a
-              href="/log"
-              className={buttonVariants({
-                variant: "outline",
-                className:
-                  "px-2 w-1/6 block flex justify-center items-center flex-col h-full",
-              })}
-            >
-              <div className="flex justify-center items-center flex-col">
-                <span className="material-symbols-outlined text-xl text-gray-900">
-                  history
-                </span>
-                <h3 className="text-[9px] text-gray-600 font-semibold">Log</h3>
-              </div>
-            </a>
+            
 
             <DropdownMenu>
               <DropdownMenuTrigger className="border rounded-md px-2 w-1/6 block flex justify-center items-center flex-col">

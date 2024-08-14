@@ -25,7 +25,8 @@ import WithQuery from "@/utils/WithQuery";
 import { localTime } from "../../utils/localTime.js";
 import { toast } from "../ui/use-toast.js";
 import { generatePdf } from "./generatePdf.js";
-import ButtonLoader from "../ButtonLoader.jsx";
+import Charts from "react-apexcharts";
+
 import ClipLoader from "react-spinners/ClipLoader.js";
 const DetailSiswaSheet = lazy(() => import("./DetailSiswaSheet.jsx"));
 const Form = lazy(() => import("./Form.jsx"));
@@ -37,7 +38,8 @@ import {
     SelectValue,
 } from "@/components/ui/select"
 import { Badge } from "../ui/badge.jsx";
-const Print = lazy(() => import("./Print.jsx"));
+import ButtonLoader from "../ButtonLoader.jsx";
+
 
 
 const SiswaData = ({ role }) => {
@@ -45,13 +47,14 @@ const SiswaData = ({ role }) => {
     const [msg, setMsg] = useState("");
     const [currentData, setCurrentData] = useState({});
     const [query, setQuery] = useState("");
-    const [dialogPrint, setDiaglogPrint] = useState(false);
     const [sheetOpen, setSheetOpen] = useState(false);
+    const [filterJenisKelamin, setFilterJenisKelamin] = useState("")
     const handleDetail = (data) => {
         setSheetOpen(!sheetOpen)
         setCurrentData({ ...data })
     }
     const [filter, setFilter] = useState("")
+    const [filterTa, setFilterTa] = useState("")
     const {
         isLoading,
         fetchNextPage,
@@ -59,11 +62,13 @@ const SiswaData = ({ role }) => {
         isFetchingNextPage,
         data,
         refetch,
+        isSuccess
+
     } = useInfiniteQuery({
-        queryKey: ["siswa"],
+        queryKey: [`siswa-${query}-${filter}-${filterTa}-${filterJenisKelamin}`],
         queryFn: async ({ pageParam }) => {
             const response = await axios.get(
-                `/api/siswa?id=${pageParam || 0}&search=${query}&filter=${filter}`
+                `/api/siswa?id=${pageParam || 0}&search=${query}&filter=${filter}&ta=${filterTa}&jk=${filterJenisKelamin}`
             );
             return response.data;
         },
@@ -165,7 +170,7 @@ const SiswaData = ({ role }) => {
 
     useEffect(() => {
         refetch();
-    }, [query, filter]);
+    }, [query, filter, filterTa, filterJenisKelamin]);
 
     const dataKelas = useQuery({
         queryKey: ["kelasForm"],
@@ -174,6 +179,31 @@ const SiswaData = ({ role }) => {
             return datas.data;
         },
     });
+    const dataTa = useQuery({
+        queryKey: ["tahunAjaran"],
+        queryFn: async () => {
+            const datas = await axios.get("/api/tahunajaran/all");
+            return datas.data.data;
+        },
+    });
+
+    const dataPrint = useMutation({
+        mutationFn: async () => {
+            const datas = await axios.get(
+                `/api/siswa?search=${query}&filter=${filter}&ta=${filterTa}&p=true&jk=${filterJenisKelamin}`
+            );
+            return datas.data.data;
+        },
+        onSuccess: (data) => {
+            const title = `${filterTa && `TA ${filterTa}`} ${filter && `Kelas ${getKelasName(filter)}`}`
+
+            generatePdf(title, getKelasName, data)
+        },
+       
+    });
+    const handlePrint = () => {
+        dataPrint.mutate()
+    }
 
     const getKelasName = (idKelas) => {
         if (dataKelas.isSuccess) {
@@ -181,15 +211,82 @@ const SiswaData = ({ role }) => {
         }
     }
 
+    const genderStats = isSuccess ? data.pages[0].data.genderStats : []
+    const labels = genderStats.map(stat => `${stat.gender}`);
+   
+    const datas = genderStats.map(stat => stat.count);
 
-    if (isLoading) {
-        return <>Loading...</>;
-    }
+
 
     return (
         <div>
-            <div className="w-full flex justify-between items-end  border-b  p-2">
-                <div className="flex gap-2">
+            <div className="w-full flex flex-wrap gap-2 md:justify-between items-end  border-b  p-2">
+                <div className="w-full pb-4">
+                    <Charts type="bar"
+                        options={{
+                            chart: {
+                                type: 'bar',
+                                height: 380
+                            },
+                            plotOptions: {
+                                bar: {
+                                    columnWidth: '45%',
+                                    distributed: true,
+                                    borderRadius:10
+                                }
+                            },
+                            colors: ['#33b2df', '#546E7A'
+                            ],
+                            dataLabels: {
+                                enabled: true
+                            },
+
+                            stroke: {
+                                width: 1,
+                                colors: ['#fff']
+                            },
+                            xaxis: {
+                                categories: labels,
+                                position: 'top',
+                                axisBorder: {
+                                    show: false
+                                },
+                                axisTicks: {
+                                    show: false
+                                },
+                            },
+                            yaxis: {
+                                axisBorder: {
+                                    show: false
+                                },
+                                axisTicks: {
+                                    show: false,
+                                },
+                                labels: {
+                                    show: false,
+                                    formatter: function (val) {
+                                        return val + "%";
+                                    }
+                                }
+
+                            },
+
+                            title: {
+                                text: `Statistik Gender ${filter && `Kelas ${getKelasName(filter)}`} ${filterTa && `TA ${filterTa}`}`,
+                                align: 'center',
+                                floating: true
+                            },
+
+
+                        }}
+                        series={[
+                            {
+                                data: datas
+                            },
+                        ]}
+                        height={350} />
+                </div>
+                <div className="grid md:grid-cols-4 gap-2 grid-cols-2">
                     <div>
                         <Label htmlFor="search">Search</Label>
                         <Input
@@ -228,11 +325,62 @@ const SiswaData = ({ role }) => {
                         )}
 
                     </div>
+                    <div>
+                        <Label className="text-right">
+                            Filter Jenis Kelamin
+                        </Label>
+
+                        <Select onValueChange={(e) => {
+                            if (e === "semua") {
+                                setFilterJenisKelamin("")
+                                return
+                            }
+                            setFilterJenisKelamin(e)
+                        }}>
+                            <SelectTrigger className="w-full" >
+                                <SelectValue placeholder={'Jenis kelamin'} />
+                            </SelectTrigger>
+                            <SelectContent >
+                                <SelectItem value="semua" >Semua</SelectItem>
+                                <SelectItem value="Laki-laki" >Laki Laki</SelectItem>
+                                <SelectItem value="Perempuan" >Perempuan</SelectItem>
+                            </SelectContent>
+                        </Select>
+                    </div>
+                    <div className="">
+                        <Label htmlFor="Deskripsi">Filter TA</Label>
+
+                        {dataTa.isSuccess && (
+                            <Select
+                                disabled={dataTa.isLoading}
+                                required
+                                onValueChange={(e) => {
+                                    if (e === "semua") {
+                                        setFilter("")
+                                        return
+                                    }
+                                    const nama = dataTa.isSuccess && dataTa.data.data.find(datas => datas.nama === e).nama
+                                    setFilterTa(nama)
+                                }}
+                            >
+                                <SelectTrigger className="w-full"  >
+                                    <SelectValue placeholder={"Pilih TA"} />
+                                </SelectTrigger>
+                                <SelectContent>
+                                    <SelectItem value={"semua"} >Semua</SelectItem>
+                                    {dataTa.isSuccess &&
+                                        dataTa.data.data.map(({ id, nama }, i) => (
+                                            <SelectItem value={nama} key={i} id={i}>{nama}</SelectItem>
+                                        ))}
+                                </SelectContent>
+                            </Select>
+                        )}
+
+                    </div>
                 </div>
                 <div className="flex items-end justify-end gap-2">
                     {role === "admin" && (
                         <>
-
                             <Dialog open={isDialogOpen} onOpenChange={() => { setIsDialogOpen(!isDialogOpen), setIsEdit(false) }} >
                                 <DialogTrigger asChild>
                                     <Button variant="outline" onClick={() => { setMsg(null), setIsDialogOpen(true) }}>
@@ -253,12 +401,10 @@ const SiswaData = ({ role }) => {
                             </Dialog>
                         </>
                     )}
-                    <Button
-                        onClick={() => setDiaglogPrint(true)}
-                        disabled={!data || data.length <= 0}
-                    >
-                        Cetak
-                    </Button>
+                    <div>
+
+                        <ButtonLoader onClick={() => handlePrint()} text={"Cetak"} loading={dataPrint.isPending} disabled={!data || data?.length <= 0} />
+                    </div>
                 </div>
             </div>
             <Table>
@@ -268,25 +414,29 @@ const SiswaData = ({ role }) => {
                         <TableHead className="w-[100px]">No</TableHead>
                         <TableHead>NISN</TableHead>
                         <TableHead>Nama Lengkap</TableHead>
+                        <TableHead>Jenis Kelamin</TableHead>
                         <TableHead>Kelas</TableHead>
+                        <TableHead>TA</TableHead>
                         <TableHead>Akun</TableHead>
                         <TableHead>Created At</TableHead>
                         <TableHead>Updated At</TableHead>
                     </TableRow>
                 </TableHeader>
                 <TableBody>
-                    {data.pages &&
+                    {isSuccess &&
                         data.pages
                             .flatMap((page) => page.data.data)
                             .map((e, i) => (
-                                <TableRow key={e.nisn}>
+                                <TableRow key={i}>
                                     <TableCell className="font-medium">{i + 1}</TableCell>
                                     <TableCell>{e.nisn}</TableCell>
-                                    <TableCell>{e.nama_lengkap}</TableCell>
-                                    <TableCell>{getKelasName(e.id_kelas)}</TableCell>
-                                    <TableCell >{e.detail_user ? <Badge className={"bg-green-600"}>{e.detail_user.email}</Badge> : <Badge className={"bg-red-600"}>Siswa Tidak Punya Akun</Badge>}</TableCell>
-                                    <TableCell>{localTime(e.created_at)}</TableCell>
-                                    <TableCell>{localTime(e.updated_at)}</TableCell>
+                                    <TableCell>{e.siswa.nama_lengkap}</TableCell>
+                                    <TableCell>{e.siswa.jenis_kelamin}</TableCell>
+                                    <TableCell>{`${getKelasName(e.id_kelas)} `}</TableCell>
+                                    <TableCell>{`${e.tahun_ajaran.nama}`}</TableCell>
+                                    <TableCell >{e.siswa.detail_user ? <Badge className={"bg-green-600"}>{e.siswa.detail_user.email}</Badge> : '-'}</TableCell>
+                                    <TableCell>{localTime(e.siswa.created_at)}</TableCell>
+                                    <TableCell>{localTime(e.siswa.updated_at)}</TableCell>
                                     <TableCell className="flex  items-center gap-2 flex-wrap">
                                         {role === "admin" &&
                                             <Button
@@ -322,7 +472,7 @@ const SiswaData = ({ role }) => {
             )}
             <Suspense>
                 <DetailSiswaSheet open={sheetOpen} setOpen={setSheetOpen} data={currentData} getKelasName={getKelasName} />
-                <Print open={dialogPrint} setOpen={setDiaglogPrint} dataKelas={dataKelas} getKelasName={getKelasName} />
+
             </Suspense>
 
         </div>

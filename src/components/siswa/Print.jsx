@@ -64,28 +64,7 @@ const Print = ({ open, setOpen, dataKelas, getKelasName }) => {
                             </Select>
                         )}
                     </div>
-                    <div>
-                        <Label className="text-right">
-                            Filter Jenis Kelamin
-                        </Label>
-
-                        <Select onValueChange={(e) => {
-                            if (e === "semua") {
-                                setFilterJenisKelamin("")
-                                return
-                            }
-                            setFilterJenisKelamin(e)
-                        }}>
-                            <SelectTrigger className="w-full" >
-                                <SelectValue placeholder={'Jenis kelamin'} />
-                            </SelectTrigger>
-                            <SelectContent >
-                                <SelectItem value="semua" >Semua</SelectItem>
-                                <SelectItem value="Laki-laki" >Laki Laki</SelectItem>
-                                <SelectItem value="Perempuan" >Perempuan</SelectItem>
-                            </SelectContent>
-                        </Select>
-                    </div>
+                   
                 </DialogHeader>
 
                 <Button onClick={() => {

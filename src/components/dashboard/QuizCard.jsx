@@ -64,7 +64,7 @@ import {
                   <div className="flex gap-2 py-2 flex-wrap">
                     <Badge className={"bg-blue-600"}>Kelas {data.kelas.kelas}</Badge>
                     <Badge className={"bg-green-600"}>{data.mapel.mapel}</Badge>
-                    <Badge className={"bg-yellow-500"}>TH : {data.tahun_ajaran.nama}</Badge>
+                    <Badge className={"bg-yellow-500"}>TA : {data.tahun_ajaran.nama}</Badge>
                   </div>
                   <CardDescription>{`${localTime(data.start_quiz)} - ${localTime(data.end_quiz)}`}</CardDescription>
                 </div>

@@ -114,7 +114,7 @@ export const POST = async ({ params, request, url }) => {
       .eq('id_kelas', quizzes[0].id_kelas);
 
     if (usersError) {
-      console.log(usersError);
+  
       return new Response(
         JSON.stringify({
           message: "Error fetching users",

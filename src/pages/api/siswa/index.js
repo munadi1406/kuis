@@ -4,25 +4,39 @@ export const GET = async ({ params, url }) => {
   const search = url.searchParams.get("search");
   const id = url.searchParams.get("id");
   const filter = url.searchParams.get("filter");
-  const perPage = 10
-  let query = supabase
-    .from("siswa")
-    .select(`*,detail_user!left(*)`)
-    .limit(perPage)
-    .order("created_at", { ascending: false });
+  const tahunAjaran = url.searchParams.get("ta");
+  const print = url.searchParams.get("p");
+  const jk = url.searchParams.get("jk");
+  const perPage = 10;
 
-  // Kondisi untuk id
+  let query = supabase
+    .from("kelas_history")
+    .select(`*,siswa!inner(*,detail_user!left(*)),tahun_ajaran!inner(*)`)
+    .order("start_date", { ascending: false });
+
+  if (!print) {
+    query = query.limit(perPage);
+  }
   if (id > 0) {
     const dateId = new Date(parseInt(id)); // Jika id adalah timestamp
-    query = query.lt("created_at", dateId.toISOString());
+    query = query.lt("start_date", dateId.toISOString());
+  }
+
+  if (jk) {
+    query = query.eq("siswa.jenis_kelamin", jk);
   }
 
   // Kondisi untuk search
   if (search) {
-    query = query.ilike("nama_lengkap", `%${search}%`);
+    query = query.ilike("siswa.nama_lengkap", `%${search}%`);
   }
+
   if (filter) {
     query = query.eq("id_kelas", filter);
+  }
+
+  if (tahunAjaran) {
+    query = query.eq("tahun_ajaran.nama", tahunAjaran);
   }
 
   const { data, error } = await query;
@@ -37,16 +51,67 @@ export const GET = async ({ params, url }) => {
     );
   }
 
+  
+  let statLaki = supabase
+    .from("kelas_history")
+    .select(`id,id_kelas,siswa!inner(jenis_kelamin),tahun_ajaran(nama)`, { count: "exact" })
+
+
+
+
+  if (filter) {
+    statLaki = statLaki.eq("id_kelas", filter);
+
+  }
+
+  if (tahunAjaran) {
+    statLaki = statLaki.eq("tahun_ajaran.nama", tahunAjaran);
+
+  }
+  const { error: maleError, data: statData } = await statLaki
+  let maleCount = 0;
+  let femaleCount = 0;
+ 
+
+  statData.forEach((item) => {
+    if (item.siswa.jenis_kelamin === "Laki-laki") {
+      maleCount++;
+    } else if (item.siswa.jenis_kelamin === "Perempuan") {
+      femaleCount++;
+    }
+  });
+
+  if (maleError) {
+    
+
+    return new Response(
+      JSON.stringify({
+        message: "internal server error",
+        error: maleError?.message,
+      }),
+      { status: 500 }
+    );
+  }
+
+  const genderStats = {
+    "Laki-Laki": maleCount,
+    Perempuan: femaleCount,
+  };
+  const genderArray = Object.entries(genderStats).map(([gender, count]) => {
+    return { gender, count };
+});
+
   let lastId = null;
 
   if (data.length > 0) {
-    lastId = new Date(data[data.length - 1].created_at).getTime();
+    lastId = new Date(data[data.length - 1].start_date).getTime();
   }
 
   const payload = {
     lastId,
     data,
-    perPage
+    perPage,
+    genderStats:genderArray, // Tambahkan statistik jenis kelamin ke payload
   };
 
   if (data) {
@@ -67,6 +132,7 @@ export const GET = async ({ params, url }) => {
     );
   }
 };
+
 
 export const POST = async ({ params, request, url }) => {
   const { nisn, idUser, namaLengkap, alamat, jenisKelamin, tanggalLahir, idKelas } = await request.json();
@@ -92,7 +158,7 @@ export const POST = async ({ params, request, url }) => {
     .select();
 
   if (siswaError) {
-  
+
     return new Response(
       JSON.stringify({
         message: "Data Siswa Gagal Ditambahkan, Pastikan NISN Tidak Sama Dengan Siswa Lain",
@@ -153,7 +219,7 @@ export const PUT = async ({ params, request, url }) => {
       idKelas,
     } = await request.json();
 
-   
+
     const { data: activeTahunAjaran, error: tahunAjaranError } = await supabase
       .from("tahun_ajaran")
       .select("id")
