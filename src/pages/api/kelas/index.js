@@ -2,64 +2,100 @@ import { supabase } from "../../../lib/supabase";
 
 
 export const GET = async ({ params, url }) => {
-  const search = url.searchParams.get("search");
-  const id = url.searchParams.get("id");
-  const perPage = 10
-  let query = supabase
-    .from("kelas")
-    .select("*")
-    .limit(perPage)
-    .order("created_at", { ascending: false });
-  
-  // Kondisi untuk id
-  if (id > 0) {
-    query = query.lt("id", id);
-  }
+  try {
 
-  // Kondisi untuk search
-  if (search) {
-    query = query.ilike("kelas", `%${search}%`);
-  }
- 
-  const { data, error } = await query;
 
-  if (error) {
-    return new Response(
-      JSON.stringify({
-        message: "Error fetching user details",
-        error: error.message,
-      }),
-      { status: 500 }
-    );
-  }
+    const search = url.searchParams.get("search");
+    const id = url.searchParams.get("id");
 
-  let lastId = null;
+    const perPage = 10;
+    const { data: activeTahunAjaran, error: tahunAjaranError } = await supabase
+      .from("tahun_ajaran")
+      .select("*")
+      .eq("status", true)  // Get the active academic year
+      .single();  // Ensure we get only one record
 
-  if (data.length > 0) {
-    lastId = data[data.length - 1].id;
-  }
+    if (tahunAjaranError) {
+      return new Response(
+        JSON.stringify({
+          message: "Error fetching active academic year",
+          error: tahunAjaranError.message,
+        }),
+        { status: 500 }
+      );
+    }
 
-  const payload = {
-    lastId,
-    data,
-    perPage
-  };
+    let query = supabase
+      .from("kelas")
+      .select(`
+      *,
+      kelas_history!left(tahun_ajaran(id), siswa!left(jenis_kelamin))
+    `)
+      .limit(perPage)
+      .order("kelas", { ascending: true })
+      .eq('kelas_history.tahun_ajaran.id', activeTahunAjaran.id)
+      .is('kelas_history.end_date', null);
 
-  if (data) {
+    // Kondisi untuk id
+    if (id > 0) {
+      query = query.lt("id", id);
+    }
+
+    // Kondisi untuk search
+    if (search) {
+      query = query.ilike("kelas", `%${search}%`);
+    }
+
+    const { data, error } = await query;
+
+    if (error) {
+      return new Response(
+        JSON.stringify({
+          message: "Error fetching class details",
+          error: error.message,
+        }),
+        { status: 500 }
+      );
+    }
+
+    // Hitung jumlah siswa berdasarkan jenis kelamin
+    const processedData = data.map((kelas) => {
+      const siswa = kelas.kelas_history.flatMap(history => history.siswa);
+      const totalLakiLaki = siswa.filter(s => s.jenis_kelamin === 'Laki-laki').length;
+      const totalPerempuan = siswa.filter(s => s.jenis_kelamin === 'Perempuan').length;
+
+      return {
+        ...kelas,
+        totalLakiLaki,
+        totalPerempuan,
+        totalSiswa: siswa.length
+      };
+    });
+
+    let lastId = null;
+    if (data.length > 0) {
+      lastId = data[data.length - 1].id;
+    }
+
+    const payload = {
+      lastId,
+      data: processedData,
+      perPage
+    };
+
     return new Response(
       JSON.stringify({
         message: 200,
-        data:{...payload},
+        data: { ...payload },
       }),
       { status: 200 }
     );
-  } else {
+  } catch (error) {
     return new Response(
       JSON.stringify({
-        message: 404,
-        data: [],
+        message: "Internal Server error",
       }),
-      { status: 404 }
+      { status: 500 }
     );
   }
 };
@@ -72,7 +108,7 @@ export const POST = async ({ params, request, url }) => {
     .select("kelas")
     .eq("kelas", dataKelas);
   if (kelas.length > 0) {
-    
+
     return new Response(
       JSON.stringify({
         message: "Mata Pelajaran Sudah Ada",
@@ -108,7 +144,7 @@ export const PUT = async ({ params, request, url }) => {
     .select("kelas")
     .eq("kelas", dataKelas);
   if (kelas.length > 0) {
-  
+
     return new Response(
       JSON.stringify({
         message: "Mata Pelajaran Sudah Ada",

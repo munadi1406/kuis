@@ -2,6 +2,7 @@ import pdfMake from "pdfmake/build/pdfmake";
 import { pdfMakeFonts } from "../users/generatePdf";
 import { localTime } from "@/utils/localTime";
 import axios from "axios";
+import { header } from "../kelas/generatePdf";
 
 pdfMake.fonts = pdfMakeFonts;
 
@@ -11,11 +12,12 @@ export const generatePdf = async (img) => {
   try {
     const documentDefinition = {
       content: [
+        header(),
         {
           text: "Statistik Rating",
           style: "header",
           alignment: "center",
-          margin: [0, 0, 0, 10],
+          margin: [0, 10, 0, 10],
         },
         {
           image: img, // Add the image Data URI to the PDF

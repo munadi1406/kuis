@@ -3,6 +3,8 @@ import { pdfMakeFonts } from "../users/generatePdf";
 import edjsHTML from "editorjs-html";
 import axios from "axios";
 import htmlToPdfmake from "html-to-pdfmake";
+import { header } from "../kelas/generatePdf";
+import { localTime } from "@/utils/localTime";
 
 
 pdfMake.fonts = pdfMakeFonts;
@@ -18,11 +20,14 @@ const fetchImageAsDataURL = async (imageUrl) => {
         reader.onerror = reject;
         reader.readAsDataURL(blob);
     });
+
 };
 export const printDifficulty = async (title, id) => {
     try {
         const { data } = await axios.get(`/api/analisis/difficulty?id=${id}`);
-
+        console.log(data)
+        const now = new Date();
+        const formattedTime = localTime(now);
         // Process each question to handle images
         const processQuestion = async (questionData, index) => {
             const htmlString = edjsParser.parse(questionData.soal).join('');
@@ -46,10 +51,23 @@ export const printDifficulty = async (title, id) => {
 
         const documentDefinition = {
             content: [
+                header(),
                 {
                     text: `Analisis Kesulitan ${title}`,
                     style: 'header',
                     alignment: 'center',
+                    margin: [0, 10, 0, 10],
+                },
+                {
+                    text: `${data.nama_lengkap} , ${localTime(data.start_quiz)} Sampai ${localTime(data.end_quiz)} ,Kelas ${data.kelas.kelas}, ${data.mapel.mapel}`,
+                    style: "subheader",
+                    alignment: "center",
+                    margin: [0, 0, 0, 10],
+                },
+                {
+                    text: `Waktu Cetak: ${formattedTime}`,
+                    style: "subheader",
+                    alignment: "right",
                     margin: [0, 0, 0, 10],
                 },
                 {
@@ -68,13 +86,13 @@ export const printDifficulty = async (title, id) => {
                                     stack: questionsContent[index], // Use the processed content for the question
                                     style: 'tableBody'
                                 },
-                                { text: item.kesulitan, style: 'tableBody' },
-                                { text: item.detailKesulitan, style: 'tableBody' },
-                                { text: item.hasil, style: 'tableBody' }
+                                { text: item.kesulitan, style: 'tableBody' ,alignment: 'center',},
+                                { text: item.detailKesulitan, style: 'tableBody',alignment: 'center', },
+                                { text: item.hasil, style: 'tableBody',alignment: 'center', }
                             ])
                         ]
                     },
-                    layout: 'lightHorizontalLines'
+
                 },
                 {
                     text: `Rata Rata Kesulitan Kuis: ${data.averageDifficulty} (${data.overallDifficulty})`,
@@ -102,9 +120,12 @@ export const printDifficulty = async (title, id) => {
                     bold: true,
                     fontSize: 13,
                     color: 'black',
+                    alignment: 'center',
+                    fillColor: '#ADD8E6'
                 },
                 tableBody: {
                     fontSize: 11,
+                    
                 },
                 averageDifficulty: {
                     fontSize: 12,
@@ -123,7 +144,7 @@ export const printDifficulty = async (title, id) => {
                 },
             },
         };
-        
+
 
         // Create and download the PDF
         pdfMake.createPdf(documentDefinition).download(`Analisis ${title}.pdf`);

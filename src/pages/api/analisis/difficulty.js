@@ -11,7 +11,7 @@ export const GET = async ({ params, url }) => {
       .eq('id_quiz', id);
     const { data: quiz, error: err } = await supabase
       .from("quiz")
-      .select(`id, title`)
+      .select(`id, title,kelas(kelas),mapel(mapel),id_user,start_quiz,end_quiz`)
       .eq('id', id).single();
 
     if (answersError) {
@@ -151,7 +151,7 @@ export const GET = async ({ params, url }) => {
       detailKesulitan: q.difficulty,
       hasil: `${q.correctCount}/${q.attemptCount} siswa benar`
     }));
-
+    const {data:gurudata} = await supabase.from('guru').select('nama_lengkap').eq('id_user',quiz.id_user).single()
     // Add overall difficulty and recommendation to results
     const output = {
       message: 200,
@@ -160,7 +160,8 @@ export const GET = async ({ params, url }) => {
       averageDifficulty: isFinite(averageDifficulty) ? averageDifficulty.toFixed(2) : 'N/A',
       overallSuccessRate: (overallSuccessRate * 100).toFixed(2) + '%',
       readyToProceed,
-      ...quiz
+      ...quiz,
+      ...gurudata,
     };
 
     return new Response(

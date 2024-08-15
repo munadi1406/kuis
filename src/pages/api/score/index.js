@@ -7,7 +7,7 @@ export const GET = async ({ url }) => {
     // Fetch quiz details to get the quiz creation date
     const { data: quizData, error: quizError } = await supabase
       .from('quiz')
-      .select('id_kelas, created_at, id_tahun_ajaran')
+      .select('id_kelas, created_at, start_quiz,end_quiz,id_tahun_ajaran,id_user,kelas(kelas)')
       .eq('id', id)
       .single();
 
@@ -107,11 +107,14 @@ export const GET = async ({ url }) => {
 
     // Sort students alphabetically by their names
     userScoresArray.sort((a, b) => a.namaLengkap.localeCompare(b.namaLengkap));
+    const {data:guruData}= await supabase.from('guru').select('*').eq('id_user',quizData.id_user).single()
 
     return new Response(
       JSON.stringify({
         message: "User details fetched successfully",
         data: userScoresArray,
+        guruData,
+        quiz:quizData
       }),
       { status: 200 }
     );

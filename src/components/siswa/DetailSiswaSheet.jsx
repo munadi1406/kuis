@@ -13,14 +13,14 @@ const DetailSiswaSheet = ({ open, setOpen, data,getKelasName }) => {
     
     return (
         <Sheet open={open} onOpenChange={setOpen}>
-            <SheetContent>
+            <SheetContent className="overflow-scroll">
                 <SheetHeader>
                     <SheetTitle>{data.nama_lengkap}</SheetTitle>
                     <SheetDescription>
                         detail data siswa {data.nama_lengkap}
                     </SheetDescription>
                 </SheetHeader>
-                <div className="pt-2 shadow-md ">
+                <div className="pt-2  shadow-md ">
                     <table className="w-full border-collapse border border-gray-300">
                         <thead>
                             <tr className="bg-gray-100">

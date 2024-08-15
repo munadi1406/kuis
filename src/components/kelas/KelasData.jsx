@@ -215,6 +215,9 @@ const KelasData = () => {
           <TableRow>
             <TableHead className="w-[100px]">No</TableHead>
             <TableHead>Kelas</TableHead>
+            <TableHead>Laki-laki</TableHead>
+            <TableHead>Perempuan</TableHead>
+            <TableHead>Total Siswa</TableHead>
             <TableHead>Created At</TableHead>
             <TableHead>Aksi</TableHead>
           </TableRow>
@@ -223,10 +226,13 @@ const KelasData = () => {
           {data.pages &&
             data.pages
               .flatMap((page) => page.data.data)
-              .map(({ created_at, id, kelas }, i) => (
+              .map(({ created_at, id, kelas ,totalLakiLaki,totalPerempuan,totalSiswa}, i) => (
                 <TableRow key={id}>
                   <TableCell className="font-medium">{i + 1}</TableCell>
                   <TableCell>{kelas}</TableCell>
+                  <TableCell>{totalLakiLaki}</TableCell>
+                  <TableCell>{totalPerempuan}</TableCell>
+                  <TableCell>{totalSiswa}</TableCell>
                   <TableCell>{localTime(created_at)}</TableCell>
                   <TableCell className="flex items-center gap-2 flex-wrap">
                     <Button
