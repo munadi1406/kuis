@@ -35,7 +35,7 @@ const ReportData = ({ idUser }) => {
     const { data, isLoading } = useQuery({
         queryKey: [`laporan-${option.mapel}-${option.kelas}`], queryFn: async () => {
             const { data } = await axios.get(`/api/report?id=${idUser}&idKelas=${option.kelas && option.kelas}&idMapel=${option.mapel && option.mapel}`)
-            return data.data
+            return data
         },
         enabled: !!option.kelas
     })
@@ -127,6 +127,11 @@ const ReportData = ({ idUser }) => {
             return datas.data;
         },
     });
+    const getKelasName = (idKelas) => {
+        if (dataKelas.isSuccess) {
+            return `${dataKelas.data.data.find(datas => datas.id === idKelas)?.kelas}`
+        }
+    }
     if (isLoading) {
         return <div>Loading...</div>
     }
@@ -168,7 +173,7 @@ const ReportData = ({ idUser }) => {
             </div>
 
             <div className="my-5 grid md:grid-cols-6 grid-cols-3">
-                {data && data.map(({ id, title, kelas: { kelas }, mapel: { mapel },tahun_ajaran:{nama} }) => (
+                {data?.data && data.data.map(({ id, title, kelas: { kelas }, mapel: { mapel },tahun_ajaran:{nama} }) => (
                     <div className="items-top flex space-x-2" key={id}>
                         <Checkbox
                             id={id}
@@ -195,7 +200,7 @@ const ReportData = ({ idUser }) => {
                     </div>
                 ))}
             </div>
-            <Button onClick={() => reportQuiz(quizzesMap, sortedUsers)} disabled={reportChecked.length <= 0}>Cetak</Button>
+            <Button onClick={() => reportQuiz(quizzesMap, sortedUsers,getKelasName(option.kelas),data)} disabled={reportChecked.length <= 0}>Cetak</Button>
             {scoreData.length > 0 && (
                 <Table>
                     <TableCaption>Rekap Nilai</TableCaption>
@@ -208,7 +213,7 @@ const ReportData = ({ idUser }) => {
                             ))}
                             <TableHead>Total</TableHead>
                             <TableHead>Rata Rata</TableHead>
-                            <TableHead>Keterangan</TableHead>
+                            <TableHead>Peringkat</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>

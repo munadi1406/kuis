@@ -2,6 +2,7 @@ import pdfMake from "pdfmake/build/pdfmake";
 import { pdfMakeFonts } from "../users/generatePdf";
 import { localTime } from "@/utils/localTime";
 import QRCode from 'qrcode';
+import { header } from "../kelas/generatePdf";
 
 pdfMake.fonts = pdfMakeFonts;
 
@@ -13,7 +14,7 @@ export const printLink = async (id, title, data, token) => {
     const formattedTime = localTime(now);
     const generateQRCodeDataURLs = async (textArray) => {
       const urls = await Promise.all(textArray.map(text => QRCode.toDataURL(text, {
-        width: 300, // Lebar QR Code dalam piksel untuk kualitas lebih baik
+        width: 250, // Lebar QR Code dalam piksel untuk kualitas lebih baik
         margin: 1   // Margin QR Code
       })));
       return urls;
@@ -22,11 +23,12 @@ export const printLink = async (id, title, data, token) => {
     const qrCodeDataURLs = await generateQRCodeDataURLs(links);
     const documentDefinition = {
       content: [
+        header(),
         {
           text: `Daftar Link ${title}`,
           style: "header",
           alignment: "center",
-          margin: [0, 0, 0, 10],
+          margin: [0, 10, 0, 10],
         },
         {
           text: `Waktu Cetak: ${formattedTime}`,
@@ -37,16 +39,18 @@ export const printLink = async (id, title, data, token) => {
         {
           table: {
             headerRows: 1,
-            widths: ["auto", "*", "60%", "*"],
+            widths: ["auto", "auto", "*", 150, "*"],
             body: [
               [
                 { text: 'No', alignment: 'center', fillColor: '#ADD8E6', bold: true, margin: [0, 5] }, // Light blue
+                { text: 'NISN', alignment: 'center', fillColor: '#ADD8E6', bold: true, margin: [0, 5] }, // Light blue
                 { text: 'Nama Lengkap', alignment: 'center', fillColor: '#ADD8E6', bold: true, margin: [0, 5] }, // Light blue
                 { text: 'Link', alignment: 'center', fillColor: '#ADD8E6', bold: true, margin: [0, 5] },// Light blue
                 { text: 'QRCODE', alignment: 'center', fillColor: '#ADD8E6', bold: true, margin: [0, 5] } // Light blue
               ],
               ...data.map((e, idx) => [
                 { text: idx + 1, alignment: 'center' }, // Center align the numbers
+                { text: e.nisn, alignment: 'left', margin: [5, 2] }, // Left align with some margin
                 { text: e.nama_lengkap, alignment: 'left', margin: [5, 2] }, // Left align with some margin
                 {
                   text: `${import.meta.env.PUBLIC_BASE_URL}take/${id}/?nisn=${e.nisn}&token=${token}`,
@@ -86,4 +90,3 @@ export const printLink = async (id, title, data, token) => {
   }
 };
 
- 

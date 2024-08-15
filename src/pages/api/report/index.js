@@ -26,6 +26,8 @@ export const GET = async ({ params, url }) => {
 
 
   const { data, error } = await query;
+  const {data:guruData}= await supabase.from('guru').select('*').eq('id_user',idUser).single()
+
 
   if (error) {
     return new Response(
@@ -43,6 +45,7 @@ export const GET = async ({ params, url }) => {
       JSON.stringify({
         message: 200,
         data: data,
+        ...guruData
       }),
       { status: 200 }
     );

@@ -1,23 +1,31 @@
 import pdfMake from 'pdfmake/build/pdfmake';
 import { pdfMakeFonts } from '../users/generatePdf';
+import { header } from '../kelas/generatePdf';
+import { getFormattedDate, localTime } from '@/utils/localTime';
 
 
 
 pdfMake.fonts = pdfMakeFonts;
 
 
-export const reportQuiz = (quizzesArray, sortedUsers) => {
-    // Menghitung data untuk tabel
+export const reportQuiz = (quizzesArray, sortedUsers,kelas,data) => {
+    
+    // Menghitung data untuk tabel  
+    
+    const now = new Date();
+    const formattedTime = localTime(now);
+    
     const tableBody = [];
 
     // Header tabel
     tableBody.push([
-        { text: 'No', alignment: 'center', fillColor: '#b3cde0' }, // Biru muda
-        { text: 'Nama', fillColor: '#b3cde0' }, // Biru muda
-        ...quizzesArray.map(({ title },i) => ({ text: i + 1, alignment: 'center', fillColor: '#b3cde0' })), // Biru muda
-        { text: 'Total', alignment: 'center', fillColor: '#b3cde0' }, // Biru muda
-        { text: 'Rata Rata', alignment: 'center', fillColor: '#b3cde0' }, // Biru muda
-        { text: 'Keterangan', alignment: 'center', fillColor: '#b3cde0' } // Biru muda
+        { text: 'No', alignment: 'center', fillColor: '#b3cde0',margin:[0,10] }, // Biru muda
+        { text: 'NISN', alignment: 'center', fillColor: '#b3cde0',margin:[0,10] }, // Biru muda
+        { text: 'Nama', fillColor: '#b3cde0', alignment: 'center',margin:[0,10] }, // Biru muda
+        ...quizzesArray.map(({ title },i) => ({ text: i + 1, alignment: 'center',margin:[0,10], fillColor: '#b3cde0' })), // Biru muda
+        { text: 'Total', alignment: 'center', fillColor: '#b3cde0',margin:[0,10] }, // Biru muda
+        { text: 'Rata Rata', alignment: 'center', fillColor: '#b3cde0',margin:[0,10] }, // Biru muda
+        { text: 'Peringkat', alignment: 'center', fillColor: '#b3cde0',margin:[0,10] } // Biru muda
     ]);
 
     // Data pengguna
@@ -50,6 +58,7 @@ export const reportQuiz = (quizzesArray, sortedUsers) => {
 
         tableBody.push([
             { text: index + 1, alignment: 'center' },
+            { text: user.nisn},
             { text: user.namaLengkap},
             ...quizzesArray.map(({ totalQuestions, users }) => {
                 const score = users.find(e => e.nisn === user.nisn);
@@ -69,22 +78,58 @@ export const reportQuiz = (quizzesArray, sortedUsers) => {
     // Dokumen PDF
     const documentDefinition = {
         content: [
+            header(),
             {
-                text: 'Rekap Nilai',
+                text: `Rekap Nilai Kelas ${kelas}`,
                 style: 'header',
                 alignment: 'center',
-                margin: [0, 0, 0, 10],
+                margin: [0, 10, 0, 10],
             },
+            {
+                text: `Waktu Cetak: ${formattedTime}`,
+                style: "subheader",
+                alignment: "right",
+                margin: [0, 0, 0, 10],
+              },
             {
                 table: {
                     headerRows: 1,
-                    widths: ['auto', '*', ...Array(quizzesArray.length).fill('auto'), 'auto', 'auto', 'auto'],
+                    widths: ['auto','auto', '*', ...Array(quizzesArray.length).fill('auto'), 'auto', 'auto', 'auto'],
                     body: tableBody
                 },
                 
             },
-            { text: 'Keterangan Angka Kolom', alignment: 'left', fillColor: '#b3cde0' },
-            ...quizzesArray.map(({ title},i) => ({ text: `${i + 1}. ${title}`, alignment: 'left', fillColor: '#b3cde0' })),
+            { text: 'Keterangan Angka Kolom', alignment: 'left', fillColor: '#b3cde0',margin:[0,10] },
+            ...quizzesArray.map(({ title},i) => ({ text: `${i + 1}. ${title}`, alignment: 'left', fillColor: '#b3cde0',margin:[0,4] })),
+            {
+                stack: [
+                  {
+                    text: `Astambul, ${getFormattedDate()}`,
+                    style: "subheader",
+                    alignment: "center",
+                    margin: [250, 0, 0, 10], // Adjust margin to position it on the right side
+                  },
+                  {
+                    text: ``,
+                    alignment: "center",
+                    margin: [250, 20], // Adding space for the signature
+                  },
+                  {
+                    text: `${data.nama_lengkap}`,
+                    style: "subheader",
+                    alignment: "center",
+                    margin: [250, 0, 0, 10], // Align the name in the center and position it on the right side
+                  },
+                  {
+                    text: `NIP.${data.nip}`,
+                    style: "subheader",
+                    alignment: "center",
+                    margin: [250, 0, 0, 10], // Align the NIP in the center and position it on the right side
+                  },
+                ],
+                 margin: [0, 20, 0, 0],
+                pageBreak: 'before',
+              }
 
         ],
         styles: {

@@ -13,6 +13,7 @@ export default defineConfig({
   integrations: [tailwind({
     applyBaseStyles: false
   }),react({
+    include: ['**/react/*'],
     experimentalReactChildren: true,
   }),],
   output: "server",

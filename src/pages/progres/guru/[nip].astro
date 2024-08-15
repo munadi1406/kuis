@@ -8,7 +8,7 @@ const { nip } = Astro.params;
 
 const { data: guru ,error} = await supabase
     .from("guru")
-    .select("nama_lengkap,id_user,created_at")
+    .select("nama_lengkap,id_user,created_at,nip")
     .eq("nip", nip)
     .single();
 
@@ -20,10 +20,11 @@ if (!guru || error) {
 
 <Dashboard title={`Progress Guru ${guru?.nama_lengkap}`}>
     <DataProgressGuru
-        transition:animate={"slide"}
+        
         client:only="react"
         idUser={guru.id_user}
         namaLengkap={guru.nama_lengkap}
         createdAt={guru.created_at}
+        nip={guru.nip}
     />
 </Dashboard>
