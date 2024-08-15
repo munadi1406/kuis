@@ -11,5 +11,5 @@ const {role} = Astro.locals as Locals
 ---
 
 <Dashboard title="Siswa">
-    <SiswaData client:only role={role} />
+    <SiswaData client:only="react" role={role} />
 </Dashboard>

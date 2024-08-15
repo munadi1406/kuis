@@ -50,7 +50,7 @@ const DataProgressSiswa = ({ nisn, namaLengkap, createdAt }) => {
       return response.data.data;
     },
     onSuccess:(data)=>{
-      printTeacherReport({namaLengkap,kuisPerBulanTahun: data.kuisDikerjakanPerBulanTahun, data: data.data })
+      printTeacherReport({namaLengkap,kuisPerBulanTahun: data.kuisDikerjakanPerBulanTahun, data: data.data,siswa:data.siswa })
     },
     
   });

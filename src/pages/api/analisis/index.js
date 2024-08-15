@@ -11,7 +11,7 @@ export const GET = async ({ params, url }) => {
         .eq('id_quiz', id);
         const { data: quiz, error:err} = await supabase
         .from("quiz")
-        .select(`id,title`)
+        .select(`id,title,start_quiz,end_quiz,kelas(kelas),mapel(mapel),id_user`)
         .eq('id', id).single();
       if (answersError) {
         // console.log({answersError})
@@ -80,12 +80,13 @@ export const GET = async ({ params, url }) => {
         soal: q.question,
         hasil: `${q.errors}/${q.total} siswa salah`
       }));
-  
+      const {data:gurudata} = await supabase.from('guru').select('nama_lengkap').eq('id_user',quiz.id_user).single()
       return new Response(
         JSON.stringify({
           message: 200,
           data: formattedResults,
-          title:quiz.title
+          ...quiz,
+          ...gurudata
         }),
         { status: 200 }
       );

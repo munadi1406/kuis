@@ -7,6 +7,7 @@ export const supabase = createClient(
       autoRefreshToken: true,
       persistSession: true,
       detectSessionInUrl: false
-    }
+    },
+    global: { fetch: fetch.bind(globalThis) }
   }
 );

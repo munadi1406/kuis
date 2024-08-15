@@ -12,13 +12,17 @@ export default defineConfig({
   },
   integrations: [tailwind({
     applyBaseStyles: false
-  }),react({
+  }), react({
     include: ['**/react/*'],
     experimentalReactChildren: true,
   }),],
   output: "server",
-  adapter: vercel(), 
-   
+  adapter: vercel({
+    isr: true,
+    edgeMiddleware: true,
+    
+  }),
+
 });
 
 // testt

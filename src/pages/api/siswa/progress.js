@@ -12,7 +12,7 @@ export const GET = async ({ url }) => {
     // Query untuk mengambil status jawaban siswa beserta detail kuis
     let statusQuery = supabase
       .from('answer_status')
-      .select(`nisn, id_quiz, status,created_at, quiz!inner(id, title, mapel(mapel), kelas(kelas))`,{count:"exact"})
+      .select(`nisn,siswa(*), id_quiz, status,created_at, quiz!inner(id, title, mapel(mapel), kelas(kelas))`,{count:"exact"})
       .eq('nisn', nisn)
       .order('created_at', { ascending: false });
 
@@ -110,6 +110,11 @@ export const GET = async ({ url }) => {
       count: value,
     }));
 
+    const { data: siswaData } = await supabase
+    .from("siswa")
+    .select(`nisn,nama_lengkap,alamat`)
+    .eq('nisn', nisn).single();
+
     const payload = {
       lastId,
       data: answerStatusData.map(item => ({
@@ -129,6 +134,7 @@ export const GET = async ({ url }) => {
       perPage,
       total: count,
       kuisDikerjakanPerBulanTahun,
+      siswa:siswaData,
     };
 
     return new Response(

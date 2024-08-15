@@ -1,6 +1,7 @@
 import pdfMake from "pdfmake/build/pdfmake";
 import { localTime } from "@/utils/localTime";
 import { pdfMakeFonts } from "@/components/users/generatePdf";
+import { header } from "@/components/kelas/generatePdf";
 
 
 pdfMake.fonts = pdfMakeFonts;
@@ -8,6 +9,7 @@ export const printTeacherReport = async (data) => {
     try {
       const now = new Date();
       const formattedTime = localTime(now);
+      
   
       // Extract necessary data from the provided object
      
@@ -16,9 +18,17 @@ export const printTeacherReport = async (data) => {
   
       const documentDefinition = {
         content: [
+          header(),
           {
             text: `Progress Guru ${data.namaLengkap}`,
             style: "header",
+            alignment: "center",
+            margin: [0, 0, 0, 2],
+          },
+          {
+            text: `NIP.${data.nip}`,
+            
+            fontSize:10,
             alignment: "center",
             margin: [0, 0, 0, 10],
           },
@@ -66,7 +76,7 @@ export const printTeacherReport = async (data) => {
               widths: ["*", "auto"],
               body: [
                 [
-                  { text: 'Tanggal', alignment: 'center', fillColor: '#ADD8E6', bold: true, margin: [0, 5] }, // Light blue
+                  { text: 'Tahun/Bulan', alignment: 'center', fillColor: '#ADD8E6', bold: true, margin: [0, 5] }, // Light blue
                   { text: 'Jumlah Kuis', alignment: 'center', fillColor: '#ADD8E6', bold: true, margin: [0, 5] } // Light blue
                 ],
                 ...quizPerBulanTahun.map(e => [

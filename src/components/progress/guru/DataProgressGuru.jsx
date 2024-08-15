@@ -18,7 +18,7 @@ import { Button } from '@/components/ui/button';
 import { printTeacherReport } from './print';
 
 
-const DataProgressGuru = ({ idUser, namaLengkap, createdAt }) => {
+const DataProgressGuru = ({ idUser, namaLengkap, createdAt,nip }) => {
 
   const [filter, setFilter] = useState("kuis")
  
@@ -55,7 +55,7 @@ const DataProgressGuru = ({ idUser, namaLengkap, createdAt }) => {
       return response.data.data;
     },
     onSuccess:(data)=>{
-      printTeacherReport({namaLengkap,kuisPerBulanTahun: data.kuisPerBulanTahun, data: data.data })
+      printTeacherReport({nip,namaLengkap,kuisPerBulanTahun: data.kuisPerBulanTahun, data: data.data })
     },
     
   });
