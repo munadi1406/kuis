@@ -75,38 +75,52 @@ const shuffleQuestionsAndOptions = (questions) => {
 };
 
 
-export const GET = async ({ params, url,cookies }) => {
+export const GET = async ({ params, url, cookies }) => {
 
-    
+
     try {
         const id = url.searchParams.get("id");
         const nisn = url.searchParams.get("nisn");
         // console.log({iniID :id})
-       
-     
-       
 
-        
-        
-        const { data: status,error:e2 } = await supabase.from('answer_status').select('*').match({ id_quiz: id, nisn: nisn }).single();
+
+
+
+
+
+        const { data: status, error: e2 } = await supabase.from('answer_status').select('*').match({ id_quiz: id, nisn: nisn }).single();
         // console.log({e2});
         // console.log({status});
-        const { data: quiz,error:e3 } = await supabase.from('quiz').select('waktu,id_kelas,id_tahun_ajaran').eq('id', id).single()
-        
-        const {data:getIdKelas} = await supabase.from('kelas_history').select('nisn,id_kelas').eq('nisn',nisn).eq('id_tahun_ajaran',quiz.id_tahun_ajaran).eq('id_kelas',quiz.id_kelas).single();
-        
-       if(getIdKelas?.id_kelas !== quiz?.id_kelas){
-        const {data:kelasName} = await supabase.from('kelas').select('kelas').eq('id',quiz.id_kelas).single();
-        return new Response(
-            JSON.stringify({
-                message: `anda tidak bisa mengerjakan kuis ini karena anda bukan siswa di kelas ${kelasName.kelas}`,
-            }),
-            { status: 401 }
-        );
-       }
+        const { data: quiz, error: e3 } = await supabase.from('quiz').select('waktu,id_kelas,id_tahun_ajaran,end_quiz').eq('id', id).single()
+
+        const { data: getIdKelas } = await supabase.from('kelas_history').select('nisn,id_kelas').eq('nisn', nisn).eq('id_tahun_ajaran', quiz.id_tahun_ajaran).eq('id_kelas', quiz.id_kelas).single();
+
+        if (!e3) {
+
+            const now = new Date();
+            const endQuizTime = new Date(quiz.end_quiz);
+
+            if (now > endQuizTime) {
+                return new Response(
+                    JSON.stringify({
+                        message: `Waktu Pengerjaan Kuis Sudah Berakhir !!!`,
+                    }),
+                    { status: 401 }
+                );
+            }
+        }
+        if (getIdKelas?.id_kelas !== quiz?.id_kelas) {
+            const { data: kelasName } = await supabase.from('kelas').select('kelas').eq('id', quiz.id_kelas).single();
+            return new Response(
+                JSON.stringify({
+                    message: `anda tidak bisa mengerjakan kuis ini karena anda bukan siswa di kelas ${kelasName.kelas}`,
+                }),
+                { status: 401 }
+            );
+        }
 
 
-        
+
         // console.log({e3})
 
 
@@ -120,7 +134,7 @@ export const GET = async ({ params, url,cookies }) => {
                 { status: 401 }
             );
         }
-        // console.log({ status })
+        console.log({ status })
         if (status) {
             // console.log("pengecekan waktu runn")
             const quizDurationMinutes = quiz.waktu; // Durasi waktu dalam menit
@@ -152,7 +166,7 @@ export const GET = async ({ params, url,cookies }) => {
             { status: 200 }
         );
     } catch (error) {
-        
+
         return new Response(
             JSON.stringify({
                 message: "Internal Server Error",

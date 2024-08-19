@@ -83,6 +83,7 @@ const SearchForm = ({ open, setIsOpen, setIdUser }) => {
                         id="search"
                         placeholder="Masukan Nama Lengkap Guru"
                         onChange={search}
+                        
                     />
                 </div>
                 {handleSearchUsers.isPending ? (
@@ -185,6 +186,7 @@ const Form = ({ mutate, isLoading, isEdit, currentData, updateGuru }) => {
                             className="col-span-3"
                             defaultValue={isEdit ? currentData.nip : ''}
                             onChange={handleChange}
+                            required
                         />
                     </div>
                     <div>
@@ -198,6 +200,7 @@ const Form = ({ mutate, isLoading, isEdit, currentData, updateGuru }) => {
                             className="col-span-3"
                             defaultValue={isEdit ? currentData.nama_lengkap : ''}
                             onChange={handleChange}
+                            required
                         />
                     </div>
                     <div>
@@ -210,6 +213,7 @@ const Form = ({ mutate, isLoading, isEdit, currentData, updateGuru }) => {
                             className="col-span-3"
                             defaultValue={isEdit ? currentData.alamat : ''}
                             onChange={handleChange}
+                            required
                         />
                     </div>
                     <div>
@@ -217,7 +221,7 @@ const Form = ({ mutate, isLoading, isEdit, currentData, updateGuru }) => {
                             Jenis Kelamin
                         </Label>
 
-                        <Select onValueChange={(e) => handleChange({ target: { name: "jenisKelamin", value: e } })} defaultValue={isEdit ? currentData.jenis_kelamin: ""}>
+                        <Select required onValueChange={(e) => handleChange({ target: { name: "jenisKelamin", value: e } })} defaultValue={isEdit ? currentData.jenis_kelamin: ""}>
                             <SelectTrigger className="w-full" >
                                 <SelectValue placeholder={'Jenis kelamin'} />
                             </SelectTrigger>
