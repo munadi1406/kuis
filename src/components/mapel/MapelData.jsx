@@ -192,6 +192,7 @@ const MapelData = () => {
                       type="text"
                       className="col-span-3"
                       onChange={(e) => setMapel(e.target.value)}
+                      required
                     />
                   </div>
                 </div>

@@ -179,6 +179,7 @@ const UsersData = () => {
                       type="email"
                       className="col-span-3"
                       onChange={handleChange}
+                      required
                     />
                   </div>
                   <div>
@@ -190,6 +191,7 @@ const UsersData = () => {
                       name="username"
                       className="col-span-3"
                       onChange={handleChange}
+                      required
                     />
                   </div>
                   <div>
@@ -202,6 +204,7 @@ const UsersData = () => {
                       type="password"
                       className="col-span-3"
                       onChange={handleChange}
+                      required
                     />
                   </div>
                   <div>
@@ -214,6 +217,7 @@ const UsersData = () => {
                       className="col-span-3"
                       onChange={handleChange}
                       name="passwordConfirm"
+                      required
                     />
                   </div>
                 </div>
