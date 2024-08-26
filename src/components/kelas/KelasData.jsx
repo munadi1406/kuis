@@ -192,6 +192,7 @@ const KelasData = () => {
                       type="text"
                       className="col-span-3"
                       onChange={(e) => setKelas(e.target.value)}
+                      required
                     />
                   </div>
                 </div>

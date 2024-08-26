@@ -128,21 +128,21 @@ const Form = ({ mutate, isLoading, isEdit, currentData, updateGuru }) => {
     // Debugging untuk memastikan data tersedia
     useEffect(() => {
         if (isEdit && currentData) {
-           
+            console.log(currentData)
             setFormData({
-                lastNisn: currentData.nisn,
+                lastNisn: currentData.siswa.nisn,
                 nisn: currentData.nisn,
-                namaLengkap: currentData.nama_lengkap,
-                alamat: currentData.alamat,
-                jenisKelamin: currentData.jenis_kelamin,
-                tanggalLahir: currentData.tanggal_lahir,
+                namaLengkap: currentData.siswa.nama_lengkap,
+                alamat: currentData.siswa.alamat,
+                jenisKelamin: currentData.siswa.jenis_kelamin,
+                tanggalLahir: currentData.siswa.tanggal_lahir,
                 idKelas: currentData.id_kelas,
-                idUser: currentData.detail_user?.id_user || null
+                idUser: currentData.siswa.detail_user?.id_user || null
             });
-            setUserData({ idUser: currentData.detail_user?.id_user, email: currentData.detail_user?.email })
+            setUserData({ idUser: currentData.siswa.detail_user?.id_user, email: currentData.siswa.detail_user?.email })
         }
     }, [isEdit, currentData]);
-    // Update idUser dalam formData ketika idUser berubah
+   
     useEffect(() => {
 
         if (userData.idUser) {
@@ -214,7 +214,7 @@ const Form = ({ mutate, isLoading, isEdit, currentData, updateGuru }) => {
                             name="namaLengkap"
                             type="text"
                             className="col-span-3"
-                            defaultValue={isEdit ? currentData.nama_lengkap : ''}
+                            defaultValue={isEdit ? formData.namaLengkap : ''}
                             onChange={handleChange}
                             required
                         />
@@ -228,7 +228,7 @@ const Form = ({ mutate, isLoading, isEdit, currentData, updateGuru }) => {
                             name="tanggalLahir"
                             type="date"
                             className="col-span-3"
-                            defaultValue={isEdit ? currentData.tanggal_lahir : ''}
+                            defaultValue={isEdit ? formData.tanggalLahir : ''}
                             onChange={handleChange}
                             required
                         />
@@ -241,7 +241,7 @@ const Form = ({ mutate, isLoading, isEdit, currentData, updateGuru }) => {
                             id="alamat"
                             name="alamat"
                             className="col-span-3"
-                            defaultValue={isEdit ? currentData.alamat : ''}
+                            defaultValue={isEdit ? formData.alamat : ''}
                             onChange={handleChange}
                             required
                         />
@@ -251,7 +251,7 @@ const Form = ({ mutate, isLoading, isEdit, currentData, updateGuru }) => {
                             Jenis Kelamin
                         </Label>
 
-                        <Select onValueChange={(e) => handleChange({ target: { name: "jenisKelamin", value: e } })} defaultValue={isEdit ? currentData.jenis_kelamin : ""} required>
+                        <Select onValueChange={(e) => handleChange({ target: { name: "jenisKelamin", value: e } })} value={isEdit ? formData.jenisKelamin : ""} required>
                             <SelectTrigger className="w-full" >
                                 <SelectValue placeholder={'Jenis kelamin'} />
                             </SelectTrigger>

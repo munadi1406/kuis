@@ -35,7 +35,7 @@ import {
   
   
   
-    const status = getStatus(data.startDate, data.endDate);
+    const status = getStatus(data.start_quiz, data.end_quiz);
     const truncateDesc = (desc, wordLimit) => {
       const words = desc.split(' ');
       if (words.length > wordLimit) {

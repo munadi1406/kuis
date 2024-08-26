@@ -111,7 +111,7 @@ export const POST = async ({ params, request, url }) => {
 
     return new Response(
       JSON.stringify({
-        message: "Mata Pelajaran Sudah Ada",
+        message: "Kelas Sudah Ada",
       }),
       { status: 409 }
     );
