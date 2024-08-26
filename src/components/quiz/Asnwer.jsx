@@ -221,7 +221,7 @@ const Asnwer = ({ id, time,nisnV }) => {
     return <div>Memuat Soal...</div>;
   }
   if(error){
-    return <AlertDialog id={id} msg={error.response.data.message} userId={nisn}/>
+    return <AlertDialog id={id} msg={error.response.data.message} userId={nisn} removeSes={removeSes}/>
   }
 
     
@@ -267,7 +267,7 @@ const Asnwer = ({ id, time,nisnV }) => {
     <div className="col-span-9 w-full rounded-md p-2 h-max">
       {isEnd && (
         
-       <AlertDialog id={id} msg={"Waktu Pengerjaan Sudah Habis !!!"} userId={nisn}/>
+       <AlertDialog id={id} msg={"Waktu Pengerjaan Sudah Habis !!!"} userId={nisn} removeSes={removeSes}/>
       )}
       <div className="sticky top-0 bg-white pt-2 border-b-2 border-blue-400">
         <div className="bg-blue-600/80 text-center w-full text-white rounded-full">

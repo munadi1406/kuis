@@ -52,10 +52,14 @@ const GuestForm = ({ id, nisn, token, data }) => {
   const day = ['minggu', 'senin', 'selasa', 'rabu', 'kamis', `jum'at`, 'sabtu']
 
 
-
-  const end_quiz = localTime(data.end_quiz);
-  const getDay = new Date(end_quiz).getDay()
-  const endQuiz = `${day[getDay]},${end_quiz}`
+ 
+  const [endQuiz,setEndQuiz] = useState()
+  useEffect(()=>{
+    const dy = new Date(data.end_quiz).getDay()
+    let oke = `${day[dy]},${localTime(data.end_quiz)}`
+    
+    setEndQuiz(oke)
+  },[data])
 
 
   return (
