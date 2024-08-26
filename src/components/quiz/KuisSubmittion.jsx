@@ -116,6 +116,22 @@ const KuisSubmittion = ({ id, title }) => {
 
   const columns = [
     {
+      accessorKey: 'nisn',
+      header: ({ column }) => {
+        return (
+          <div
+
+            onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+          >
+            NISN
+
+          </div>
+        )
+      },
+      cell: ({ row }) => <div className="Capitalize">{row.original.nisn}</div>,
+
+    },
+    {
       accessorKey: 'namaLengkap',
       header: ({ column }) => {
         return (
@@ -228,6 +244,10 @@ const KuisSubmittion = ({ id, title }) => {
                 </tr>
               </thead>
               <tbody>
+                <tr>
+                  <td className="border border-gray-300 p-2 text-gray-700">NISN</td>
+                  <td className="border border-gray-300 p-2 text-gray-700">{detailData.nisn}</td>
+                </tr>
                 <tr>
                   <td className="border border-gray-300 p-2 text-gray-700">Nama Lengkap</td>
                   <td className="border border-gray-300 p-2 text-gray-700">{detailData.namaLengkap}</td>
