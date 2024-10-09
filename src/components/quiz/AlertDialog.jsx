@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { buttonVariants } from "../ui/button";
 
-const AlertDialog = ({ id, msg, userId }) => {
+const AlertDialog = ({ id, msg, userId, removeSes }) => {
     return (
         <AlertDiaglogS open={true}>
             <AlertDialogContent>
@@ -23,6 +23,7 @@ const AlertDialog = ({ id, msg, userId }) => {
                 <AlertDialogFooter>
                     <a href={`/result/${id}/${userId}`} className={buttonVariants()} onClick={() => {
                         localStorage.removeItem(id)
+                        removeSes()
                     }}>
                         Lihat Nilai
                     </a>

@@ -16,27 +16,41 @@ import {
   DialogTrigger,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { Button } from "../ui/button";
+import { Button } from "../ui/button.jsx";
 import { useEffect, useState } from "react";
-import { Label } from "../ui/label";
-import { Input } from "../ui/input";
+import { Label } from "../ui/label.jsx";
+import { Input } from "../ui/input.jsx";
 import { useInfiniteQuery, useMutation, useQuery } from "@tanstack/react-query";
 import axios from "axios";
 import WithQuery from "@/utils/WithQuery";
-import { localTime } from "./../../utils/localTime.js";
+import { localTime } from "../../utils/localTime.js";
 import { toast } from "../ui/use-toast.js";
 import EditMapel from "./EditMapel.jsx";
 import { generatePdf } from "./generatePdf.js";
 import ButtonLoader from "../ButtonLoader.jsx";
-import Charts from "react-apexcharts";
 
-const KelasData = () => {
+const HpData = () => {
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [isDialogEditOpen, setIsDialogEditOpen] = useState(false);
   const [kelas, setKelas] = useState("");
   const [msg, setMsg] = useState("");
   const [currentData, setCurrentData] = useState({ id: 0, kelas: 0 });
   const [query, setQuery] = useState("");
+  const [hpData,setHpData] = useState()
+  const [foto,setFoto] = useState();
+
+
+  useEffect(()=>{
+    console.log(foto)
+  },[foto])
+  const handleChange = (e) => {
+    
+    const name = e.target.name;
+    setHpData((prev) => ({
+      ...prev,
+      [name]: e.target.value,
+    }));
+  };
 
   const {
     isLoading,
@@ -49,7 +63,7 @@ const KelasData = () => {
     queryKey: ["kelas"],
     queryFn: async ({ pageParam }) => {
       const response = await axios.get(
-        `/api/kelas?id=${pageParam || 0}&search=${query}`
+        `/api/hp?id=${pageParam || 0}&search=${query}`
       );
       return response.data;
     },
@@ -62,8 +76,17 @@ const KelasData = () => {
   const { mutate } = useMutation({
     mutationFn: async (e) => {
       e.preventDefault();
-      const createMapel = await axios.post("api/kelas", {
-        dataKelas: kelas,
+      const formData = new FormData()
+      formData.append('imei', hpData.imei)
+      formData.append('merk', hpData.merk)
+      formData.append('harga', hpData.harga)
+      formData.append('tanggal_pembuatan', hpData.tanggalPembuatan)
+      formData.append('foto',foto)
+
+      const createMapel = await axios.post("api/hp",formData,{
+        headers: {
+          'Content-Type':"mutipart/form-data"
+        }
       });
       return createMapel;
     },
@@ -72,7 +95,7 @@ const KelasData = () => {
       setIsDialogOpen(false);
       toast({
         title: "Berhasil",
-        description: `Mata Pelajaran Berhasil Di Tambahkan`,
+        description: `data hp Berhasil Di Tambahkan`,
       });
     },
     onError: (error) => {
@@ -80,28 +103,28 @@ const KelasData = () => {
       toast({
         title: "Gagal",
         variant: "destructive",
-        description: `Mata Pelajaran Gagal Di Tambahkan`,
+        description: `Data HP Gagal Di tambahkan`,
       });
     },
   });
   const deleteMapel = useMutation({
     mutationFn: async (id) => {
-      const isDelete = await axios.delete(`api/kelas?id=${id}`);
+      const isDelete = await axios.delete(`api/hp?id=${id}`);
       return isDelete;
     },
     onSuccess: (data) => {
       refetch();
       toast({
         title: "Berhasil",
-        description: `Mata Pelajaran Berhasil Di Hapus`,
+        description: `Data Hp Berhasil Di Hapus`,
       });
     },
     onError: (error) => {
-
+     
       toast({
         title: "Gagal",
         variant: "destructive",
-        description: `Mata Pelajaran Gagal Di Hapus`,
+        description: `Data Hp Gagal Di Hapus`,
       });
     },
   });
@@ -119,15 +142,15 @@ const KelasData = () => {
       setIsDialogEditOpen(false);
       toast({
         title: "Berhasil",
-        description: `Mata Pelajaran Berhasil Di Update`,
+        description: `data hp Berhasil Di Update`,
       });
     },
     onError: (error) => {
-
+     
       toast({
         title: "Gagal",
         variant: "destructive",
-        description: `Mata Pelajaran Gagal Di Update`,
+        description: `data hp Gagal Di Update`,
       });
     },
   });
@@ -135,7 +158,7 @@ const KelasData = () => {
   const search = (e) => {
     const query = e.target.value;
     if (query.length >= 1) {
-
+      
       if (searchTimeout) {
         clearTimeout(searchTimeout);
       }
@@ -150,100 +173,14 @@ const KelasData = () => {
   useEffect(() => {
     refetch();
   }, [query]);
-  const statKelas = useQuery({
-    queryKey: ["statKelas"],
-    queryFn: async () => {
-      const datas = await axios.get("/api/kelas/stat");
-      return datas.data.data;
-    },
-  });
-  console.log('statKelas', statKelas.data)
-  const [statKelasData, setStatKelasData] = useState({ labels: [], datas: [] })
-  useEffect(() => {
-    console.log('data kkelas oke')
-    console.log(statKelas?.data?.length)
-    if (statKelas.data) {
-      console.log("oke")
-      const labels = statKelas?.data.data.map((item) => item.kelas); // Mengambil nama kelas
-      console.log({ labels });
 
-      const datas = statKelas?.data.data.map((stat) => stat.totalSiswa); // Mengambil total siswa di setiap kelas
-
-      setStatKelasData({ labels, datas }); // Mengatur data ke state
-    }
-  }, [statKelas.data]);
-
-  if (isLoading || statKelas.isLoading) {
+  if (isLoading) {
     return <>Loading...</>;
   }
 
-
   return (
     <div>
-      <div className="w-full flex flex-wrap gap-2 md:justify-between items-end  border-b  p-2">
-        <div className="w-full pb-4">
-        <Charts
-  type="bar"
-  options={{
-    chart: {
-      type: 'bar',
-      height: 380
-    },
-    plotOptions: {
-      bar: {
-        columnWidth: '45%',
-        distributed: true, // Mengaktifkan warna berbeda untuk setiap bar
-        borderRadius: 10
-      }
-    },
-    colors: ['#33b2df', '#546E7A', '#FF5733', '#28B463', '#8E44AD', '#F4D03F'], // Warna berbeda untuk setiap bar
-    dataLabels: {
-      enabled: true
-    },
-    stroke: {
-      width: 1,
-      colors: ['#fff']
-    },
-    xaxis: {
-      categories: statKelasData.labels, // Menetapkan label (nama kelas)
-      position: 'top',
-      axisBorder: {
-        show: false
-      },
-      axisTicks: {
-        show: false
-      },
-    },
-    yaxis: {
-      axisBorder: {
-        show: false
-      },
-      axisTicks: {
-        show: false,
-      },
-      labels: {
-        show: true, // Menampilkan label Y-axis
-        formatter: function (val) {
-          return val; // Hanya menampilkan jumlah total siswa
-        }
-      }
-    },
-    title: {
-      text: `Grafik Siswa`,
-      align: 'center',
-      floating: true
-    },
-  }}
-  series={[
-    {
-      name: "Total Students", // Nama series
-      data: statKelasData.datas, // Data array untuk total siswa
-    },
-  ]}
-  height={350}
-/>
-
-        </div>
+      <div className="w-full flex justify-between items-end  border-b  p-2">
         <div>
           <Label htmlFor="search">Search</Label>
           <Input
@@ -257,12 +194,12 @@ const KelasData = () => {
           <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
             <DialogTrigger asChild>
               <Button variant="outline" onClick={() => setIsDialogOpen(true)}>
-                Buat Kelas
+                Tambah Data HP
               </Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-[425px]">
               <DialogHeader>
-                <DialogTitle>Buat kelas</DialogTitle>
+                <DialogTitle>Tambah Data HP</DialogTitle>
                 <DialogDescription className="text-red-600 text-xs">
                   {msg}
                 </DialogDescription>
@@ -270,15 +207,67 @@ const KelasData = () => {
               <form autoComplete="false" onSubmit={mutate} method="post">
                 <div className="grid gap-4 py-4">
                   <div>
+                    <Label htmlFor="imei" className="text-right">
+                     IMEI
+                    </Label>
+                    <Input
+                      id="imei"
+                      name="imei"
+                      type="text"
+                      className="col-span-3"
+                      onChange={(e) => handleChange(e)}
+                      required
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="merk" className="text-right">
+                     merk
+                    </Label>
+                    <Input
+                      id="merk"
+                      name="merk"
+                      type="text"
+                      className="col-span-3"
+                      onChange={(e) => handleChange(e)}
+                      required
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="harga" className="text-right">
+                     harga
+                    </Label>
+                    <Input
+                      id="harga"
+                      name="harga"
+                      type="number"
+                      className="col-span-3"
+                      onChange={(e) => handleChange(e)}
+                      required
+                    />
+                  </div>
+                  <div>
+                    <Label htmlFor="tanggalPembuatan" className="text-right">
+                     tanggal pembuatan
+                    </Label>
+                    <Input
+                      id="tanggalPembuatan"
+                      name="tanggalPembuatan"
+                      type="date"
+                      className="col-span-3"
+                      onChange={(e) => handleChange(e)}
+                      required
+                    />
+                  </div>
+                  <div>
                     <Label htmlFor="email" className="text-right">
-                      Kelas
+                     foto
                     </Label>
                     <Input
                       id="email"
-                      name="kelas"
-                      type="text"
+                      name="foto"
+                      type="file"
                       className="col-span-3"
-                      onChange={(e) => setKelas(e.target.value)}
+                      onChange={(e) => setFoto(e.target.files[0])}
                       required
                     />
                   </div>
@@ -302,10 +291,11 @@ const KelasData = () => {
         <TableHeader>
           <TableRow>
             <TableHead className="w-[100px]">No</TableHead>
-            <TableHead>Kelas</TableHead>
-            <TableHead>Laki-laki</TableHead>
-            <TableHead>Perempuan</TableHead>
-            <TableHead>Total Siswa</TableHead>
+            <TableHead>IMEI</TableHead>
+            <TableHead>Merk</TableHead>
+            <TableHead>Harga</TableHead>
+            <TableHead>Tanggal Pembuatan</TableHead>
+            <TableHead>Foto</TableHead>
             <TableHead>Created At</TableHead>
             <TableHead>Aksi</TableHead>
           </TableRow>
@@ -314,24 +304,25 @@ const KelasData = () => {
           {data.pages &&
             data.pages
               .flatMap((page) => page.data.data)
-              .map(({ created_at, id, kelas, totalLakiLaki, totalPerempuan, totalSiswa }, i) => (
-                <TableRow key={id}>
+              .map((e, i) => (
+                <TableRow key={e.id}>
                   <TableCell className="font-medium">{i + 1}</TableCell>
-                  <TableCell>{kelas}</TableCell>
-                  <TableCell>{totalLakiLaki}</TableCell>
-                  <TableCell>{totalPerempuan}</TableCell>
-                  <TableCell>{totalSiswa}</TableCell>
-                  <TableCell>{localTime(created_at)}</TableCell>
+                  <TableCell>{e.imei}</TableCell>
+                  <TableCell>{e.merk}</TableCell>
+                  <TableCell>{e.harga}</TableCell>
+                  <TableCell>{e.tanggal_pembuatan}</TableCell>
+                  <TableCell><img src={e.foto} width={20}/></TableCell>
+                  <TableCell>{localTime(e.created_at)}</TableCell>
                   <TableCell className="flex items-center gap-2 flex-wrap">
                     <Button
                       onClick={() => {
                         setIsDialogEditOpen(true),
-                          setCurrentData({ id, kelas });
+                          setCurrentData(e);
                       }}
                     >
                       Edit
                     </Button>
-                    <Button onClick={() => deleteMapel.mutate(id)} variant="destructive">
+                    <Button onClick={() => deleteMapel.mutate(e.id)} variant="destructive">
                       Hapus
                     </Button>
                   </TableCell>
@@ -357,4 +348,4 @@ const KelasData = () => {
   );
 };
 
-export default WithQuery(KelasData);
+export default WithQuery(HpData);
