@@ -51,7 +51,7 @@ export const GET = async ({ params, url }) => {
     );
   }
 
-  
+
   let statLaki = supabase
     .from("kelas_history")
     .select(`id,id_kelas,siswa!inner(jenis_kelamin),tahun_ajaran(nama)`, { count: "exact" })
@@ -71,7 +71,7 @@ export const GET = async ({ params, url }) => {
   const { error: maleError, data: statData } = await statLaki
   let maleCount = 0;
   let femaleCount = 0;
- 
+
 
   statData.forEach((item) => {
     if (item.siswa.jenis_kelamin === "Laki-laki") {
@@ -82,7 +82,7 @@ export const GET = async ({ params, url }) => {
   });
 
   if (maleError) {
-    
+
 
     return new Response(
       JSON.stringify({
@@ -99,7 +99,7 @@ export const GET = async ({ params, url }) => {
   };
   const genderArray = Object.entries(genderStats).map(([gender, count]) => {
     return { gender, count };
-});
+  });
 
   let lastId = null;
 
@@ -111,7 +111,7 @@ export const GET = async ({ params, url }) => {
     lastId,
     data,
     perPage,
-    genderStats:genderArray, // Tambahkan statistik jenis kelamin ke payload
+    genderStats: genderArray, // Tambahkan statistik jenis kelamin ke payload
   };
 
   if (data) {
@@ -135,7 +135,7 @@ export const GET = async ({ params, url }) => {
 
 
 export const POST = async ({ params, request, url }) => {
-  const { nisn, idUser, namaLengkap, alamat, jenisKelamin, tanggalLahir, idKelas } = await request.json();
+  const { nisn, idUser, namaLengkap, alamat, jenisKelamin, tanggalLahir, idKelas, noTelepon, noTeleponOrtu } = await request.json();
 
   const { data: activeTahunAjaran, error: tahunAjaranError } = await supabase
     .from("tahun_ajaran")
@@ -154,7 +154,7 @@ export const POST = async ({ params, request, url }) => {
   }
   const { data: siswaData, error: siswaError } = await supabase
     .from("siswa")
-    .insert([{ nisn, id_user: idUser, nama_lengkap: namaLengkap, alamat, jenis_kelamin: jenisKelamin, tanggal_lahir: tanggalLahir, id_kelas: idKelas }])
+    .insert([{ nisn, id_user: idUser, nama_lengkap: namaLengkap, alamat, jenis_kelamin: jenisKelamin, tanggal_lahir: tanggalLahir, id_kelas: idKelas, no_hp: noTelepon, no_hp_ortu: noTeleponOrtu }])
     .select();
 
   if (siswaError) {
@@ -217,6 +217,7 @@ export const PUT = async ({ params, request, url }) => {
       jenisKelamin,
       tanggalLahir,
       idKelas,
+      noTelepon, noTeleponOrtu
     } = await request.json();
 
 
@@ -373,6 +374,7 @@ export const PUT = async ({ params, request, url }) => {
         jenis_kelamin: jenisKelamin,
         tanggal_lahir: tanggalLahir,
         id_kelas: idKelas,
+        no_hp: noTelepon, no_hp_ortu: noTeleponOrtu
       })
       .eq("nisn", lastNisn)
       .select();

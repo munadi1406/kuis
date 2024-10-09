@@ -7,7 +7,7 @@ export const auth = defineMiddleware(async (context, next) => {
   const { request } = context;
   const url = new URL(request.url);
 
-  const protectedPaths = ["/dashboard", "/profile", "/feedback", "/log", "/kuis", "/createKuis", "/history", "/users", "/mapel", "/kelas", "/laporan", "/progres", "/guru", "/siswa", "/analize", "/tahunajaran", "/edit"];
+  const protectedPaths = ["/dashboard", "/profile", "/feedback", "/log", "/kuis", "/createKuis", "/history", "/users", "/mapel", "/kelas", "/laporan", "/progres", "/guru", "/siswa", "/analize", "/tahunajaran", "/edit",'/hp'];
   const isProtectedPath = protectedPaths.some(path => url.pathname === path || url.pathname.startsWith(`${path}/`));
 
   if (isProtectedPath) {

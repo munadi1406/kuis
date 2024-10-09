@@ -122,7 +122,10 @@ const Form = ({ mutate, isLoading, isEdit, currentData, updateGuru }) => {
         alamat: '',
         jenisKelamin: '',
         idKelas: 0,
-        idUser: null
+        idUser: null,
+        noTelepon:'',
+        noTeleponOrtu:''
+
     });
 
     // Debugging untuk memastikan data tersedia
@@ -137,7 +140,9 @@ const Form = ({ mutate, isLoading, isEdit, currentData, updateGuru }) => {
                 jenisKelamin: currentData.siswa.jenis_kelamin,
                 tanggalLahir: currentData.siswa.tanggal_lahir,
                 idKelas: currentData.id_kelas,
-                idUser: currentData.siswa.detail_user?.id_user || null
+                idUser: currentData.siswa.detail_user?.id_user || null,
+                noTelepon:currentData.siswa.no_hp || null,
+                noTeleponOrtu:currentData.siswa.no_hp_ortu || null,
             });
             setUserData({ idUser: currentData.siswa.detail_user?.id_user, email: currentData.siswa.detail_user?.email })
         }
@@ -286,6 +291,35 @@ const Form = ({ mutate, isLoading, isEdit, currentData, updateGuru }) => {
                             </Select>
                         )}
 
+                    </div>
+                    <div>
+                        <Label htmlFor="noTelepon" className="text-right">
+                            No Telepon
+                        </Label>
+                        <Input
+                            id="noTelepon"
+                            name="noTelepon"
+                            type="text"
+                            className="col-span-3"
+                            defaultValue={isEdit ? formData.noTelepon : ''}
+                            onChange={handleChange}
+                            placeholder="Isi Jika Ada"
+                        />
+                    </div>
+                    <div>
+                        <Label htmlFor="noTeleponOrtu" className="text-right">
+                            No Telepon Orang Tua
+                        </Label>
+                        <Input
+                            id="noTeleponOrtu"
+                            name="noTeleponOrtu"
+                            type="text"
+                            className="col-span-3"
+                            defaultValue={isEdit ? formData.noTeleponOrtu : ''}
+                            onChange={handleChange}
+                            placeholder="Isi Jika Ada"
+
+                        />
                     </div>
                     {isEdit && (
                         <div className="space-y-2">

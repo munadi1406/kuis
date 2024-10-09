@@ -83,6 +83,9 @@ export default function Navbar({ data, role, path, roleUser }) {
                             <a href="/siswa">
                               <DropdownMenuItem>Siswa</DropdownMenuItem>
                             </a>
+                            {/* <a href="/hp">
+                              <DropdownMenuItem>HP</DropdownMenuItem>
+                            </a> */}
 
                           </DropdownMenuContent>
                         </DropdownMenu>

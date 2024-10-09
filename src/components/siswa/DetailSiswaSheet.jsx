@@ -50,6 +50,14 @@ const DetailSiswaSheet = ({ open, setOpen, data,getKelasName }) => {
                                 <td className="border border-gray-300 p-2 text-gray-700">{data?.siswa?.jenis_kelamin}</td>
                             </tr>
                             <tr>
+                                <td className="border border-gray-300 p-2 text-gray-700">No Telepon</td>
+                                <td className="border border-gray-300 p-2 text-gray-700">{data?.siswa?.no_hp}</td>
+                            </tr>
+                            <tr>
+                                <td className="border border-gray-300 p-2 text-gray-700">No Telepon Orang Tua</td>
+                                <td className="border border-gray-300 p-2 text-gray-700">{data?.siswa?.no_hp_ortu}</td>
+                            </tr>
+                            <tr>
                                 <td className="border border-gray-300 p-2 text-gray-700">Created At</td>
                                 <td className="border border-gray-300 p-2 text-gray-700">{localTime(data?.siswa?.created_at)}</td>
                             </tr>

@@ -285,7 +285,7 @@ const SiswaData = ({ role }) => {
                             },
                         ]}
                         height={350} />
-                </div>
+                </div> 
                 <div className="grid md:grid-cols-4 gap-2 grid-cols-2">
                     <div>
                         <Label htmlFor="search">Search</Label>
