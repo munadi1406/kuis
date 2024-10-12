@@ -12,13 +12,21 @@ export default defineConfig({
   },
   integrations: [tailwind({
     applyBaseStyles: false
-  }),react({
+  }), react({
     include: ['**/react/*'],
     experimentalReactChildren: true,
   }),],
   output: "server",
-  adapter: vercel(), 
-   
+  adapter: vercel({
+    isr: {
+      bypassToken: "maskdmkasd01293012309120390123asdasdmk", // Untuk mem-bypass cache
+      exclude: [
+          "/api/**",     // Mengecualikan seluruh rute di bawah /api
+          "/siswa/**"    // Mengecualikan seluruh rute di bawah /siswa
+      ]
+  }
+  })
+
 });
 
 // testt
