@@ -17,11 +17,7 @@ export default defineConfig({
     experimentalReactChildren: true,
   }),],
   output: "server",
-  adapter: vercel({
-    isr: {
-      bypassToken: "maskdmkasd01293012309120390123asdasdmk", // Untuk mem-bypass cache
-  }
-  })
+  adapter: vercel()
 
 });
 
