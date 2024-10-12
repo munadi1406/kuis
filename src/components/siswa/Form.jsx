@@ -299,7 +299,7 @@ const Form = ({ mutate, isLoading, isEdit, currentData, updateGuru }) => {
                         <Input
                             id="noTelepon"
                             name="noTelepon"
-                            type="text"
+                            type="number"
                             className="col-span-3"
                             defaultValue={isEdit ? formData.noTelepon : ''}
                             onChange={handleChange}
@@ -313,12 +313,11 @@ const Form = ({ mutate, isLoading, isEdit, currentData, updateGuru }) => {
                         <Input
                             id="noTeleponOrtu"
                             name="noTeleponOrtu"
-                            type="text"
+                            type="number"
                             className="col-span-3"
                             defaultValue={isEdit ? formData.noTeleponOrtu : ''}
                             onChange={handleChange}
                             placeholder="Isi Jika Ada"
-
                         />
                     </div>
                     {isEdit && (

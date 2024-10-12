@@ -133,7 +133,20 @@ export const GET = async ({ params, url }) => {
   }
 };
 
-
+const formatPhoneNumber = (phone) => {
+  // Remove any spaces and check if it starts with +62, if not, add +62
+  let formattedPhone = phone.replace(/\s+/g, ''); // Remove spaces
+  if (!formattedPhone.startsWith("+62")) {
+    if (formattedPhone.startsWith("0")) {
+      // Replace leading 0 with +62
+      formattedPhone = "+62" + formattedPhone.substring(1);
+    } else {
+      // Add +62 if no leading 0
+      formattedPhone = "+62" + formattedPhone;
+    }
+  }
+  return formattedPhone;
+};
 export const POST = async ({ params, request, url }) => {
   const { nisn, idUser, namaLengkap, alamat, jenisKelamin, tanggalLahir, idKelas, noTelepon, noTeleponOrtu } = await request.json();
 
@@ -154,7 +167,7 @@ export const POST = async ({ params, request, url }) => {
   }
   const { data: siswaData, error: siswaError } = await supabase
     .from("siswa")
-    .insert([{ nisn, id_user: idUser, nama_lengkap: namaLengkap, alamat, jenis_kelamin: jenisKelamin, tanggal_lahir: tanggalLahir, id_kelas: idKelas, no_hp: noTelepon, no_hp_ortu: noTeleponOrtu }])
+    .insert([{ nisn, id_user: idUser, nama_lengkap: namaLengkap, alamat, jenis_kelamin: jenisKelamin, tanggal_lahir: tanggalLahir, id_kelas: idKelas, no_hp: formatPhoneNumber(noTelepon), no_hp_ortu: formatPhoneNumber(noTeleponOrtu) }])
     .select();
 
   if (siswaError) {
@@ -374,7 +387,7 @@ export const PUT = async ({ params, request, url }) => {
         jenis_kelamin: jenisKelamin,
         tanggal_lahir: tanggalLahir,
         id_kelas: idKelas,
-        no_hp: noTelepon, no_hp_ortu: noTeleponOrtu
+        no_hp: formatPhoneNumber(noTelepon), no_hp_ortu: formatPhoneNumber(noTeleponOrtu)
       })
       .eq("nisn", lastNisn)
       .select();
