@@ -20,10 +20,6 @@ export default defineConfig({
   adapter: vercel({
     isr: {
       bypassToken: "maskdmkasd01293012309120390123asdasdmk", // Untuk mem-bypass cache
-      exclude: [
-          "/api/**",     // Mengecualikan seluruh rute di bawah /api
-          "/siswa/**"    // Mengecualikan seluruh rute di bawah /siswa
-      ]
   }
   })
 
