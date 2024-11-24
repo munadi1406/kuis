@@ -3,30 +3,44 @@ import Layout from "@/layouts/Layout.astro";
 import { supabase } from "@/lib/supabase";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import CardCount from "@/components/result/CardCount";
-import HtmlRender from '@/utils/HtmlRender'
+import HtmlRender from "@/utils/HtmlRender";
 
 const { id, userId } = Astro.params;
 
+// Fetch quiz details with correct options
 const {
   count,
   data: quiz,
   error: err,
 } = await supabase
   .from("quiz")
-  .select(`title,questions(question,id,options(option_is_true,option,id))`)
-  .eq("questions.options.option_is_true", true)
+  .select(`title,kkm,questions(question,id,options(option_is_true,option,id))`)
   .eq("id", id)
   .single();
-// console.log(quiz);
-// console.log(err);
-const { data: answers, error } = await supabase
+
+// Fetch user's answers for the quiz
+const { data: answers, error: answerError } = await supabase
   .from("answers")
   .select(`*, options(*)`)
   .eq("id_quiz", id)
   .eq("nisn", userId);
+
+// Fetch user's history from nilai_history
+const { data: nilaiHistory, error: historyError } = await supabase
+  .from("nilai_history")
+  .select(`attempt_no, score, answers`)
+  .eq("id_quiz", id)
+  .eq("nisn", userId);
+
+// Parse JSONB `answers` field
+nilaiHistory.forEach((attempt) => {
+  if (typeof attempt.answers === "string") {
+    attempt.answers = JSON.parse(attempt.answers);
+  }
+});
+
 const getQuizScore = async () => {
-  if (error) {
-    // console.error("Error fetching answers:", error);
+  if (answerError) {
     return { score: 0, totalQuestions: 0, correctAnswers: 0 };
   }
 
@@ -34,7 +48,8 @@ const getQuizScore = async () => {
   const correctAnswers = answers.filter(
     (answer) => answer.options.option_is_true,
   );
-  // console.log(count);
+  // console.log(answers)
+
   // Calculate score
   const totalQuestions = quiz.questions.length;
   const score = (correctAnswers.length / totalQuestions) * 100;
@@ -43,10 +58,11 @@ const getQuizScore = async () => {
 };
 
 const { score, totalQuestions, correctAnswers } = await getQuizScore();
+const KKM = quiz.kkm
 ---
-
 <Layout title={quiz.title}>
   <div class="p-2 space-y-2">
+    {/* Quiz Overview */}
     <Card>
       <CardHeader>
         <CardTitle>{quiz.title}</CardTitle>
@@ -54,50 +70,136 @@ const { score, totalQuestions, correctAnswers } = await getQuizScore();
       <CardContent>
         <div class="grid md:grid-cols-3 grid-cols-1 gap-2">
           <CardCount title={"Total Soal"} value={totalQuestions} />
+          <CardCount title={"Total Jawaban Yang Benar"} value={correctAnswers} />
           <CardCount
-            title={"Total Jawaban Yang Benar"}
-            value={correctAnswers}
+            title={"Nilai"}
+            value={
+              nilaiHistory.length > 0 && score > KKM
+                ? `${KKM.toFixed(2)} (Max karena remedial)`
+                : score.toFixed(2)
+            }
           />
-          <CardCount title={"Nilai"} value={score.toFixed(2)} />
         </div>
+        {nilaiHistory.length > 0 && score > KKM && (
+          <p class="text-red-500 font-semibold mt-2">
+            Nilai ini dibatasi maksimal KKM ({KKM}) karena siswa telah melakukan remedial.
+          </p>
+        )}
       </CardContent>
     </Card>
-  </div>
-  <div class="my-2">
-    <table
-      class="border-collapse table-auto border-slate-500 w-full rounded-md"
-    >
-      <thead>
-        <tr>
-          <th class="border font-semibold text-base bg-blue2"> Soal </th>
-          <th class="border font-semibold text-base bg-blue2">
-            Jawaban Yang Benar
-          </th>
-          <th class="border font-semibold text-base bg-blue2">
-            Jawaban Anda
-          </th>
-        </tr>
-      </thead>
-      <tbody>
-        {quiz && quiz.questions && quiz.questions.map((e, i) => {
-          const userAnswer = answers.find(ans => ans.id_question === e.id);
-          const correctOption = e.options.find(opt => opt.option_is_true);
-          return (
+
+    {/* Table for Current Answers */}
+    <Card>
+      <CardHeader>
+        <CardTitle>Jawaban Siswa (Saat Ini)</CardTitle>
+      </CardHeader>
+      <CardContent>
+        <table class="w-full text-left border-collapse">
+          <thead>
             <tr>
-              <td class="p-2">
-                <HtmlRender data={e.question} />
-              </td>
-              <td class="text-center bg-green-300">
-                {correctOption ? correctOption.option : "Tidak ada jawaban benar"}
-              </td>
-              <td class={`text-center ${userAnswer && userAnswer.options.option_is_true ? "bg-green-300" : "bg-red-300"}`}>
-                {userAnswer ? userAnswer.options.option : "Tidak ada jawaban"}
-              </td>
+              <th class="border px-4 py-2">Soal</th>
+              <th class="border px-4 py-2">Jawaban Benar</th>
+              <th class="border px-4 py-2">Jawaban Anda</th>
             </tr>
-          );
-        })}
-      </tbody>
-    </table>
-    <!-- {console.log(answers)} -->
+          </thead>
+          <tbody>
+            {quiz.questions.map((question, index) => {
+              const userAnswer = answers.find((ans) => ans.id_question === question.id);
+              const correctOption = question.options.find((opt) => opt.option_is_true);
+              // console.log(correctOption)
+
+              return (
+                <tr key={index}>
+                  <td class="border px-4 py-2">
+                    <HtmlRender data={question.question} />
+                  </td>
+                  <td class="border px-4 py-2 bg-green-300">
+                    {correctOption ? correctOption.option : "Tidak ada jawaban benar"}
+                  </td>
+                  <td
+                    class={`border px-4 py-2 ${
+                      userAnswer && userAnswer.options.option_is_true
+                        ? "bg-green-300"
+                        : "bg-red-300"
+                    }`}>
+                    {userAnswer ? userAnswer.options.option : "Tidak ada jawaban"}
+                  </td>
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+      </CardContent>
+    </Card>
+
+    {/* Attempt History */}
+    {nilaiHistory.map((attempt, attemptIndex) => {
+      const totalCorrectAnswers = Array.isArray(attempt.answers)
+        ? attempt.answers.filter((ans) => ans.option_is_true).length
+        : 0;
+
+      const attemptData = quiz.questions.map((question) => {
+        const userAnswer = Array.isArray(attempt.answers)
+          ? attempt.answers.find((ans) => ans.id_question === question.id)
+          : null;
+        const correctOption = question.options.find((opt) => opt.option_is_true);
+
+        return {
+          question: question.question,
+          correctOption: correctOption ? correctOption.option : "Tidak ada jawaban benar",
+          userOption: userAnswer
+            ? question.options.find((opt) => opt.id === userAnswer.id_option)?.option
+            : "Tidak ada jawaban",
+          isCorrect: userAnswer ? userAnswer.option_is_true : false,
+        };
+      });
+
+      return (
+        <Card key={attemptIndex}>
+          <CardHeader>
+            <CardTitle>{`Attempt ${attempt.attempt_no || attemptIndex + 1}`}</CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div class="grid md:grid-cols-3 grid-cols-1 gap-2">
+              <CardCount title={"Total Soal"} value={quiz.questions.length} />
+              <CardCount title={"Jawaban Benar"} value={totalCorrectAnswers} />
+              <CardCount title={"Nilai"} value={attempt.score?.toFixed(2) || "0.00"} />
+            </div>
+            <div class="my-4">
+              <table class="w-full text-left border-collapse">
+                <thead>
+                  <tr>
+                    <th class="border px-4 py-2">Soal</th>
+                    <th class="border px-4 py-2">Jawaban Benar</th>
+                    <th class="border px-4 py-2">Jawaban Anda</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {attemptData.map((data, index) => (
+                    <tr key={index}>
+                      <td class="border px-4 py-2">
+                        <HtmlRender data={data.question} />
+                      </td>
+                      <td class="border px-4 py-2 bg-green-300">
+                        {data.correctOption}
+                      </td>
+                      <td
+                        class={`border px-4 py-2 ${
+                          data.isCorrect ? "bg-green-300" : "bg-red-300"
+                        }`}>
+                        {data.userOption}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </CardContent>
+        </Card>
+      );
+    })}
   </div>
 </Layout>
+
+
+

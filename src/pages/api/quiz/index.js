@@ -12,7 +12,7 @@ const generateCustomToken = (length = 12) => {
 export const POST = async ({ params, request, url }) => {
   const datasss = await request.json();
   
-  const { title, desc, duration, startDate, endDate, token, soalData, mapel, kelas, id_user } = datasss.data
+  const { title, desc,kkm, duration, startDate, endDate, token, soalData, mapel, kelas, id_user } = datasss.data
   let quizId;
   let insertedQuestionIds = [];
 
@@ -56,7 +56,7 @@ export const POST = async ({ params, request, url }) => {
 
     const { data: quizData, error: quizError } = await supabase
       .from("quiz")
-      .insert({ title, desc, start_quiz: startDate, end_quiz: endDate, token:finalToken, id_mapel: mapel, id_kelas: kelas, waktu: duration, id_user: id_user ,id_tahun_ajaran:activeTahunAjaran.id})
+      .insert({ title, desc,kkm, start_quiz: startDate, end_quiz: endDate, token:finalToken, id_mapel: mapel, id_kelas: kelas, waktu: duration, id_user: id_user ,id_tahun_ajaran:activeTahunAjaran.id})
       .select();
 
     if (quizError) throw new Error(`Quiz insert error: ${quizError.message}`);
@@ -131,7 +131,7 @@ export const POST = async ({ params, request, url }) => {
 export const PUT = async ({ params, request, url }) => {
   const datasss = await request.json();
   
-  const { title, desc, duration, startDate, endDate, token, soalData, mapel, kelas, id_user } = datasss.data;
+  const { title, kkm,desc, duration, startDate, endDate, token, soalData, mapel, kelas, id_user } = datasss.data;
   let quizId = datasss.data.id; // Assuming the quiz ID is provided for updating
   let insertedQuestionIds = [];
   let existingQuestionIds = [];
@@ -185,7 +185,7 @@ export const PUT = async ({ params, request, url }) => {
     }
     const { error: quizUpdateError } = await supabase
       .from("quiz")
-      .update({ title, desc, start_quiz: startDate, end_quiz: endDate, id_mapel: mapel, id_kelas: kelas, waktu: duration, id_user: id_user ,token})
+      .update({ title, desc,kkm, start_quiz: startDate, end_quiz: endDate, id_mapel: mapel, id_kelas: kelas, waktu: duration, id_user: id_user ,token})
       .eq('id', quizId);
 
     if (quizUpdateError) throw new Error(`Quiz update error: ${quizUpdateError.message}`);
@@ -254,7 +254,7 @@ export const PUT = async ({ params, request, url }) => {
       { status: 200 }
     );
   } catch (error) {
-    console.log(error)
+    // console.log(error)
     console.error('Transaction error:', error.message);
 
     // Rollback operations if necessary

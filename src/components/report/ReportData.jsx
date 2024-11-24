@@ -64,9 +64,9 @@ const ReportData = ({ idUser }) => {
     useEffect(() => {
         if (reportChecked.length > 0) {
             reset()
-            
+
             mutate()
-        }else{
+        } else {
             setScoreData([])
         }
     }, [reportChecked])
@@ -91,6 +91,7 @@ const ReportData = ({ idUser }) => {
                 acc[quiz.quizId] = {
                     totalQuestions: quiz.totalQuestions,
                     quizId: quiz.quizId,
+                    kkm: quiz.kkm,
                     title: quiz.title,
                     users: quiz.users
                 };
@@ -173,7 +174,7 @@ const ReportData = ({ idUser }) => {
             </div>
 
             <div className="my-5 grid md:grid-cols-6 grid-cols-3">
-                {data?.data && data.data.map(({ id, title, kelas: { kelas }, mapel: { mapel },tahun_ajaran:{nama} }) => (
+                {data?.data && data.data.map(({ id, title, kelas: { kelas }, mapel: { mapel }, tahun_ajaran: { nama } }) => (
                     <div className="items-top flex space-x-2" key={id}>
                         <Checkbox
                             id={id}
@@ -188,19 +189,19 @@ const ReportData = ({ idUser }) => {
                                 {title}
                             </label>
                             <p className="text-sm text-muted-foreground">
-                                Kelas : {kelas} 
+                                Kelas : {kelas}
                             </p>
                             <p className="text-sm text-muted-foreground">
-                                Mapel : {mapel} 
+                                Mapel : {mapel}
                             </p>
                             <p className="text-sm text-muted-foreground">
-                                Tahun Ajaran : {nama} 
+                                Tahun Ajaran : {nama}
                             </p>
                         </div>
                     </div>
                 ))}
             </div>
-            <Button onClick={() => reportQuiz(quizzesMap, sortedUsers,getKelasName(option.kelas),data)} disabled={reportChecked.length <= 0}>Cetak</Button>
+            <Button onClick={() => reportQuiz(quizzesMap, sortedUsers, getKelasName(option.kelas), data)} disabled={reportChecked.length <= 0}>Cetak</Button>
             {scoreData.length > 0 && (
                 <Table>
                     <TableCaption>Rekap Nilai</TableCaption>
@@ -222,12 +223,18 @@ const ReportData = ({ idUser }) => {
                             let totalScore = 0;
                             let totalQuizzes = 0;
 
-                            quizzesMap.forEach(({ quizId, totalQuestions, users }) => {
+                            quizzesMap.forEach(({ quizId, totalQuestions, kkm, users }) => {
                                 const score = users.find(e => e.nisn === user.nisn);
-                              
+
                                 if (score) {
-                                  
-                                    totalScore += (score.score / totalQuestions) * 100;
+                                    totalScore += totalQuestions > 0
+                                        ? (score.hasRemedial && ((score.score / totalQuestions) * 100) >= kkm
+                                            ? Number(kkm)
+                                            : (score.score / totalQuestions) * 100)
+                                        : 0;
+                                    // console.log({ totalScore })
+                                    // console.log(((score.score / totalQuestions) * 100) > kkm)
+                                    // console.log({ kkm })
                                 }
                                 totalQuizzes += 1;
                             });
@@ -252,10 +259,12 @@ const ReportData = ({ idUser }) => {
                                 <TableRow key={user.nisn}>
                                     <TableCell>{index + 1}</TableCell>
                                     <TableCell>{user.namaLengkap}</TableCell>
-                                    {quizzesMap.map(({ quizId, totalQuestions, users }) => {
+                                    {quizzesMap.map(({ quizId, totalQuestions,kkm, users }) => {
                                         const score = users.find(e => e.nisn === user.nisn);
                                         const percentage = score
-                                            ? ((score.score / totalQuestions) * 100).toFixed(1)
+                                            ? score.hasRemedial && ((score.score / totalQuestions) * 100) > kkm
+                                                ? Number(kkm).toFixed(1)
+                                                : ((score.score / totalQuestions) * 100).toFixed(1)
                                             : '0.0';
 
                                         return (

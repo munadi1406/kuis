@@ -131,7 +131,7 @@ const Form = ({ mutate, isLoading, isEdit, currentData, updateGuru }) => {
     // Debugging untuk memastikan data tersedia
     useEffect(() => {
         if (isEdit && currentData) {
-            console.log(currentData)
+            // console.log(currentData)
             setFormData({
                 lastNisn: currentData.siswa.nisn,
                 nisn: currentData.nisn,

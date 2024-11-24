@@ -22,7 +22,7 @@ import EditorInput from "../EditorInput";
 import { toast } from "../ui/use-toast";
 import ButtonLoader from "../ButtonLoader";
 
-const CreateQuiz = ({idUser}) => {
+const CreateQuiz = ({ idUser }) => {
   const [jumlahSoal, setJumlahSoal] = useState(1);
   const [jumlahOpsiJawaban, setJumlahOpsiJawaban] = useState(4);
   const [judul, setJudul] = useState("");
@@ -30,6 +30,7 @@ const CreateQuiz = ({idUser}) => {
   const [duration, setDuration] = useState(0);
   const [startQuiz, setStartQuiz] = useState("");
   const [endQuiz, setEndQuiz] = useState("");
+  const [kkm,setKkm] = useState(80)
   const [option, setOption] = useState({
     mapel: 0,
     kelas: 0,
@@ -147,6 +148,7 @@ const CreateQuiz = ({idUser}) => {
         endDate: endQuiz,
         token,
         soalData,
+        kkm,
         ...option
       };
       // console.log(dataPayload)
@@ -267,14 +269,14 @@ const CreateQuiz = ({idUser}) => {
           </div>
           <div className="w-full gap-1.5">
             <Label htmlFor="Deskripsi">Deskripsi Quiz</Label>
-            <Textarea id="Deskripsi" onChange={(e) => setDeskripsi(e.target.value)} />
+            <Textarea id="Deskripsi" onChange={(e) => setDeskripsi(e.target.value)} required/>
           </div>
 
 
 
           <div className="w-full gap-1.5">
             <Label htmlFor="mapel">Pilih Mata Pelajaran</Label>
-            <Select id="mapel" name="mapel" disabled={dataMapel.isLoading} value={option.mapel === 0 ? "" : option.mapel} onValueChange={(e) => handleSelectChange({ target: { name: "mapel", value: e } })}>
+            <Select id="mapel" name="mapel" disabled={dataMapel.isLoading} value={option.mapel === 0 ? "" : option.mapel} onValueChange={(e) => handleSelectChange({ target: { name: "mapel", value: e } })} required>
               <SelectTrigger className="w-full" >
                 <SelectValue placeholder="Mata Pelajaran" />
               </SelectTrigger>
@@ -288,7 +290,7 @@ const CreateQuiz = ({idUser}) => {
           </div>
           <div className="w-full gap-1.5">
             <Label htmlFor="Deskripsi">Kelas</Label>
-            <Select disabled={dataKelas.isLoading} value={option.kelas === 0 ? "" : option.kelas} onValueChange={(e) => handleSelectChange({ target: { name: "kelas", value: e } })}>
+            <Select required={true} disabled={dataKelas.isLoading} value={option.kelas === 0 ? "" : option.kelas} onValueChange={(e) => handleSelectChange({ target: { name: "kelas", value: e } })}>
               <SelectTrigger className="w-full">
                 <SelectValue placeholder="Pilih Kelas" />
               </SelectTrigger>
@@ -358,7 +360,8 @@ const CreateQuiz = ({idUser}) => {
             required={true}
             id="date1"
             onChange={handleDateChange}
-            value={startQuiz ? new Date(startQuiz).toISOString().slice(0, 16) : ""}
+            // Konversi ke waktu lokal
+            value={startQuiz ? new Date(new Date(startQuiz).getTime() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 16) : ""}
           />
         </div>
         <div className="w-full gap-1.5">
@@ -368,7 +371,8 @@ const CreateQuiz = ({idUser}) => {
             required={true}
             id="date2"
             onChange={handleDateChange}
-            value={endQuiz ? new Date(endQuiz).toISOString().slice(0, 16) : ""}
+            // Konversi ke waktu lokal
+            value={endQuiz ? new Date(new Date(endQuiz).getTime() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 16) : ""}
           />
         </div>
         <div className="w-full gap-1.5">
@@ -380,6 +384,18 @@ const CreateQuiz = ({idUser}) => {
             required={true}
             onChange={(e) => setDuration(e.target.value)}
             id="lamaPengerjaan"
+          />
+        </div>
+        <div className="w-full gap-1.5">
+          <Label htmlFor="kkm">KKM</Label>
+          <Input
+            type={"number"}
+            label={"Lama Pengerjaan Quiz"}
+            placeholder={"Masukkan KKM"}
+            required={true}
+            onChange={(e) => setKkm(e.target.value)}
+            value={kkm}
+            id="kkm"
           />
         </div>
         <div className="w-full gap-1.5">

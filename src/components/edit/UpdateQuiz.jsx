@@ -29,6 +29,7 @@ const UpdateQuiz = ({ quizData,idUser }) => {
   const [deskripsi, setDeskripsi] = useState("");
   const [duration, setDuration] = useState(0);
   const [startQuiz, setStartQuiz] = useState("");
+  const [kkm,setKkm] = useState(80)
   const [endQuiz, setEndQuiz] = useState("");
   const [option, setOption] = useState({
     mapel: 0,
@@ -137,6 +138,7 @@ const UpdateQuiz = ({ quizData,idUser }) => {
         kelas: quizData.id_kelas || 0,
       });
       setToken(quizData.token || "");
+      setKkm(quizData.kkm || 80)
 
       // Mengatur jumlah soal dan opsi jawaban
       const jumlahSoal = quizData.questions.length;
@@ -193,6 +195,7 @@ const UpdateQuiz = ({ quizData,idUser }) => {
         endDate: endQuiz,
         token,
         soalData,
+        kkm,
         ...option
       };
      
@@ -434,7 +437,7 @@ const UpdateQuiz = ({ quizData,idUser }) => {
             required={true}
             id="date1"
             onChange={handleDateChange}
-            value={startQuiz ? new Date(startQuiz).toISOString().slice(0, 16) : ""}
+            value={startQuiz ? new Date(new Date(startQuiz).getTime() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 16) : ""}
           />
         </div>
         <div className="w-full gap-1.5">
@@ -444,7 +447,7 @@ const UpdateQuiz = ({ quizData,idUser }) => {
             required={true}
             id="date2"
             onChange={handleDateChange}
-            value={endQuiz ? new Date(endQuiz).toISOString().slice(0, 16) : ""}
+            value={endQuiz ? new Date(new Date(endQuiz).getTime() - new Date().getTimezoneOffset() * 60000).toISOString().slice(0, 16) : ""}
           />
         </div>
         <div className="w-full gap-1.5">
@@ -457,6 +460,18 @@ const UpdateQuiz = ({ quizData,idUser }) => {
             onChange={(e) => setDuration(e.target.value)}
             value={duration}
             id="lamaPengerjaan"
+          />
+        </div>
+        <div className="w-full gap-1.5">
+          <Label htmlFor="kkm">KKM</Label>
+          <Input
+            type={"number"}
+            label={"Lama Pengerjaan Quiz"}
+            placeholder={"Masukkan KKM"}
+            required={true}
+            onChange={(e) => setKkm(e.target.value)}
+            value={kkm}
+            id="kkm"
           />
         </div>
         <div className="w-full gap-1.5">

@@ -34,7 +34,7 @@ const DeleteQuiz = ({ isOpen, data, setIsOpen }) => {
     })
     return (
         <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
-
+{/* {console.log(data)} */}
             <AlertDialogContent>
                 <AlertDialogHeader>
                     <AlertDialogTitle>Apakah Anda Yakin Ingin Menghapus Kuis {data.title} ?</AlertDialogTitle>

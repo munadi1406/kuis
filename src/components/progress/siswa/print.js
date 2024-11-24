@@ -11,7 +11,7 @@ export const printTeacherReport = async (data) => {
       const formattedTime = localTime(now);
       
       // Extract necessary data from the provided object
-      console.log({data})
+      // console.log({data})
       const quizDataArray = data.data;
       const quizPerBulanTahun = data.kuisPerBulanTahun;
   

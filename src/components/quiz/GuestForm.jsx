@@ -78,6 +78,9 @@ const GuestForm = ({ id, nisn, token, data }) => {
               <div>
                 <span className="font-semibold">Jumlah Soal:</span> {data.questions.length}
               </div>
+              <div>
+                <span className="font-semibold">KKM:</span> {data.kkm}
+              </div>
             </div>
           </DialogDescription>
         </DialogHeader>

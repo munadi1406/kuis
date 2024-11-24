@@ -157,15 +157,15 @@ const KelasData = () => {
       return datas.data.data;
     },
   });
-  console.log('statKelas', statKelas.data)
+  // console.log('statKelas', statKelas.data)
   const [statKelasData, setStatKelasData] = useState({ labels: [], datas: [] })
   useEffect(() => {
-    console.log('data kkelas oke')
-    console.log(statKelas?.data?.length)
+    // console.log('data kkelas oke')
+    // console.log(statKelas?.data?.length)
     if (statKelas.data) {
-      console.log("oke")
+      // console.log("oke")
       const labels = statKelas?.data.data.map((item) => item.kelas); // Mengambil nama kelas
-      console.log({ labels });
+      // console.log({ labels });
 
       const datas = statKelas?.data.data.map((stat) => stat.totalSiswa); // Mengambil total siswa di setiap kelas
 

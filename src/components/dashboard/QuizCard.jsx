@@ -90,7 +90,7 @@ import {
             <ContextMenuItem>
               <a href={`/kuis/${data.id}`}>Detail</a>
             </ContextMenuItem>
-            <ContextMenuItem className="bg-red-500 text-white" onClick={() => handleClick({ id:data.id, title:data.id })}>Hapus</ContextMenuItem>
+            <ContextMenuItem className="bg-red-500 text-white" onClick={() => handleClick({ id:data.id, title:data.title })}>Hapus</ContextMenuItem>
           </ContextMenuContent>
         </ContextMenu>
       </>
