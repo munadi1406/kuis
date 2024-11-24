@@ -8,7 +8,8 @@ pdfMake.fonts = pdfMakeFonts;
 
 export const generatePdf = async (title, id) => {
   const { data } = await axios.get(`/api/score?id=${id}`)
-  console.log(data)
+
+  // console.log(data) 
 
   const now = new Date();
   const formattedTime = localTime(now);
@@ -50,14 +51,14 @@ export const generatePdf = async (title, id) => {
                 { text: 'Jawaban Salah', alignment: 'center', fillColor: '#ADD8E6', bold: true, margin: [0, 5] }, // Light blue
                 { text: 'Nilai', alignment: 'center', fillColor: '#ADD8E6', bold: true, margin: [0, 5] } // Light blue
               ],
-              ...data.data.map(({ nisn, namaLengkap, total, score }, i) => [
+              ...data.data.map(({ nisn, namaLengkap, total, score,hasRemedial }, i) => [
                 { text: i + 1, alignment: 'center', margin: [0, 3] },
                 { text: nisn, alignment: 'center', margin: [0, 3] },
                 { text: namaLengkap, alignment: 'left', margin: [0, 3] },
                 { text: total, alignment: 'center', margin: [0, 3] },
                 { text: score, alignment: 'center', margin: [0, 3] },
                 { text: total - score, alignment: 'center', margin: [0, 3] },
-                { text: score / total * 100, alignment: 'center', margin: [0, 3] },
+                { text: hasRemedial && (score / total * 100 ) >= data.quiz.kkm ? data.quiz.kkm : score / total * 100, alignment: 'center', margin: [0, 3] },
               ]),
             ],
           },

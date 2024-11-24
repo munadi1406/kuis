@@ -63,7 +63,7 @@ export const GET = async ({ params, url }) => {
       { status: 200 }
     );
   } catch (error) {
-    console.log(error)
+    // console.log(error)
     return new Response(
       JSON.stringify({
         message: "Internal Server error",
@@ -75,14 +75,14 @@ export const GET = async ({ params, url }) => {
 
 export const POST = async ({ params, request, url }) => {
     const formData = await request.formData()
-    console.log(formData)
+    // console.log(formData)
     const imei = formData.get('imei')
     const merk = formData.get('merk')
     const tahunPembuatan = formData.get('tanggal_pembuatan')
 
     const harga = formData.get('harga')
     const foto = formData.get('foto')
-    console.log(foto.name)
+    // console.log(foto.name)
 
   
     
@@ -100,14 +100,14 @@ export const POST = async ({ params, request, url }) => {
       .from("test")
       .getPublicUrl(`public/${foto.name}`);
       
-      console.log({urls})
+      // console.log({urls})
 
 
   const { data, error } = await supabase
     .from("hp")
     .insert({imei,merk,tanggal_pembuatan:tahunPembuatan,harga,foto:urls.publicUrl})
     .select();
-    console.log(error)
+    // console.log(error)
   if (error) {
     return new Response(
       JSON.stringify({

@@ -51,6 +51,7 @@ const Cards = ({ title, startDate, endDate, skor, id, desc }) => {
 
   return (
     <>
+  
       <DeleteQuiz isOpen={isDelete} data={currentData} setIsOpen={setIsDelete} />
       <ContextMenu>
         <ContextMenuTrigger>

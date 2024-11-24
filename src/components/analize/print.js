@@ -25,7 +25,7 @@ const fetchImageAsDataURL = async (imageUrl) => {
 export const printDifficulty = async (title, id) => {
     try {
         const { data } = await axios.get(`/api/analisis/difficulty?id=${id}`);
-        console.log(data)
+      
         const now = new Date();
         const formattedTime = localTime(now);
         // Process each question to handle images

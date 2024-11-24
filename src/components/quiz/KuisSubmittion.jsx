@@ -41,7 +41,7 @@ import ButtonLoader from "../ButtonLoader";
 
 
 
-const KuisSubmittion = ({ id, title }) => {
+const KuisSubmittion = ({ id, title,kkm }) => {
   const [quizData, setQuizData] = useState([])
 
   const { data, isLoading, error } = useQuery({
@@ -150,7 +150,18 @@ const KuisSubmittion = ({ id, title }) => {
     {
       accessorFn: row => (row.score / row.total) * 100,
       id: 'nilai',
-      cell: ({ row }) => (row.original.score / row.original.total * 100).toFixed(1),
+      cell: ({ row }) => {
+        const percentage = (row.original.score / row.original.total * 100).toFixed(1);
+        const isRemedial = row.original.hasRemedial && percentage >= kkm;
+        const backgroundColor = isRemedial || percentage >= kkm ? 'bg-green-500' : 'bg-red-500';
+      
+        return (
+          <div className={`${backgroundColor} p-2 rounded text-center text-white`}>
+            {isRemedial ? `${kkm} (Remedial)` : percentage}
+          </div>
+        );
+      },
+      
       header: ({ column }) => (
         <div
           variant="ghost"
@@ -181,9 +192,9 @@ const KuisSubmittion = ({ id, title }) => {
     {
       accessorKey: 'Aksi',
       cell: ({ row }) =>
-        row.getValue('status') ? <div className="flex flex-wrap gap-2">
+        row.getValue('status') || row.original.hasRemedial ? <div className="flex flex-wrap gap-2">
           <Button onClick={() => handleIsDetail(row.original)}>Detail</Button>
-          <Button className={"bg-blue-600"} disabled={resetAnswer.isPending} onClick={() => resetAnswer.mutate({ nisn: row.original.nisn, idQuiz: id })} >Reset</Button>
+            <Button className={"bg-blue-600"} disabled={resetAnswer.isPending} onClick={() => resetAnswer.mutate({ nisn: row.original.nisn, idQuiz: id })} >Remedial</Button>
         </div> : "Detail Tidak Tersedia"
 
       ,
@@ -266,7 +277,8 @@ const KuisSubmittion = ({ id, title }) => {
                 </tr>
                 <tr>
                   <td className="border border-gray-300 p-2 text-gray-700">Nilai</td>
-                  <td className="border border-gray-300 p-2 text-gray-700">{(detailData.score / detailData.total * 100).toFixed(1)}</td>
+                  <td className="border border-gray-300 p-2 text-gray-700">{detailData.hasRemedial && (detailData.score / detailData.total * 100).toFixed(1) >=kkm ? `${kkm} (Remedial)` : (detailData.score / detailData.total * 100).toFixed(1)}</td>
+
                 </tr>
                 <tr>
                   <td className="border border-gray-300 p-2 text-gray-700">Di Kerjakan Pada</td>
@@ -296,7 +308,7 @@ const KuisSubmittion = ({ id, title }) => {
                 <tr>
                   <td className="border border-gray-300 p-2 text-gray-700">Lihat Jawaban</td>
                   <td className="border border-gray-300 p-2 text-gray-700">
-                    <a href={`/result/${id}/${detailAnswer?.data?.nisn}`} className={buttonVariants()} target="_blank">Jawaban</a>
+                    <a href={`/result/${id}/${detailData.nisn}`} className={buttonVariants()} target="_blank">Jawaban</a>
                   </td>
                 </tr>
               </tbody>

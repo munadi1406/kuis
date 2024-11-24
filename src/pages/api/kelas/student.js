@@ -40,7 +40,7 @@ export const GET = async ({ params, url }) => {
       );
     }
   } catch (error) {
-    console.log(error)
+    // console.log(error)
     return new Response(
       JSON.stringify({
         message: "Internal server error",

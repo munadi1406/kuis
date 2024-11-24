@@ -134,7 +134,7 @@ export const GET = async ({ params, url, cookies }) => {
                 { status: 401 }
             );
         }
-        console.log({ status })
+        // console.log({ status })
         if (status) {
             // console.log("pengecekan waktu runn")
             const quizDurationMinutes = quiz.waktu; // Durasi waktu dalam menit
