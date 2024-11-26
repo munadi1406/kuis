@@ -229,7 +229,7 @@ const KelasData = () => {
       }
     },
     title: {
-      text: `Grafik Siswa`,
+      text: `Grafik Siswa Per Kelas`,
       align: 'center',
       floating: true
     },

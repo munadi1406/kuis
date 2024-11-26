@@ -171,6 +171,9 @@ const Form = ({ mutate, isLoading, isEdit, currentData, updateGuru }) => {
     });
 
 
+    useEffect(()=>{
+        console.log({formData})
+    },[formData])
 
     // Handle perubahan nilai input
     const handleChange = (e) => {

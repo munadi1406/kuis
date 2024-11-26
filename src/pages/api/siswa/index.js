@@ -134,19 +134,28 @@ export const GET = async ({ params, url }) => {
 };
 
 const formatPhoneNumber = (phone) => {
-  // Remove any spaces and check if it starts with +62, if not, add +62
-  let formattedPhone = phone.replace(/\s+/g, ''); // Remove spaces
-  if (!formattedPhone.startsWith("+62")) {
-    if (formattedPhone.startsWith("0")) {
-      // Replace leading 0 with +62
-      formattedPhone = "+62" + formattedPhone.substring(1);
-    } else {
-      // Add +62 if no leading 0
-      formattedPhone = "+62" + formattedPhone;
-    }
+  console.log(phone)
+  // Check if phone number is empty or undefined
+  if (!Number(phone)) return phone; // If there's no phone number, just return
+  
+  // Remove any spaces
+  let formattedPhone = phone.replace(/\s+/g, ''); 
+
+  // If it starts with +62 or 62, leave it as is
+  if (formattedPhone.startsWith("+62")) {
+    formattedPhone = formattedPhone.substring(1); // Remove the plus sign
+  } else if (formattedPhone.startsWith("0")) {
+    // If it starts with 0, replace it with 62
+    formattedPhone = "62" + formattedPhone.substring(1);
+  } else if (!formattedPhone.startsWith("62")) {
+    // If it doesn't start with 62, prepend 62
+    formattedPhone = "62" + formattedPhone;
   }
+  
+  console.log({ formattedPhone });
   return formattedPhone;
 };
+
 export const POST = async ({ params, request, url }) => {
   const { nisn, idUser, namaLengkap, alamat, jenisKelamin, tanggalLahir, idKelas, noTelepon, noTeleponOrtu } = await request.json();
 
