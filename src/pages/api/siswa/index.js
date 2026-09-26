@@ -7,7 +7,7 @@ export const GET = async ({ params, url }) => {
   const tahunAjaran = url.searchParams.get("ta");
   const print = url.searchParams.get("p");
   const jk = url.searchParams.get("jk");
-  const perPage = 10;
+  const perPage = 10; 
 
   let query = supabase
     .from("kelas_history")
